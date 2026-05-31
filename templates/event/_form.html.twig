@@ -1,4 +1,38 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
-{{ form_end(form) }}
+<div class="d-flex flex-row justify-content-center align-items-center gap-1">
+    {{ form_start(form) }}
+    <div class="mb-1">
+        {{ form_label(form.title) }}
+        {{ form_widget(form.title) }}
+        {{ form_errors(form.title) }}
+    </div>
+    <div class="mb-1">
+        {{ form_label(form.description) }}
+        {{ form_widget(form.description) }}
+        {{ form_errors(form.description) }}
+    </div>
+    <div class="mb-1">
+        {{ form_label(form.location) }}
+        {{ form_widget(form.location) }}
+        {{ form_errors(form.location) }}
+    </div>
+    <div class="mb-1">
+        {{ form_label(form.startDate) }}
+        {{ form_widget(form.startDate) }}
+        {{ form_errors(form.startDate) }}
+    </div>
+    <div class="mb-2">
+        {{ form_label(form.endDate) }}
+        {{ form_widget(form.endDate) }}
+        {{ form_errors(form.endDate) }}
+    </div>
+    <div class="d-flex flex-row justify-content-center align-items-center gap-2">
+        <a href="{{ path('app_event_index') }}" class="btn btn-primary"> << Back</a>
+        <button class="btn btn-success">{{ button_label|default('Save') }}</button>
+        {% if show_delete is defined and show_delete %}
+            <button type="submit" class="btn btn-danger"
+                    form="delete-form-{{ event.id }}">Delete</button>
+            {{ include('event/_delete_form.html.twig') }}
+        {% endif %}
+    </div>
+    {{ form_end(form) }}
+</div>

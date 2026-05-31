@@ -27,8 +27,8 @@
                 <td>{{ event.endDate ? event.endDate|date('Y-m-d H:i') : '-' }}</td>
                 <td>{{ event.location }}</td>
                 <td>
-                    <a href="{{ path('app_event_show', {'id': event.id}) }}">show</a>
-                    <a href="{{ path('app_event_edit', {'id': event.id}) }}">edit</a>
+                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-primary">Show</a>
+                    <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn btn-warning">Edit</a>
                 </td>
             </tr>
         {% else %}
@@ -39,5 +39,7 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_event_new') }}" class="btn btn-primary">Create new</a>
+    <div class="d-flex flex-column justify-content-center align-items-center">
+        <a href="{{ path('app_event_new') }}" class="btn btn-primary">Create new</a>
+    </div>
 {% endblock %}
