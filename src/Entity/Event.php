@@ -30,7 +30,7 @@ class Event
     private ?\DateTime $endDate = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
     public function getId(): ?int
@@ -94,6 +94,18 @@ class Event
     public function setEndDate(?\DateTime $endDate): static
     {
         $this->endDate = $endDate;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }
