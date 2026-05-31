@@ -13,10 +13,43 @@
     {% endblock %}
 </head>
 <body>
-<header class="py-3 text-center border-bottom">
-    <h1 class="mb-0">
-        Local Events Calendar
-    </h1>
+<header class="py-3 border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            {# LEFT spacer #}
+            <div class="col-3"></div>
+            {# CENTER TITLE #}
+            <div class="col-6 text-center">
+                <h1 class="mb-0">
+                    Local Events Calendar
+                </h1>
+            </div>
+            {# RIGHT USER INFO #}
+            <div class="col-3 text-end small">
+                {% if app.user %}
+                    <div>
+                        <span class="text-muted">User:</span>
+                        <strong>{{ app.user.userIdentifier }}</strong>
+                    </div>
+                    {% set roles = app.user.roles %}
+                        <div>
+                            <span class="text-muted">Role:</span>
+                            {% if 'ROLE_ADMIN' in roles %}
+                                <strong>admin</strong>
+                            {% elseif 'ROLE_USER' in roles %}
+                                <strong>user</strong>
+                            {% else %}
+                                <span class="text-muted">unknown</span>
+                            {% endif %}
+                        </div>
+                {% else %}
+                    <div class="text-muted">
+                        Not logged in
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </header>
 <main role="main" class="container-fluid">
     {% block body %}{% endblock %}
