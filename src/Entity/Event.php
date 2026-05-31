@@ -29,6 +29,10 @@ class Event
     #[ORM\Column(nullable: true)]
     private ?\DateTime $endDate = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $owner = null;
+
     public function getId(): ?int
     {
         return $this->id;
