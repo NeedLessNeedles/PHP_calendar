@@ -3,37 +3,29 @@
 {% block title %}Log in!{% endblock %}
 
 {% block body %}
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+    <div class="container d-flex justify-content-center align-items-center mt-4">
+        <form method="post" class="auth-card d-flex flex-column gap-2">
+            <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+            <label for="inputEmail">Email</label>
+            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+            <label for="inputPassword">Password</label>
+            <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+            <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
 
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
-        </div>
-    {% endif %}
-    <div class="container d-flex flex-column justify-content-center align-items-center
-         min-hv-100 border border-light rounded p-3 mt-4"
-         style="max-width: 450px;"
-    >
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-        <label for="inputEmail">Email</label>
-        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-        <label for="inputPassword">Password</label>
-        <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+            <div class="checkbox mb-3">
+                <label style="cursor: pointer;">
+                    <input type="checkbox" name="_remember_me" style="transform: scale(1.3)"> Remember me
+                </label>
+            </div>
 
-        <div class="checkbox mb-3">
-            <label>
-                <input type="checkbox" name="_remember_me"> Remember me
-            </label>
-        </div>
-
-        <div class="d-flex flex-row gap-2">
-            <a href="{{ path('app_home') }}" class="btn btn-primary"> << Back</a>
-            <button class="btn btn-success" type="submit">Login</button>
-        </div>
+            <div class="d-flex justify-content-center gap-2">
+                <a href="{{ path('app_home') }}" class="btn btn-primary"> << Back</a>
+                <button class="btn btn-success" type="submit">Login</button>
+            </div>
+        </form>
     </div>
-</form>
+
 {% endblock %}

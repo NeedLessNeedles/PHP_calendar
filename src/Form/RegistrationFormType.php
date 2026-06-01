@@ -25,6 +25,12 @@ class RegistrationFormType extends AbstractType
                         message: 'You should agree to our terms.',
                     ),
                 ],
+                'attr' => [
+                    'style' => 'transform: scale(1.3); cursor: pointer;',
+                ],
+                'label_attr' => [
+                    'style' => 'cursor: pointer;',
+                ],
             ])
             ->add('plainPassword', PasswordType::class, [
                 // instead of being set onto the object directly,
