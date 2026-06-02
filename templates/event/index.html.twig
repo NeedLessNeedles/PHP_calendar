@@ -14,6 +14,7 @@
                 <th>Start Date</th>
                 <th>End Date</th>
                 <th>Location</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -26,6 +27,7 @@
                 <td>{{ event.startDate ? event.startDate|date('Y-m-d H:i') : '' }}</td>
                 <td>{{ event.endDate ? event.endDate|date('Y-m-d H:i') : '-' }}</td>
                 <td>{{ event.location }}</td>
+                <td>{{ event.status }}</td>
                 <td>
                     <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-primary btn-sm">Show</a>
                     <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn btn-warning btn-sm">Edit</a>
@@ -40,12 +42,12 @@
     </table>
 
     <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
-        <a href="{{ path('app_event_new') }}" class="btn btn-primary">Create new</a>
+        <a href="{{ path('app_event_new') }}" class="btn btn-success">Create new</a>
         <a href="{{ path('app_event_index') }}" class="btn btn-primary">List view</a>
         <a href="{{ path('app_event_calendar') }}" class="btn btn-info">Calendar view</a>
         <a href="{{ path('app_profile') }}" class="btn btn-secondary">Settings</a>
-        {% if 'ROLE_ADMIN' in app.user.roles %}
-            <a href="{{ path('app_admin_users') }}" class="btn btn-primary">Admin panel</a>
+        {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
+            <a href="{{ path('app_admin') }}" class="btn btn-primary">Admin panel</a>
         {% endif %}
     </div>
 {% endblock %}

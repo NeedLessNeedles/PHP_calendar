@@ -3,11 +3,14 @@
 {% block title %}Admin panel{% endblock %}
 
 {% block body %}
-<div class="container d-flex justify-content-center align-items-center mt-2">
+<div class="container d-flex justify-content-center align-items-center mt-3">
     <div class="auth-card d-flex flex-column gap-1">
         <div class="h3 mb-2 font-weight-normal">Admin panel</div>
+
         <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
-            <a href="{{ path('app_home') }}" class="btn btn-primary"> << Back</a>
+            <a href="{{ path('app_home') }}" class="btn btn-primary"><< Back</a>
+            <a href="{{ path('app_admin_users') }}" class="btn btn-primary">Manage users</a>
+            <a href="{{ path('app_admin_requests') }}" class="btn btn-primary">Manage requests</a>
         </div>
     </div>
 </div>

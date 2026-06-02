@@ -30,8 +30,11 @@ class Event
     private ?\DateTime $endDate = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $owner = null;
+
+    #[ORM\Column(length: 30)]
+    private ?string $status = null;
 
     public function getId(): ?int
     {
@@ -106,6 +109,18 @@ class Event
     public function setOwner(?User $owner): static
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

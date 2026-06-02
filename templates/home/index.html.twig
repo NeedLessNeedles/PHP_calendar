@@ -9,22 +9,17 @@
                 Welcome to the local events calendar application.
             </p>
 
-            {% if app.user %}
-                <div class="mt-2">
-                    <a href="/event" class="btn btn-primary">
-                        Browse Events
-                    </a>
-                </div>
-            {% else %}
-                <div class="d-flex justify-content-center gap-2">
-                    <a href="{{ path('app_login') }}" class="btn btn-success">
-                        Login
-                    </a>
-                    <a href="{{ path('app_register') }}" class="btn btn-outline-primary">
-                        Register
-                    </a>
-                </div>
-            {% endif %}
+            <div class="d-flex justify-content-center gap-2">
+                <a href="/event" class="btn btn-primary">
+                    Browse Events
+                </a>
+                <a href="{{ path('app_login') }}" class="btn btn-success">
+                    Login
+                </a>
+                <a href="{{ path('app_register') }}" class="btn btn-outline-primary">
+                    Register
+                </a>
+            </div>
         </div>
     </div>
 {% endblock %}

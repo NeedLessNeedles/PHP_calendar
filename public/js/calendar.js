@@ -18,6 +18,19 @@ document.addEventListener('DOMContentLoaded', function () {
             if (startInput) {
                 startInput.value = info.dateStr + "T12:00";
             }
+        },
+        eventDidMount: function(info) {
+            const status = info.event.extendedProps.status;
+
+            if (status === 'approved') {
+                info.el.style.backgroundColor = '#0d6efd';
+            }
+
+            if (status === 'pending') {
+                info.el.style.backgroundColor = '#ffc107';
+                info.el.style.color = '#000';
+                info.el.style.opacity = '0.9';
+            }
         }
     });
     calendar.render();

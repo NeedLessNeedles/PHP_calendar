@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Event;
 use App\Form\ProfileEmailType;
 use App\Form\AdminChangePasswordType;
 use App\Repository\UserRepository;
@@ -12,12 +13,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\EventRepository;
 
+/**
+ * Class AdminController.
+ */
 #[IsGranted('ROLE_ADMIN')]
 #[Route('/admin')]
 class AdminController extends AbstractController
 {
-    #[Route(name: 'app_admin', methods: ['GET'])]
+    /**
+     * Index action.
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        name: 'app_admin',
+        methods: ['GET']
+    )]
     public function index(): Response
     {
 
@@ -26,7 +39,18 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/users', name: 'app_admin_users', methods: ['GET'])]
+    /**
+     * Show action.
+     *
+     * @param UserRepository $userRepository User repository
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/users',
+        name: 'app_admin_users',
+        methods: ['GET']
+    )]
     public function show(UserRepository $userRepository): Response
     {
 
@@ -35,7 +59,20 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/users/{id}/edit', name: 'app_admin_users_edit', methods: ['GET', 'POST'])]
+    /**
+     * Edit action.
+     *
+     * @param User $user user
+     * @param Request $request request
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/users/{id}/edit',
+        name: 'app_admin_users_edit',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['GET', 'POST']
+    )]
     public function edit(User $user, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
         // FORM: email
@@ -67,5 +104,37 @@ class AdminController extends AbstractController
             'emailForm' => $emailForm,
             'passwordForm' => $passwordForm,
         ]);
+    }
+
+    #[Route('/requests', name: 'app_admin_requests', methods: ['GET'])]
+    public function requests(EventRepository $eventRepository): Response
+    {
+        $events = $eventRepository->findBy([
+            'status' => 'pending'
+        ]);
+
+        return $this->render('admin/requests.html.twig', [
+            'events' => $events,
+        ]);
+    }
+
+    #[Route('/requests/{id}/approve', name: 'app_admin_requests_approve', methods: ['POST'])]
+    public function approve(Event $event, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $event->setStatus('approved');
+        $em->flush();
+
+        return $this->redirectToRoute('app_admin_requests');
+    }
+
+    #[Route('/requests/{id}/reject', name: 'app_admin_requests_reject', methods: ['POST'])]
+    public function reject(Event $event, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $em->remove($event);
+        $em->flush();
+
+        return $this->redirectToRoute('app_admin_requests');
     }
 }

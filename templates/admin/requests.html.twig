@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Requests{% endblock %}
+
+{% block body %}
+    <div class="container d-flex justify-content-center align-items-center mt-3">
+        <div class="auth-card d-flex flex-column gap-1" style="max-width: 800px;">
+            <div class="h3 mb-2 font-weight-normal">Admin panel</div>
+            <div class="container mt-3">
+                <h2>Pending events</h2>
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Start</th>
+                        <th>Owner</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for event in events %}
+                        <tr>
+                            <td>{{ event.id }}</td>
+                            <td>{{ event.title }}</td>
+                            <td>{{ event.startDate|date('Y-m-d H:i') }}</td>
+                            <td>{{ event.owner ? event.owner.email : 'guest' }}</td>
+                            <td class="d-flex gap-2">
+
+                                <form method="post" action="{{ path('app_admin_requests_approve', {'id': event.id}) }}">
+                                    <button class="btn btn-success btn-sm">Approve</button>
+                                </form>
+
+                                <form method="post" action="{{ path('app_admin_requests_reject', {'id': event.id}) }}">
+                                    <button class="btn btn-danger btn-sm">Reject</button>
+                                </form>
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
+                <a href="{{ path('app_admin') }}" class="btn btn-primary"> << Back</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

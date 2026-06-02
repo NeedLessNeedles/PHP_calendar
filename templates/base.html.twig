@@ -44,13 +44,14 @@
                             {% endif %}
                         </div>
                     </div>
-                    <a href="{{ path('app_logout') }}" class="btn btn-danger">
-                        Logout
-                    </a>
+                    <a href="{{ path('app_logout') }}" class="btn btn-danger">Logout</a>
                 {% else %}
-                    <div class="text-muted">
-                        Not logged in
+                    <div class="d-flex flex-column text-end">
+                        <div class="text-muted">
+                            Not logged in
+                        </div>
                     </div>
+                    <a href="{{ path('app_login') }}" class="btn btn-success">Login</a>
                 {% endif %}
             </div>
         </div>

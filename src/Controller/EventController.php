@@ -20,13 +20,14 @@ class EventController extends AbstractController
     #[Route(name: 'app_event_index', methods: ['GET'])]
     public function index(EventRepository $eventRepository): Response
     {
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $events = $eventRepository->findAll();
-        } else {
-            $events = $eventRepository->findBy([
-                'owner' => $this->getUser(),
-            ]);
-        }
+        $events = $eventRepository->findAll();
+//        if ($this->isGranted('ROLE_ADMIN')) {
+//            $events = $eventRepository->findAll();
+//        } else {
+//            $events = $eventRepository->findBy([
+//                'owner' => $this->getUser(),
+//            ]);
+//        }
 
         return $this->render('event/index.html.twig', [
             'events' => $events,
@@ -34,7 +35,6 @@ class EventController extends AbstractController
     }
 
     #[Route('/new', name: 'app_event_new', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_USER')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $event = new Event();
@@ -43,11 +43,17 @@ class EventController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
-            if (!$user) {
-                throw $this->createAccessDeniedException();
+
+            if ($user && in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+                $event->setStatus('approved');
+            } elseif ($user) {
+                $event->setStatus('approved');
+            } else {
+                $event->setStatus('pending');
             }
 
-            $event->setOwner($this->getUser());
+            $event->setOwner($user);
+
             $entityManager->persist($event);
             $entityManager->flush();
 
@@ -114,39 +120,41 @@ class EventController extends AbstractController
     )]
     public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
-        $this->denyAccessUnlessGranted(
-            EventVoter::DELETE,
-            $event
-        );
+        $this->denyAccessUnlessGranted(EventVoter::DELETE, $event);
 
-        if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->request->get('_token'))) {
             $entityManager->remove($event);
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_event_calendar');
     }
 
     #[Route('/json', name: 'app_event_json', methods: ['GET'])]
     public function eventsJson(EventRepository $eventRepository): JsonResponse
     {
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $events = $eventRepository->findAll();
-        } else {
-            $events = $eventRepository->findBy([
-                'owner' => $this->getUser(),
-            ]);
-        }
+//        if ($this->isGranted('ROLE_ADMIN')) {
+//            $events = $eventRepository->findAll();
+//        } elseif ($this->getUser()) {
+//            $events = $eventRepository->findBy([
+//                'status' => 'approved',
+//                'owner' => $this->getUser(),
+//            ]);
+//        } else {
+//            $events = $eventRepository->findBy([
+//                'status' => 'pending',
+//            ]);
+//        }
+        $events = $eventRepository->findAll();
 
         $data = [];
-
         foreach ($events as $event) {
             $data[] = [
                 'id' => $event->getId(),
                 'title' => $event->getTitle(),
                 'start' => $event->getStartDate()->format('Y-m-d\TH:i:s'),
                 'end' => $event->getEndDate()?->format('Y-m-d\TH:i:s'),
-//                'isMine' => $this->getUser() === $event->getOwner(),
+                'status' => $event->getStatus(),
             ];
         }
 
