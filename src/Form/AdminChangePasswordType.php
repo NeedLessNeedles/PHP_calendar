@@ -9,12 +9,11 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class ChangePasswordType extends AbstractType
+class AdminChangePasswordType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('currentPassword', PasswordType::class)
             ->add('newPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'constraints' => [

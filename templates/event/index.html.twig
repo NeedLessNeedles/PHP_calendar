@@ -41,6 +41,7 @@
 
     <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
         <a href="{{ path('app_event_new') }}" class="btn btn-primary">Create new</a>
+        <a href="{{ path('app_profile') }}" class="btn btn-primary">Settings</a>
         {% if 'ROLE_ADMIN' in app.user.roles %}
             <a href="{{ path('app_admin_users') }}" class="btn btn-primary">Admin panel</a>
         {% endif %}

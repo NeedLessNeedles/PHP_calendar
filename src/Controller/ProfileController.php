@@ -17,11 +17,7 @@ use App\Form\ChangePasswordType;
 class ProfileController extends AbstractController
 {
     #[Route(name: 'app_profile', methods: ['GET', 'POST'])]
-    public function index(
-        Request $request,
-        EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
-    ): Response
+    public function index(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = $this->getUser();
 

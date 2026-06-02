@@ -5,7 +5,7 @@
 {% block body %}
     <div class="container d-flex justify-content-center align-items-center mt-3">
         <div class="auth-card d-flex flex-column gap-1" style="max-width: 850px;">
-            <div class="h3 mb-2 font-weight-normal">Admin panel</div>
+            <div class="h3 mb-2 font-weight-normal">Users</div>
 
             <table class="table">
                 <thead>
@@ -29,10 +29,7 @@
                             {% endif %}
                         </td>
                         <td>
-{#                            <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-primary btn-sm">Show</a>#}
-{#                            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn btn-warning btn-sm">Edit</a>#}
-                            <button class="btn btn-primary btn-sm">Show</button>
-                            <button class="btn btn-warning btn-sm">Edit</button>
+                            <a href="{{ path('app_admin_users_edit', {'id': user.id}) }}" class="btn btn-warning btn-sm">Edit</a>
                         </td>
                     </tr>
                 {% else %}
