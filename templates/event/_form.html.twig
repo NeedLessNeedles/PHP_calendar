@@ -1,16 +1,3 @@
-{#<div class="d-flex justify-content-center align-items-center gap-1">#}
-
-{#    <div class="d-flex flex-row justify-content-center align-items-center gap-2">#}
-{#        <a href="{{ path('app_event_index') }}" class="btn btn-primary"> << Back</a>#}
-{#        <button class="btn btn-success">{{ button_label|default('Save') }}</button>#}
-{#        {% if show_delete is defined and show_delete %}#}
-{#            <button type="submit" class="btn btn-danger"#}
-{#                    form="delete-form-{{ event.id }}">Delete</button>#}
-{#            {{ include('event/_delete_form.html.twig') }}#}
-{#        {% endif %}#}
-{#    </div>#}
-{#</div>#}
-
 {{ form_start(form, {
     action: path('app_event_new'),
     attr: {

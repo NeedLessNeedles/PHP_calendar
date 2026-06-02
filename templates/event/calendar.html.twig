@@ -23,7 +23,6 @@
         </div>
 
         <div class="d-flex justify-content-center gap-2 mt-2 mb-1">
-{#            <a href="{{ path('app_event_new') }}" class="btn btn-primary">Create new</a>#}
             <a href="{{ path('app_event_index') }}" class="btn btn-primary">List view</a>
             <a href="{{ path('app_event_calendar') }}" class="btn btn-info">Calendar view</a>
             <a href="{{ path('app_profile') }}" class="btn btn btn-secondary">Settings</a>
@@ -37,30 +36,5 @@
 {% block javascripts %}
     {{ parent() }}
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const calendarEl = document.getElementById('calendar');
-
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                height: '77vh',
-                events: '/event/json',
-
-                eventClick: function(info) {
-                    window.location.href = '/event/' + info.event.id;
-                },
-                dateClick: function(info) {
-                    const modalElement = document.getElementById('eventModal');
-                    const modal = new bootstrap.Modal(modalElement);
-                    modal.show();
-
-                    const startInput = document.getElementById('event_startDate');
-                    if (startInput) {
-                        startInput.value = info.dateStr + "T12:00";
-                    }
-                }
-            });
-            calendar.render();
-        });
-    </script>
+    <script src="{{ asset('js/calendar.js') }}"></script>
 {% endblock %}

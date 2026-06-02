@@ -60,7 +60,12 @@ class EventController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}<\d+>', name: 'app_event_show', methods: ['GET'])]
+    #[Route(
+        '/{id}',
+        name: 'app_event_show',
+        requirements: ['id' => '\d+'],
+        methods: ['GET']
+    )]
     public function show(Event $event): Response
     {
         $this->denyAccessUnlessGranted(
@@ -73,7 +78,12 @@ class EventController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}<\d+>/edit', name: 'app_event_edit', methods: ['GET', 'POST'])]
+    #[Route(
+        '/{id}/edit',
+        name: 'app_event_edit',
+        requirements: ['id' => '\d+'],
+        methods: ['GET', 'POST']
+    )]
     public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted(
@@ -96,7 +106,12 @@ class EventController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}<\d+>', name: 'app_event_delete', methods: ['POST'])]
+    #[Route(
+        '/{id}',
+        name: 'app_event_delete',
+        requirements: ['id' => '\d+'],
+        methods: ['POST']
+    )]
     public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted(

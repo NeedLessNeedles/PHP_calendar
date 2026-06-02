@@ -42,7 +42,7 @@ class AdminController extends AbstractController
         $emailForm = $this->createForm(ProfileEmailType::class, $user);
         $emailForm->handleRequest($request);
 
-        // FORM: password (NIE mapujemy na User entity)
+        // FORM: password
         $passwordForm = $this->createForm(AdminChangePasswordType::class);
         $passwordForm->handleRequest($request);
 
