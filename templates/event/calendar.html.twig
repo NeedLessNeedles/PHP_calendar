@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Calendar{% endblock %}
+
+{% block body %}
+    <div class="container mt-2">
+        <div id="calendar" class="calendar-container"></div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 'auto',
+
+                events: '/event/json',
+
+                eventClick: function(info) {
+                    window.location.href = '/event/' + info.event.id;
+                }
+            });
+
+            calendar.render();
+        });
+    </script>
+{% endblock %}

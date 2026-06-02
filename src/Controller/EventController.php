@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Security\Voter\EventVoter;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/event')]
 class EventController extends AbstractController
@@ -59,7 +60,7 @@ class EventController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_event_show', methods: ['GET'])]
+    #[Route('/{id}<\d+>', name: 'app_event_show', methods: ['GET'])]
     public function show(Event $event): Response
     {
         $this->denyAccessUnlessGranted(
@@ -72,7 +73,7 @@ class EventController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_event_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}<\d+>/edit', name: 'app_event_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted(
@@ -95,7 +96,7 @@ class EventController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_event_delete', methods: ['POST'])]
+    #[Route('/{id}<\d+>', name: 'app_event_delete', methods: ['POST'])]
     public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted(
@@ -109,5 +110,36 @@ class EventController extends AbstractController
         }
 
         return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/json', name: 'app_event_json', methods: ['GET'])]
+    public function eventsJson(EventRepository $eventRepository): JsonResponse
+    {
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $events = $eventRepository->findAll();
+        } else {
+            $events = $eventRepository->findBy([
+                'owner' => $this->getUser(),
+            ]);
+        }
+
+        $data = [];
+
+        foreach ($events as $event) {
+            $data[] = [
+                'id' => $event->getId(),
+                'title' => $event->getTitle(),
+                'start' => $event->getStartDate()->format('Y-m-d\TH:i:s'),
+                'end' => $event->getEndDate()?->format('Y-m-d\TH:i:s'),
+            ];
+        }
+
+        return $this->json($data);
+    }
+
+    #[Route('/calendar', name: 'app_event_calendar', methods: ['GET'])]
+    public function calendar(): Response
+    {
+        return $this->render('event/calendar.html.twig');
     }
 }
