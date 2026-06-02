@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin panel{% endblock %}
+
+{% block body %}
+    <div class="container d-flex justify-content-center align-items-center mt-3">
+        <div class="auth-card d-flex flex-column gap-1" style="max-width: 850px;">
+            <div class="h3 mb-2 font-weight-normal">Admin panel</div>
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if 'ROLE_ADMIN' in user.roles %}
+                                admin
+                            {% else %}
+                                user
+                            {% endif %}
+                        </td>
+                        <td>
+{#                            <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-primary btn-sm">Show</a>#}
+{#                            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn btn-warning btn-sm">Edit</a>#}
+                            <button class="btn btn-primary btn-sm">Show</button>
+                            <button class="btn btn-warning btn-sm">Edit</button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6">No users found</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
+                <a href="{{ path('app_home') }}" class="btn btn-primary"> << Back</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
