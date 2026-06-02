@@ -3,10 +3,14 @@
 {% block title %}New Event{% endblock %}
 
 {% block body %}
-    <h1 class="d-flex flex-row justify-content-center align-items-center">Create new Event</h1>
-    <div class="border border-light rounded p-2 w-50 mx-auto">
-        {{ include('event/_form.html.twig', {
-            show_delete: false
-        }) }}
+<div class="container d-flex justify-content-center align-items-center mt-2" style="max-width: 500px;">
+    <div class="auth-card d-flex flex-column gap-2">
+        <h1 class="h3 mb-1 font-weight-normal">Create new event</h1>
+        <div>
+            {{ include('event/_form.html.twig', {
+                show_delete: false
+            }) }}
+        </div>
     </div>
+</div>
 {% endblock %}

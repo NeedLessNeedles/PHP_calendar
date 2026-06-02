@@ -3,9 +3,13 @@
 {% block title %}Edit Event{% endblock %}
 
 {% block body %}
-    <h1>Edit Event</h1>
-
-    {{ include('event/_form.html.twig', {'button_label': 'Update', show_delete: true }) }}
-
+<div class="container d-flex justify-content-center align-items-center mt-2" style="max-width: 500px;">
+    <div class="auth-card d-flex flex-column gap-2">
+        <h1 class="h3 mb-1 font-weight-normal">Edit event</h1>
+        <div>
+            {{ include('event/_form.html.twig', {'button_label': 'Update', show_delete: true }) }}
+        </div>
+    </div>
     {{ include('event/_delete_form.html.twig') }}
+</div>
 {% endblock %}
