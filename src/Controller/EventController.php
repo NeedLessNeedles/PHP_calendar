@@ -131,6 +131,7 @@ class EventController extends AbstractController
                 'title' => $event->getTitle(),
                 'start' => $event->getStartDate()->format('Y-m-d\TH:i:s'),
                 'end' => $event->getEndDate()?->format('Y-m-d\TH:i:s'),
+//                'isMine' => $this->getUser() === $event->getOwner(),
             ];
         }
 

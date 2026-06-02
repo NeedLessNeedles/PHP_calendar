@@ -5,6 +5,7 @@
 {% block body %}
     <div class="container mt-2">
         <div id="calendar" class="calendar-container"></div>
+{#        {{ include('event/new.html.twig') }}#}
     </div>
 {% endblock %}
 
@@ -17,8 +18,7 @@
 
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                height: 'auto',
-
+                height: '82vh',
                 events: '/event/json',
 
                 eventClick: function(info) {

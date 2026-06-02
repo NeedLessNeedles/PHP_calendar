@@ -24,3 +24,14 @@ a {
     border-radius: 12px;
     background: #1e1e1e;
 }
+
+.calendar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    color: green !important;
+}
+.fc-event {
+    font-size: 12px;
+    padding: 2px 4px;
+    cursor: pointer;
+}
