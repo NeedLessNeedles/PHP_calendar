@@ -1,11 +1,18 @@
 <?php
 
+/**
+ * Event entity.
+ */
+
 namespace App\Entity;
 
 use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Class Event.
+ */
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
 {

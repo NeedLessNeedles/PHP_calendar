@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Home controller.
  */
@@ -12,6 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 /**
  * Class HomeController.
  */
+#[Route('/home')]
 class HomeController extends AbstractController
 {
     /**
@@ -19,7 +21,10 @@ class HomeController extends AbstractController
      *
      * @return Response HTTP response
      */
-    #[Route('/', name: 'app_home')]
+    #[Route(
+        name: 'app_home',
+        methods: ['GET']
+    )]
     public function index(): Response
     {
         if ($this->getUser()) {

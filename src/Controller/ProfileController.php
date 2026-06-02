@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Profile controller.
+ */
+
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,11 +16,25 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Form\ProfileEmailType;
 use App\Form\ChangePasswordType;
 
-//#[IsGranted('ROLE_USER, ROLE_ADMIN')]
+/**
+ * Class ProfileController.
+ */
 #[Route('/profile')]
 class ProfileController extends AbstractController
 {
-    #[Route(name: 'app_profile', methods: ['GET', 'POST'])]
+    /**
+     * Index action.
+     *
+     * @param Request                     $request        request
+     * @param EntityManagerInterface      $entityManager  entityManager
+     * @param UserPasswordHasherInterface $passwordHasher passwordHasher
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        name: 'app_profile',
+        methods: ['GET', 'POST']
+    )]
     public function index(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = $this->getUser();
@@ -40,11 +58,20 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/index.html.twig', [
             'emailForm' => $emailForm,
-            'passwordForm' => $passwordForm
+            'passwordForm' => $passwordForm,
         ]);
     }
 
-    #[Route('/edit', name: 'app_profile_edit', methods: ['GET', 'POST'])]
+    /**
+     * Edit action.
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/edit',
+        name: 'app_profile_edit',
+        methods: ['GET', 'POST']
+    )]
     public function edit(): Response
     {
         return $this->render('profile/edit.html.twig', []);

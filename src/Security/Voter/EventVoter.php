@@ -15,8 +15,9 @@ final class EventVoter extends Voter
     public const DELETE = 'EVENT_DELETE';
 
     public function __construct(
-        private Security $security
-    ) {}
+        private Security $security,
+    ) {
+    }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -31,7 +32,7 @@ final class EventVoter extends Voter
     protected function voteOnAttribute(
         string $attribute,
         mixed $subject,
-        TokenInterface $token
+        TokenInterface $token,
     ): bool {
         $user = $token->getUser();
 
@@ -39,7 +40,7 @@ final class EventVoter extends Voter
         $event = $subject;
 
         if (!$user instanceof User) {
-            if ($attribute === self::VIEW) {
+            if (self::VIEW === $attribute) {
                 return true;
             }
 
@@ -50,16 +51,16 @@ final class EventVoter extends Voter
             return true;
         }
 
-        if ($attribute === self::VIEW) {
+        if (self::VIEW === $attribute) {
             return true;
         }
 
-        if ($attribute === self::DELETE) {
+        if (self::DELETE === $attribute) {
             return $event->getOwner() === $user
-                && $event->getStatus() === 'approved';
+                && 'approved' === $event->getStatus();
         }
 
-        if ($attribute === self::EDIT) {
+        if (self::EDIT === $attribute) {
             return $event->getOwner() === $user;
         }
 

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Event controller.
+ */
+
 namespace App\Controller;
 
 use App\Entity\Event;
@@ -14,27 +18,45 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Security\Voter\EventVoter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * Class EventController.
+ */
 #[Route('/event')]
 class EventController extends AbstractController
 {
-    #[Route(name: 'app_event_index', methods: ['GET'])]
+    /**
+     * Index action.
+     *
+     * @param EventRepository $eventRepository Event repository
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        name: 'app_event_index',
+        methods: ['GET']
+    )]
     public function index(EventRepository $eventRepository): Response
     {
         $events = $eventRepository->findAll();
-//        if ($this->isGranted('ROLE_ADMIN')) {
-//            $events = $eventRepository->findAll();
-//        } else {
-//            $events = $eventRepository->findBy([
-//                'owner' => $this->getUser(),
-//            ]);
-//        }
 
         return $this->render('event/index.html.twig', [
             'events' => $events,
         ]);
     }
 
-    #[Route('/new', name: 'app_event_new', methods: ['GET', 'POST'])]
+    /**
+     * New action.
+     *
+     * @param Request                $request       request
+     * @param EntityManagerInterface $entityManager Entity manager
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/new',
+        name: 'app_event_new',
+        methods: ['GET', 'POST']
+    )]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $event = new Event();
@@ -66,10 +88,17 @@ class EventController extends AbstractController
         ]);
     }
 
+    /**
+     * Show action.
+     *
+     * @param Event $event event
+     *
+     * @return Response HTTP response
+     */
     #[Route(
         '/{id}',
         name: 'app_event_show',
-        requirements: ['id' => '\d+'],
+        requirements: ['id' => '[1-9]\d*'],
         methods: ['GET']
     )]
     public function show(Event $event): Response
@@ -84,10 +113,19 @@ class EventController extends AbstractController
         ]);
     }
 
+    /**
+     * Edit action.
+     *
+     * @param Request                $request       request
+     * @param Event                  $event         event
+     * @param EntityManagerInterface $entityManager entityManager
+     *
+     * @return Response HTTP response
+     */
     #[Route(
         '/{id}/edit',
         name: 'app_event_edit',
-        requirements: ['id' => '\d+'],
+        requirements: ['id' => '[1-9]\d*'],
         methods: ['GET', 'POST']
     )]
     public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
@@ -112,10 +150,19 @@ class EventController extends AbstractController
         ]);
     }
 
+    /**
+     * Delete action.
+     *
+     * @param Request                $request       request
+     * @param Event                  $event         event
+     * @param EntityManagerInterface $entityManager entityManager
+     *
+     * @return Response HTTP response
+     */
     #[Route(
         '/{id}',
         name: 'app_event_delete',
-        requirements: ['id' => '\d+'],
+        requirements: ['id' => '[1-9]\d*'],
         methods: ['POST']
     )]
     public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
@@ -130,21 +177,20 @@ class EventController extends AbstractController
         return $this->redirectToRoute('app_event_calendar');
     }
 
-    #[Route('/json', name: 'app_event_json', methods: ['GET'])]
+    /**
+     * EventsJson action.
+     *
+     * @param EventRepository $eventRepository event repository
+     *
+     * @return JsonResponse HTTP response
+     */
+    #[Route(
+        '/json',
+        name: 'app_event_json',
+        methods: ['GET']
+    )]
     public function eventsJson(EventRepository $eventRepository): JsonResponse
     {
-//        if ($this->isGranted('ROLE_ADMIN')) {
-//            $events = $eventRepository->findAll();
-//        } elseif ($this->getUser()) {
-//            $events = $eventRepository->findBy([
-//                'status' => 'approved',
-//                'owner' => $this->getUser(),
-//            ]);
-//        } else {
-//            $events = $eventRepository->findBy([
-//                'status' => 'pending',
-//            ]);
-//        }
         $events = $eventRepository->findAll();
 
         $data = [];
@@ -161,7 +207,16 @@ class EventController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/calendar', name: 'app_event_calendar', methods: ['GET', 'POST'])]
+    /**
+     * Calendar action.
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/calendar',
+        name: 'app_event_calendar',
+        methods: ['GET', 'POST']
+    )]
     public function calendar(): Response
     {
         $event = new Event();

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Admin controller.
+ */
+
 namespace App\Controller;
 
 use App\Entity\User;
@@ -62,8 +66,10 @@ class AdminController extends AbstractController
     /**
      * Edit action.
      *
-     * @param User $user user
-     * @param Request $request request
+     * @param User                        $user           user
+     * @param Request                     $request        request
+     * @param EntityManagerInterface      $entityManager  entityManager
+     * @param UserPasswordHasherInterface $passwordHasher passwordHasher
      *
      * @return Response HTTP response
      */
@@ -106,11 +112,22 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/requests', name: 'app_admin_requests', methods: ['GET'])]
+    /**
+     * Requests action.
+     *
+     * @param EventRepository $eventRepository eventRepository
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/requests',
+        name: 'app_admin_requests',
+        methods: ['GET']
+    )]
     public function requests(EventRepository $eventRepository): Response
     {
         $events = $eventRepository->findBy([
-            'status' => 'pending'
+            'status' => 'pending',
         ]);
 
         return $this->render('admin/requests.html.twig', [
@@ -118,7 +135,20 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/requests/{id}/approve', name: 'app_admin_requests_approve', methods: ['POST'])]
+    /**
+     * Approve action.
+     *
+     * @param Event                  $event event
+     * @param EntityManagerInterface $em    entityManager
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/requests/{id}/approve',
+        name: 'app_admin_requests_approve',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['POST']
+    )]
     public function approve(Event $event, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -128,7 +158,20 @@ class AdminController extends AbstractController
         return $this->redirectToRoute('app_admin_requests');
     }
 
-    #[Route('/requests/{id}/reject', name: 'app_admin_requests_reject', methods: ['POST'])]
+    /**
+     * Reject action.
+     *
+     * @param Event                  $event event
+     * @param EntityManagerInterface $em    entityManager
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/requests/{id}/reject',
+        name: 'app_admin_requests_reject',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['POST']
+    )]
     public function reject(Event $event, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
