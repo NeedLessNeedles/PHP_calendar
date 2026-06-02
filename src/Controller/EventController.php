@@ -51,7 +51,7 @@ class EventController extends AbstractController
             $entityManager->persist($event);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_event_calendar', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('event/new.html.twig', [
@@ -138,9 +138,15 @@ class EventController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/calendar', name: 'app_event_calendar', methods: ['GET'])]
+    #[Route('/calendar', name: 'app_event_calendar', methods: ['GET', 'POST'])]
     public function calendar(): Response
     {
-        return $this->render('event/calendar.html.twig');
+        $event = new Event();
+        $event->setOwner($this->getUser());
+        $form = $this->createForm(EventType::class, $event);
+
+        return $this->render('event/calendar.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 }

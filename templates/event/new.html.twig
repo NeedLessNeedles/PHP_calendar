@@ -1,15 +1,15 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}New Event{% endblock %}
-
 {% block body %}
 <div class="container d-flex justify-content-center align-items-center mt-2" style="max-width: 500px;">
-    <div class="auth-card d-flex flex-column gap-2">
+    <div class="auth-card p-3">
         <h1 class="h3 mb-1 font-weight-normal">Create new event</h1>
-        <div>
-            {{ include('event/_form.html.twig', {
-                show_delete: false
-            }) }}
+        {{ include('event/_form.html.twig', { form: form }) }}
+
+        <div class="d-flex flex-row justify-content-center align-items-center gap-2">
+            <a href="{{ path('app_event_index') }}" class="btn btn-primary"> << Back</a>
+            <button class="btn btn-success">{{ button_label|default('Save') }}</button>
         </div>
     </div>
 </div>

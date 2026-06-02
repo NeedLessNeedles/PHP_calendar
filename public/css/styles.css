@@ -28,10 +28,12 @@ a {
 .calendar-container {
     max-width: 1200px;
     margin: 0 auto;
-    color: green !important;
 }
 .fc-event {
     font-size: 12px;
     padding: 2px 4px;
     cursor: pointer;
+}
+.fc-daygrid-day {
+    cursor: pointer !important;
 }
