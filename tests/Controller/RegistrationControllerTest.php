@@ -1,14 +1,39 @@
 <?php
 
-namespace App\Tests;
+/**
+ * Tests for RegistrationController.
+ */
+
+namespace App\Tests\Controller;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * Class RegistrationControllerTest.
+ */
 class RegistrationControllerTest extends WebTestCase
 {
+    /**
+     * Test '/register' route.
+     */
+    public function testIndex(): void
+    {
+        //given
+        $client = static::createClient();
+
+        //when
+        $client->request('GET', '/register');
+
+        //then
+        self::assertResponseIsSuccessful();
+    }
+
+    /**
+     * Test Setup method.
+     */
     private KernelBrowser $client;
     private UserRepository $userRepository;
 

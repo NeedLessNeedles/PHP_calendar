@@ -35,7 +35,7 @@ class RegistrationController extends AbstractController
      */
     #[Route(
         name: 'app_register',
-        methods: ['POST'],
+        methods: ['GET', 'POST'],
     )]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, Security $security, EntityManagerInterface $entityManager): Response
     {

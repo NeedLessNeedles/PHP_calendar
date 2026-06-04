@@ -1,11 +1,21 @@
 <?php
 
+/**
+ * Tests for AdminController.
+ */
+
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class AdminControllerTest extends WebTestCase
+/**
+ * Class AdminControllerTest.
+ */
+class AdminControllerTest extends WebTestCase
 {
+    /**
+     * Test index() method.
+     */
     public function testIndex(): void
     {
         $client = static::createClient();

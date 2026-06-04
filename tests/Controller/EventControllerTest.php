@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Tests for EventController.
+ */
+
 namespace App\Tests\Controller;
 
 use App\Entity\Event;
@@ -8,7 +12,10 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class EventControllerTest extends WebTestCase
+/**
+ * Class EventControllerTest.
+ */
+class EventControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
     private EntityManagerInterface $manager;
