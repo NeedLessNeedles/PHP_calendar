@@ -17,6 +17,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Table(name: 'categories')]
 #[ORM\UniqueConstraint(name: 'uq_categories_title', columns: ['title'])]
 #[UniqueEntity(fields: ['title'])]
+
+/**
+ * Class Category.
+ */
 class Category
 {
     /**

@@ -39,6 +39,17 @@ class EventTest extends TestCase
     }
 
     /**
+     * Tests if Description column can be null.
+     */
+    public function testDescriptionCanBeNull(): void
+    {
+        $event = new Event();
+        $event->setDescription(null);
+
+        $this->assertNull($event->getDescription());
+    }
+
+    /**
      * Test set() and get() for Location column.
      */
     public function testLocation(): void
@@ -47,6 +58,17 @@ class EventTest extends TestCase
         $event->setLocation('Event location');
 
         $this->assertEquals('Event location', $event->getLocation());
+    }
+
+    /**
+     * Tests if Location column can be null.
+     */
+    public function testLocationCanBeNull(): void
+    {
+        $event = new Event();
+        $event->setLocation(null);
+
+        $this->assertNull($event->getLocation());
     }
 
     /**
@@ -98,6 +120,17 @@ class EventTest extends TestCase
         $event->setOwner($user);
 
         $this->assertSame($user, $event->getOwner());
+    }
+
+    /**
+     * Tests if Owner column can be null.
+     */
+    public function testOwnerCanBeNull(): void
+    {
+        $event = new Event();
+        $event->setOwner(null);
+
+        $this->assertNull($event->getOwner());
     }
 
     /**
