@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[IsGranted('ROLE_ADMIN')]
+//#[IsGranted('ROLE_ADMIN')]
 #[Route('/category')]
 class CategoryController extends AbstractController
 {
@@ -34,7 +34,7 @@ class CategoryController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $category = new Category();
-//        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
 
