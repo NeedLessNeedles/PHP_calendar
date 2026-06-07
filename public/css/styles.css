@@ -40,9 +40,14 @@ body {
 
 .main-nav .nav-link {
     color: #adb5bd !important;
-    transition: color 0.2s ease-in-out !important;
+    transition: color 0.1s ease-in-out !important;
 }
 
 .main-nav .nav-link:hover {
     color: white !important;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0;
 }
