@@ -38,13 +38,25 @@ body {
     cursor: pointer !important;
 }
 
+.main-nav {
+    display: flex;
+    align-items: stretch !important;
+    height: 50px;
+}
 .main-nav .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100%;
+    border-radius: 6px;
+    transition: background 0.1s ease-in-out, color 0.1s ease-in-out;
     color: #adb5bd !important;
-    transition: color 0.1s ease-in-out !important;
 }
 
 .main-nav .nav-link:hover {
     color: white !important;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .dropdown:hover .dropdown-menu {
