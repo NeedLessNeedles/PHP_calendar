@@ -39,9 +39,12 @@ class EventController extends AbstractController
     public function index(EventRepository $eventRepository): Response
     {
         $events = $eventRepository->findAll();
+        $event = new Event();
+        $form = $this->createForm(EventType::class, $event);
 
         return $this->render('event/index.html.twig', [
             'events' => $events,
+            'form' => $form->createView()
         ]);
     }
 
