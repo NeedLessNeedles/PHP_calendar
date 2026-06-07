@@ -9,7 +9,7 @@
 
         <div class="d-flex flex-row justify-content-center align-items-center gap-2">
             <a href="{{ path('app_event_index') }}" class="btn btn-primary"> << Back</a>
-            <button class="btn btn-success">{{ button_label|default('Save') }}</button>
+            <button type="submit" form="event_form" class="btn btn-success">{{ button_label|default('Save') }}</button>
         </div>
     </div>
 </div>

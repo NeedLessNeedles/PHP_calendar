@@ -6,6 +6,9 @@ use App\Entity\Event;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use App\Entity\Category;
 
 class EventType extends AbstractType
 {
@@ -15,8 +18,19 @@ class EventType extends AbstractType
             ->add('title')
             ->add('description')
             ->add('location')
-            ->add('startDate')
-            ->add('endDate')
+            ->add('startDate', DateTimeType::class, [
+                'widget' => 'single_text',
+            ])
+            ->add('endDate', DateTimeType::class, [
+                'widget' => 'single_text',
+                'required' => false,
+            ])
+            ->add('category', EntityType::class, [
+                'class' => Category::class,
+                'choice_label' => function(Category $category) {
+                    return $category->getTitle();
+                },
+            ])
         ;
     }
 

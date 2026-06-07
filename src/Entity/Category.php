@@ -49,6 +49,11 @@ class Category
     #[ORM\Column(type: 'datetime_immutable')]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    public function __toString(): string
+    {
+        return $this->title;
+    }
+
     /**
      * Getter for Id.
      *

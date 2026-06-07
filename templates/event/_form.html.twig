@@ -4,6 +4,7 @@
         id: 'event_form'
     }
 }) }}
+{{ form_errors(form) }}
     <div class="d-flex flex-column gap-2" style="width: 380px;">
         <div class="mb-1">
             {{ form_label(form.title) }}
@@ -29,6 +30,11 @@
             {{ form_label(form.endDate) }}
             {{ form_widget(form.endDate) }}
             {{ form_errors(form.endDate) }}
+        </div>
+        <div class="mb-2">
+            {{ form_label(form.category) }}
+            {{ form_widget(form.category) }}
+            {{ form_errors(form.category) }}
         </div>
     </div>
 {{ form_end(form) }}

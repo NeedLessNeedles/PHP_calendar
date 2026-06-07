@@ -9,6 +9,7 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Form\EventType;
 use App\Repository\EventRepository;
+use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,8 +48,9 @@ class EventController extends AbstractController
     /**
      * New action.
      *
-     * @param Request                $request       request
-     * @param EntityManagerInterface $entityManager Entity manager
+     * @param Request                $request            request
+     * @param EntityManagerInterface $entityManager      Entity manager
+     * @param CategoryRepository     $categoryRepository Category repo
      *
      * @return Response HTTP response
      */
@@ -63,6 +65,10 @@ class EventController extends AbstractController
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
+//        if ($form->isSubmitted()) {
+//            dd($form->isValid(), (string) $form->getErrors(true));
+//        }
+
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
 
@@ -74,6 +80,9 @@ class EventController extends AbstractController
                 $event->setStatus('pending');
             }
 
+            if (!$event->getCategory()) {
+                throw $this->createNotFoundException('Category is required');
+            }
             $event->setOwner($user);
 
             $entityManager->persist($event);
