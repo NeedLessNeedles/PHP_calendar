@@ -2,9 +2,9 @@ body {
     background-color: #121212 !important;
     color: white;
 }
-a {
-    color: #8ab4ff;
-}
+/*a {*/
+/*    color: #8ab4ff;*/
+/*}*/
 .table {
     border-collapse: separate !important;
     border-spacing: 0 !important;
@@ -36,4 +36,13 @@ a {
 }
 .fc-daygrid-day {
     cursor: pointer !important;
+}
+
+.main-nav .nav-link {
+    color: #adb5bd !important;
+    transition: color 0.2s ease-in-out !important;
+}
+
+.main-nav .nav-link:hover {
+    color: white !important;
 }

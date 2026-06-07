@@ -43,13 +43,13 @@
         </tbody>
     </table>
 
-    <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
-        <a href="{{ path('app_event_new') }}" class="btn btn-success">Create new</a>
-        <a href="{{ path('app_event_index') }}" class="btn btn-primary">List view</a>
-        <a href="{{ path('app_event_calendar') }}" class="btn btn-info">Calendar view</a>
-        <a href="{{ path('app_profile') }}" class="btn btn-secondary">Settings</a>
-        {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
-            <a href="{{ path('app_admin') }}" class="btn btn-primary">Admin panel</a>
-        {% endif %}
-    </div>
+{#    <div class="d-flex justify-content-center gap-2 mt-2 mb-2">#}
+{#        <a href="{{ path('app_event_new') }}" class="btn btn-success">Create new</a>#}
+{#        <a href="{{ path('app_event_index') }}" class="btn btn-primary">List view</a>#}
+{#        <a href="{{ path('app_event_calendar') }}" class="btn btn-info">Calendar view</a>#}
+{#        <a href="{{ path('app_profile') }}" class="btn btn-secondary">Settings</a>#}
+{#        {% if app.user and 'ROLE_ADMIN' in app.user.roles %}#}
+{#            <a href="{{ path('app_admin') }}" class="btn btn-primary">Admin panel</a>#}
+{#        {% endif %}#}
+{#    </div>#}
 {% endblock %}
