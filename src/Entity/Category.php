@@ -123,4 +123,12 @@ class Category
     {
         $this->updatedAt = $updatedAt;
     }
+
+    public function __construct()
+    {
+        $now = new \DateTimeImmutable();
+
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
+    }
 }
