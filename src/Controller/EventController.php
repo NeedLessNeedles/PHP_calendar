@@ -8,6 +8,7 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Form\EventType;
+use App\Form\EventEditType;
 use App\Repository\EventRepository;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -40,11 +41,18 @@ class EventController extends AbstractController
     {
         $events = $eventRepository->findAll();
         $event = new Event();
-        $form = $this->createForm(EventType::class, $event);
+        $createForm = $this->createForm(EventType::class, new Event(), [
+            'action' => $this->generateUrl('app_event_new'),
+        ]);
+
+        $editForm = $this->createForm(EventEditType::class, null, [
+            'action' => '#', // JS ustawi /{id}/edit
+        ]);
 
         return $this->render('event/index.html.twig', [
             'events' => $events,
-            'form' => $form->createView()
+            'createForm' => $createForm->createView(),
+            'editForm' => $editForm->createView()
         ]);
     }
 
@@ -138,7 +146,7 @@ class EventController extends AbstractController
         '/{id}/edit',
         name: 'app_event_edit',
         requirements: ['id' => '[1-9]\d*'],
-        methods: ['GET', 'POST']
+        methods: ['POST']
     )]
     public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
@@ -147,19 +155,17 @@ class EventController extends AbstractController
             $event
         );
 
-        $form = $this->createForm(EventType::class, $event);
+        $form = $this->createForm(EventEditType::class, $event);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Event updated');
+        } else {
+            $this->addFlash('error', 'Validation failed');
         }
 
-        return $this->render('event/edit.html.twig', [
-            'event' => $event,
-            'form' => $form,
-        ]);
+        return $this->redirectToRoute('app_event_index');
     }
 
     /**
@@ -186,7 +192,7 @@ class EventController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_event_calendar');
+        return $this->redirectToRoute('app_event_index');
     }
 
     /**
@@ -217,6 +223,25 @@ class EventController extends AbstractController
         }
 
         return $this->json($data);
+    }
+
+    #[Route(
+        '/{id}/json',
+        name: 'app_event_json_edit',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['GET']
+    )]
+    public function editEventJson(Event $event): JsonResponse
+    {
+        return $this->json([
+            'id' => $event->getId(),
+            'title' => $event->getTitle(),
+            'description' => $event->getDescription(),
+            'location' => $event->getLocation(),
+            'startDate' => $event->getStartDate()?->format('Y-m-d\TH:i'),
+            'endDate' => $event->getEndDate()?->format('Y-m-d\TH:i'),
+            'category' => $event->getCategory()?->getId(),
+        ]);
     }
 
     /**

@@ -16,7 +16,9 @@
                 <th>Location</th>
                 <th>Status</th>
                 <th>Category</th>
-                <th>Actions</th>
+                {% if app.user %}
+                    <th>Actions</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -30,10 +32,26 @@
                 <td>{{ event.location }}</td>
                 <td>{{ event.status }}</td>
                 <td>{{ event.category }}</td>
-                <td>
-                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-primary btn-sm">Show</a>
-                    <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn btn-warning btn-sm">Edit</a>
-                </td>
+                {% if app.user %}
+                    <td>
+                        <button class="btn btn-primary btn-sm edit-event-btn" data-id="{{ event.id }}" type="button" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
+                        <form
+                            method="post"
+                            action="{{ path('app_event_delete', {'id': event.id}) }}"
+                            style="display:inline;"
+                            onsubmit="return confirm('Delete event?');"
+                        >
+                            <input
+                                type="hidden"
+                                name="_token"
+                                value="{{ csrf_token('delete' ~ event.id) }}"
+                            >
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                {% endif %}
             </tr>
         {% else %}
             <tr>
@@ -56,5 +74,10 @@
 {#        {% endif %}#}
     </div>
 
-    {{ include('event/_modal_form.html.twig', { form: form }) }}
+    {{ include('event/_modal_form.html.twig', { form: createForm }) }}
+    {{ include('event/_modal_edit.html.twig', { form: editForm }) }}
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/edit_event.js') }}"></script>
 {% endblock %}
