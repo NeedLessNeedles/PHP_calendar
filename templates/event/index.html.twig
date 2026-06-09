@@ -3,13 +3,30 @@
 {% block title %}Events list{% endblock %}
 
 {% block body %}
-{#    <div class="d-flex justify-content-center navigation mt-1">#}
-{#        {{ knp_pagination_render(pagination) }}#}
-{#    </div>#}
 
     <h1>Events list</h1>
 
     <table class="table">
+        <colgroup>
+            {# ID #}
+            <col style="width: 5%;">
+            {# Title #}
+            <col style="width: 15%;">
+            {# Description #}
+            <col style="width: 15%;">
+            {# Start Date #}
+            <col style="width: 15%;">
+            {# End Date #}
+            <col style="width: 10%;">
+            {# Location #}
+            <col style="width: 10%;">
+            {# Status #}
+            <col style="width: 10%;">
+            {# Category #}
+            <col style="width: 10%;">
+            {# Actions #}
+            <col style="width: 10%;">
+        </colgroup>
         <thead>
             <tr>
                 <th>ID</th>
