@@ -19,6 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Security\Voter\EventVoter;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * Class EventController.
@@ -37,9 +38,14 @@ class EventController extends AbstractController
         name: 'app_event_index',
         methods: ['GET']
     )]
-    public function index(EventRepository $eventRepository): Response
+    public function index(Request $request, EventRepository $eventRepository, PaginatorInterface $paginator): Response
     {
-        $events = $eventRepository->findAll();
+        //$events = $eventRepository->findAll();
+        $pagination = $paginator->paginate(
+            $eventRepository->queryAll(),
+            $request->query->getInt('page', 1),
+            EventRepository::PAGINATOR_ITEMS_PER_PAGE
+        );
         $event = new Event();
         $createForm = $this->createForm(EventType::class, new Event(), [
             'action' => $this->generateUrl('app_event_new'),
@@ -50,9 +56,9 @@ class EventController extends AbstractController
         ]);
 
         return $this->render('event/index.html.twig', [
-            'events' => $events,
+            'pagination' => $pagination,
             'createForm' => $createForm->createView(),
-            'editForm' => $editForm->createView()
+            'editForm' => $editForm->createView(),
         ]);
     }
 
