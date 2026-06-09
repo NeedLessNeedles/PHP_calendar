@@ -1,24 +1,54 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
+
     const calendarEl = document.getElementById('calendar');
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
+
         initialView: 'dayGridMonth',
         height: '77vh',
         events: '/event/json',
 
-        eventClick: function(info) {
-            window.location.href = '/event/' + info.event.id;
+        eventClick: async function(info) {
+
+            console.log('eventCLick inside');
+            //alert('CLICK');
+            console.log(document.getElementById('editModal'));
+            info.jsEvent.preventDefault();
+            const modalElement = document.getElementById('editModal');
+
+            const editModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            const form = document.getElementById('edit_event_form');
+
+            const response = await fetch(`/event/${info.event.id}/json`);
+            const event = await response.json();
+
+            form.querySelector('[name$="[title]"]').value = event.title ?? '';
+            form.querySelector('[name$="[description]"]').value = event.description ?? '';
+            form.querySelector('[name$="[location]"]').value = event.location ?? '';
+            form.querySelector('[name$="[startDate]"]').value = event.startDate ?? '';
+            form.querySelector('[name$="[endDate]"]').value = event.endDate ?? '';
+            form.querySelector('[name$="[category]"]').value = event.category ?? '';
+
+            form.action = `/event/${info.event.id}/edit`;
+
+            editModal.show();
         },
+
         dateClick: function(info) {
-            const modalElement = document.getElementById('eventModal');
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
+
+            const eventModal = new bootstrap.Modal(
+                document.getElementById('eventModal')
+            );
 
             const startInput = document.getElementById('event_startDate');
+
             if (startInput) {
                 startInput.value = info.dateStr + "T12:00";
             }
+
+            eventModal.show();
         },
+
         eventDidMount: function(info) {
             const status = info.event.extendedProps.status;
 
@@ -33,5 +63,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
     calendar.render();
 });

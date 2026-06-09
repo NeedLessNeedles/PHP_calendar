@@ -10,16 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     buttons.forEach(button => {
         button.addEventListener('click', async () => {
-            console.log('EDIT EVENT JS LOADED');
-
             const id = button.dataset.id;
 
             const response = await fetch(`/event/${id}/json`);
             const event = await response.json();
-
-            console.log(event);
-            console.log(document.getElementById('event_title'));
-            console.log(document.getElementById('event_description'));
 
             const titleField = form.querySelector('[id$="_title"]');
             titleField.value = event.title ?? '';

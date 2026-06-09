@@ -46,7 +46,7 @@ class EventController extends AbstractController
         ]);
 
         $editForm = $this->createForm(EventEditType::class, null, [
-            'action' => '#', // JS ustawi /{id}/edit
+            'action' => '#',
         ]);
 
         return $this->render('event/index.html.twig', [
@@ -258,10 +258,17 @@ class EventController extends AbstractController
     {
         $event = new Event();
         $event->setOwner($this->getUser());
-        $form = $this->createForm(EventType::class, $event);
+//        $createForm = $this->createForm(EventType::class, $event);
+        $createForm = $this->createForm(EventType::class, new Event(), [
+            'action' => $this->generateUrl('app_event_new'),
+        ]);
+        $editForm = $this->createForm(EventEditType::class, null, [
+            'action' => '#',
+        ]);
 
         return $this->render('event/calendar.html.twig', [
-            'form' => $form->createView(),
+            'createForm' => $createForm->createView(),
+            'editForm' => $editForm->createView()
         ]);
     }
 }

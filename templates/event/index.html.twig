@@ -66,12 +66,6 @@
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#eventModal">
             Create new
         </button>
-{#        <a href="{{ path('app_event_index') }}" class="btn btn-primary">List view</a>#}
-{#        <a href="{{ path('app_event_calendar') }}" class="btn btn-info">Calendar view</a>#}
-{#        <a href="{{ path('app_profile') }}" class="btn btn-secondary">Settings</a>#}
-{#        {% if app.user and 'ROLE_ADMIN' in app.user.roles %}#}
-{#            <a href="{{ path('app_admin') }}" class="btn btn-primary">Admin panel</a>#}
-{#        {% endif %}#}
     </div>
 
     {{ include('event/_modal_form.html.twig', { form: createForm }) }}

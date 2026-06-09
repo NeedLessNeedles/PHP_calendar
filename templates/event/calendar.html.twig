@@ -6,25 +6,12 @@
     <div class="container mt-2">
         <div id="calendar" class="calendar-container"></div>
         {# MODAL #}
-        <div class="modal fade" id="eventModal" tabindex="-1">
-            <div class="modal-dialog modal-lg modal-dialog-centered justify-content-center" style="width: 480px;">
-                <div class="modal-content auth-card p-3">
-                    <h1 class="h3 mb-1 font-weight-normal">Create new event</h1>
-                    {{ include('event/_modal_form.html.twig', { form: form }) }}
-
-                    <div class="d-flex flex-row justify-content-center align-items-center gap-2">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Cancel
-                        </button>
-                        <button type="submit" form="event_form" class="btn btn-success">Save</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {{ include('event/_modal_form.html.twig', { createForm: createForm }) }}
+        {{ include('event/_modal_edit.html.twig', { editForm: editForm }) }}
     </div>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('js/calendar.js') }}"></script>
+    <script type="module" src="{{ asset('js/calendar.js') }}"></script>
 {% endblock %}
