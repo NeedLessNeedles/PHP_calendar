@@ -7,15 +7,28 @@ namespace App\DataFixtures;
 
 use App\Entity\Event;
 use App\Entity\Category;
+use App\DataFixtures\CategoryFixtures;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 /**
  * Class EventFixtures.
  */
-class EventFixtures extends AbstractBaseFixtures
+class EventFixtures extends AbstractBaseFixtures implements DependentFixtureInterface, FixtureGroupInterface
 {
     /**
      * Load data.
      */
+    public static function getGroups(): array
+    {
+        return ['main'];
+    }
+    public function getDependencies(): array
+    {
+        return [
+            CategoryFixtures::class,
+        ];
+    }
     public function loadData(): void
     {
         $categories = $this->manager

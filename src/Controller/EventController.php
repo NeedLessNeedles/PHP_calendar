@@ -44,7 +44,12 @@ class EventController extends AbstractController
         $pagination = $paginator->paginate(
             $eventRepository->queryAll(),
             $request->query->getInt('page', 1),
-            EventRepository::PAGINATOR_ITEMS_PER_PAGE
+            EventRepository::PAGINATOR_ITEMS_PER_PAGE,
+            [
+                'sortFieldAllowList' => ['event.startDate', 'event.title'],
+                'defaultSortFieldName' => 'event.startDate',
+                'defaultSortDirection' => 'desc',
+            ]
         );
         $event = new Event();
         $createForm = $this->createForm(EventType::class, new Event(), [
