@@ -6,6 +6,7 @@ body {
 /*    color: #8ab4ff;*/
 /*}*/
 .table {
+    /*max-width: 200px !important;*/
     border-collapse: separate !important;
     border-spacing: 0 !important;
 }

@@ -3,15 +3,36 @@
 {% block title %}Events list{% endblock %}
 
 {% block body %}
+
     <h1>Events list</h1>
 
     <table class="table">
+        <colgroup>
+            {# ID #}
+            <col style="width: 5%;">
+            {# Title #}
+            <col style="width: 15%;">
+            {# Description #}
+            <col style="width: 15%;">
+            {# Start Date #}
+            <col style="width: 15%;">
+            {# End Date #}
+            <col style="width: 10%;">
+            {# Location #}
+            <col style="width: 10%;">
+            {# Status #}
+            <col style="width: 10%;">
+            {# Category #}
+            <col style="width: 10%;">
+            {# Actions #}
+            <col style="width: 10%;">
+        </colgroup>
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Title</th>
                 <th>Description</th>
-                <th>Start Date</th>
+                <th>{{ knp_pagination_sortable(pagination, 'Start Date', 'event.startDate') }}</th>
                 <th>End Date</th>
                 <th>Location</th>
                 <th>Status</th>
@@ -22,7 +43,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for event in events %}
+        {% for event in pagination.items %}
             <tr>
                 <td>{{ event.id }}</td>
                 <td>{{ event.title }}</td>
@@ -61,8 +82,11 @@
         </tbody>
     </table>
 
+    <div class="d-flex justify-content-center navigation mt-1">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+
     <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
-{#        <a href="{{ path('app_event_new') }}" class="btn btn-success">Create new</a>#}
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#eventModal">
             Create new
         </button>
