@@ -37,9 +37,10 @@
                 <th>Location</th>
                 <th>Status</th>
                 <th>Category</th>
-                {% if app.user %}
-                    <th>Actions</th>
-                {% endif %}
+                <th>Actions</th>
+{#                {% if app.user %}#}
+
+{#                {% endif %}#}
             </tr>
         </thead>
         <tbody>
@@ -72,6 +73,8 @@
                             </button>
                         </form>
                     </td>
+                {% else %}
+                    <td>-</td>
                 {% endif %}
             </tr>
         {% else %}

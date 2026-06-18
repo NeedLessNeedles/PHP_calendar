@@ -6,12 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         initialView: 'dayGridMonth',
         height: '77vh',
-        events: '/event/json',
+        // events: '/event/json',
+        //events: EVENTS_URL,
+        events: '/~21_miszczyk/app/event/json',
+        //events: window.location.pathname.replace('/calendar', '') + '/json',
 
         eventClick: async function(info) {
-
-            console.log('eventCLick inside');
-            //alert('CLICK');
             console.log(document.getElementById('editModal'));
             info.jsEvent.preventDefault();
             const modalElement = document.getElementById('editModal');
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const editModal = bootstrap.Modal.getOrCreateInstance(modalElement);
             const form = document.getElementById('edit_event_form');
 
-            const response = await fetch(`/event/${info.event.id}/json`);
+            const response = await fetch(`/~21_miszczyk/app/event/${info.event.id}/json`);
             const event = await response.json();
 
             form.querySelector('[name$="[title]"]').value = event.title ?? '';

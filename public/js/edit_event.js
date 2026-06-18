@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', async () => {
             const id = button.dataset.id;
 
-            const response = await fetch(`/event/${id}/json`);
+            const response = await fetch(`/~21_miszczyk/app/event/${event.id}/json`);
             const event = await response.json();
 
             const titleField = form.querySelector('[id$="_title"]');
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const categoryField = form.querySelector('[id$="_category"]');
             categoryField.value = event.category ?? '';
 
-            form.action = `/event/${id}/edit`;
+            form.action = `/event/${event.id}/edit`;
 
             modal.show();
         });
