@@ -11,6 +11,7 @@ use App\Form\EventType;
 use App\Form\EventEditType;
 use App\Repository\EventRepository;
 use App\Repository\CategoryRepository;
+use App\Service\EventService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,6 +28,9 @@ use Knp\Component\Pager\PaginatorInterface;
 #[Route('/event')]
 class EventController extends AbstractController
 {
+    public function __construct(private readonly EventServiceInterface $eventService)
+    {
+    }
     /**
      * Index action.
      *
@@ -38,18 +42,10 @@ class EventController extends AbstractController
         name: 'app_event_index',
         methods: ['GET']
     )]
-    public function index(Request $request, EventRepository $eventRepository, PaginatorInterface $paginator): Response
+    public function index(Request $request): Response
     {
-        //$events = $eventRepository->findAll();
-        $pagination = $paginator->paginate(
-            $eventRepository->queryAll(),
-            $request->query->getInt('page', 1),
-            EventRepository::PAGINATOR_ITEMS_PER_PAGE,
-            [
-                'sortFieldAllowList' => ['event.startDate', 'event.title'],
-                'defaultSortFieldName' => 'event.startDate',
-                'defaultSortDirection' => 'desc',
-            ]
+        $pagination = $this->eventService->getPaginatedList(
+            $request->query->getInt('page', 1)
         );
         $event = new Event();
         $createForm = $this->createForm(EventType::class, new Event(), [
@@ -81,34 +77,16 @@ class EventController extends AbstractController
         name: 'app_event_new',
         methods: ['GET', 'POST']
     )]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request): Response
     {
         $event = new Event();
+
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
-//        if ($form->isSubmitted()) {
-//            dd($form->isValid(), (string) $form->getErrors(true));
-//        }
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
-
-            if ($user && in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-                $event->setStatus('approved');
-            } elseif ($user) {
-                $event->setStatus('approved');
-            } else {
-                $event->setStatus('pending');
-            }
-
-            if (!$event->getCategory()) {
-                throw $this->createNotFoundException('Category is required');
-            }
-            $event->setOwner($user);
-
-            $entityManager->persist($event);
-            $entityManager->flush();
+            //$user = $this->getUser();
+            $this->eventService->create($event, $this->getUser());
 
             return $this->redirectToRoute('app_event_calendar', [], Response::HTTP_SEE_OTHER);
         }

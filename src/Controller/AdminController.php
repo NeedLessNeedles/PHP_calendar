@@ -26,6 +26,9 @@ use App\Repository\EventRepository;
 #[Route('/admin')]
 class AdminController extends AbstractController
 {
+    public function __construct(private readonly AdminServiceInterface $adminService)
+    {
+    }
     /**
      * Index action.
      *
@@ -98,9 +101,12 @@ class AdminController extends AbstractController
         if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
             $data = $passwordForm->getData();
 
-            $user->setPassword(
-                $passwordHasher->hashPassword($user, $data['newPassword'])
+            $this->adminService->changePassword(
+                $user,
+                $data['newPassword']
             );
+
+            $entityManager->flush();
 
             $entityManager->flush();
         }
@@ -152,7 +158,7 @@ class AdminController extends AbstractController
     public function approve(Event $event, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $event->setStatus('approved');
+        $this->adminService->approveEvent($event);
         $em->flush();
 
         return $this->redirectToRoute('app_admin_requests');

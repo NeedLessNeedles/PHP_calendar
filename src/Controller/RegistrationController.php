@@ -23,6 +23,9 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/register')]
 class RegistrationController extends AbstractController
 {
+    public function __construct(private readonly RegistrationServiceInterface $registrationService)
+    {
+    }
     /**
      * Register action.
      *
@@ -47,10 +50,10 @@ class RegistrationController extends AbstractController
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
 
-            $user->setPassword($passwordHasher->hashPassword($user, $plainPassword));
-
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $this->registrationService->registerUser(
+                $user,
+                $plainPassword,
+            );
 
             return $security->login($user, CustomAuthenticator::class, 'main');
         }

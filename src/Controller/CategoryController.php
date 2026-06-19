@@ -16,6 +16,10 @@ use App\Repository\EventRepository;
 #[Route('/category')]
 class CategoryController extends AbstractController
 {
+    public function __construct(
+        private readonly CategoryServiceInterface $categoryService
+    ) {
+    }
     #[Route(
         name: 'app_category_index',
         methods: ['GET', 'POST']
@@ -49,24 +53,21 @@ class CategoryController extends AbstractController
             return $this->redirectToRoute('app_category_index');
         }
 
-//        return $this->render('category/index.html.twig', [
-//            'form' => $form,
-//        ]);
         return $this->redirectToRoute('app_category_index');
     }
 
-//    #[Route(
-//        '/{id}',
-//        name: 'app_category_show',
-//        requirements: ['id' => '[1-9]\d*'],
-//        methods: ['GET']
-//    )]
-//    public function show(Category $category): Response
-//    {
-//        return $this->render('category/show.html.twig', [
-//            'category' => $category,
-//        ]);
-//    }
+    #[Route(
+        '/{id}',
+        name: 'app_category_show',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['GET']
+    )]
+    public function show(Category $category): Response
+    {
+        return $this->render('category/show.html.twig', [
+            'category' => $category,
+        ]);
+    }
 
     #[Route(
         '/{id}/edit',
@@ -82,8 +83,8 @@ class CategoryController extends AbstractController
             throw $this->createAccessDeniedException('Invalid CSRF');
         }
 
-        $category->setTitle($request->request->all('category')['title']);
-        $category->setUpdatedAt(new \DateTimeImmutable());
+        $title = $request->request->all('category')['title'];
+        $this->categoryService->edit($category, $title);
 
         $em->flush();
 
@@ -105,17 +106,7 @@ class CategoryController extends AbstractController
         if (!$this->isCsrfTokenValid('delete'.$category->getId(), $request->request->get('_token'))) {
             return $this->redirectToRoute('app_category_index');
         }
-        $usedByEvents = $eventRepository->count([
-            'category' => $category
-        ]);
-
-        if ($usedByEvents > 0) {
-            $this->addFlash('error', 'Cannot delete category used by events.');
-            return $this->redirectToRoute('app_category_index');
-        }
-
-        $em->remove($category);
-        $em->flush();
+        $this->categoryService->delete($category);
 
         return $this->redirectToRoute('app_category_index');
     }
