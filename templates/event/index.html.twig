@@ -6,25 +6,47 @@
 
     <h1>Events list</h1>
 
-    <div class="mb-3" style="max-width: 200px;">
-        <label for="categoryFilter" class="form-label">Filter by: Category</label>
-        <select
-            id="categoryFilter"
-            class="form-select"
-            onchange="location = this.value"
-        >
-            <option value="{{ path('app_event_index') }}"
-                    {% if currentCategory is null %}selected{% endif %}>
-                All categories
-            </option>
-            {% for category in categories %}
-                <option value="{{ path('app_event_index', {categoryId: category.id}) }}"
-                        {% if currentCategory == category.id %}selected{% endif %}>
-                    {{ category.title }}
+    <div class="d-flex flex-direction-row align-items-center gap-3">
+        <div class="mb-2" style="max-width: 190px;">
+            <label for="categoryFilter" class="form-label">Filter by: Category</label>
+            <select
+                id="categoryFilter"
+                class="form-select"
+                onchange="location = this.value"
+            >
+                <option value="{{ path('app_event_index') }}"
+                        {% if currentCategory is null %}selected{% endif %}>
+                    All
                 </option>
-            {% endfor %}
-        </select>
+                {% for category in categories %}
+                    <option value="{{ path('app_event_index', {categoryId: category.id}) }}"
+                            {% if currentCategory == category.id %}selected{% endif %}>
+                        {{ category.title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">Search events</label>
+            <form method="get" class="d-flex gap-2">
+                <input type="text"
+                       name="title"
+                       value="{{ app.request.get('title') }}"
+                       class="form-control"
+                       placeholder="Search by title">
+
+                <button class="btn btn-primary">Search</button>
+
+                <a href="{{ path('app_event_index') }}" class="btn btn-secondary">
+                    Reset
+                </a>
+
+            </form>
+        </div>
+
     </div>
+
 
     <table class="table">
         <colgroup>

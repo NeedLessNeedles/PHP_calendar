@@ -48,12 +48,14 @@ class EventController extends AbstractController
         //$categoryId = $request->query->getInt('categoryId');
         $categoryId = $request->query->get('categoryId');
         $categoryId = is_numeric($categoryId) ? (int)$categoryId : null;
+        $title = $request->query->get('title');
 
         $pagination = $this->eventService->getPaginatedList(
             $page,
-            $categoryId
+            $categoryId,
+            $title
         );
-        $event = new Event();
+        //$event = new Event();
         $createForm = $this->createForm(EventType::class, new Event(), [
             'action' => $this->generateUrl('app_event_new'),
         ]);
@@ -68,6 +70,7 @@ class EventController extends AbstractController
             'currentCategory' => $categoryId ?: null,
             'createForm' => $createForm->createView(),
             'editForm' => $editForm->createView(),
+            'title' => $title,
         ]);
     }
 
