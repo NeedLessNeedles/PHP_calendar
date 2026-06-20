@@ -48,6 +48,8 @@ class UserFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
                 'admin123'
             );
             $user->setPassword($hashedPassword);
+            $user->setIsBlocked(false);
+
             $this->manager->persist($user);
         }
 
@@ -60,6 +62,8 @@ class UserFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
                 'user123'
             );
             $user->setPassword($hashedPassword);
+            $user->setIsBlocked(false);
+
             $this->manager->persist($user);
         }
 

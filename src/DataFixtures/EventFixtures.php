@@ -27,6 +27,7 @@ class EventFixtures extends AbstractBaseFixtures implements DependentFixtureInte
     {
         return [
             CategoryFixtures::class,
+            TagFixtures::class,
         ];
     }
     public function loadData(): void
@@ -34,8 +35,11 @@ class EventFixtures extends AbstractBaseFixtures implements DependentFixtureInte
         $categories = $this->manager
             ->getRepository(Category::class)
             ->findAll();
+        $tags = $this->manager
+            ->getRepository(Tag::class)
+            ->findAll();
 
-        for ($i = 0; $i < 10; ++$i) {
+        for ($i = 0; $i < 20; ++$i) {
             $event = new Event();
             $event->setTitle($this->faker->sentence);
             $event->setDescription($this->faker->sentence);
@@ -47,6 +51,10 @@ class EventFixtures extends AbstractBaseFixtures implements DependentFixtureInte
             $event->setCategory(
                 $this->faker->randomElement($categories)
             );
+            $randomTags = $this->faker->randomElements($tags, rand(1, 2));
+            foreach ($randomTags as $tag) {
+                $event->addTag($tag);
+            }
 
             $this->manager->persist($event);
         }

@@ -9,6 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use App\Entity\Category;
+use App\Entity\Tag;
 
 class EventType extends AbstractType
 {
@@ -30,6 +31,13 @@ class EventType extends AbstractType
                 'choice_label' => function(Category $category) {
                     return $category->getTitle();
                 },
+            ])
+            ->add('tags', EntityType::class, [
+                'class' => Tag::class,
+                'choice_label' => 'title',
+                'multiple' => true,
+                'expanded' => false,
+                'required' => false,
             ])
         ;
     }

@@ -36,5 +36,10 @@
             {{ form_widget(form.category) }}
             {{ form_errors(form.category) }}
         </div>
+        <div class="mb-2">
+            {{ form_label(form.tags) }}
+            {{ form_widget(form.tags) }}
+            {{ form_errors(form.tags) }}
+        </div>
     </div>
 {{ form_end(form) }}
