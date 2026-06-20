@@ -31,4 +31,17 @@ class AdminService implements AdminServiceInterface
         $event->setStatus('approved');
     }
 
+    public function toggleBlock(User $targetUser, User $currentUser): void
+    {
+        if ($targetUser->getId() === $currentUser->getId()) {
+            throw new \LogicException('You cannot block yourself.');
+        }
+
+        if (in_array('ROLE_ADMIN', $targetUser->getRoles(), true)) {
+            throw new \LogicException('You cannot block another admin.');
+        }
+
+        $targetUser->setIsBlocked(!$targetUser->isBlocked());
+    }
+
 }

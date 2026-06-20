@@ -119,6 +119,20 @@ class AdminController extends AbstractController
         ]);
     }
 
+    #[Route(
+        '/users/{id}/block',
+        name: 'app_admin_users_block',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['POST']
+    )]
+    public function block(User $user, EntityManagerInterface $em): Response
+    {
+        $this->adminService->toggleBlock($user, $this->getUser());
+        $em->flush();
+
+        return $this->redirectToRoute('app_admin_users');
+    }
+
     /**
      * Requests action.
      *

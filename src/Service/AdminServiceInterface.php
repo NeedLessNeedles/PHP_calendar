@@ -17,4 +17,6 @@ interface AdminServiceInterface
 
     public function approveEvent(Event $event): void;
 
+    public function toggleBlock(User $targetUser, User $currentUser): void;
+
 }

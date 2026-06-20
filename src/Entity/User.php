@@ -43,6 +43,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[ORM\Column(type: 'boolean')]
+    private bool $isBlocked = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -116,6 +119,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
 
         return $data;
+    }
+
+    public function isBlocked(): bool
+    {
+        return $this->isBlocked;
+    }
+
+    public function setIsBlocked(bool $isBlocked): static
+    {
+        $this->isBlocked = $isBlocked;
+        return $this;
     }
 
     #[\Deprecated]
