@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\EventRepository;
+use App\Service\AdminServiceInterface;
 
 /**
  * Class AdminController.

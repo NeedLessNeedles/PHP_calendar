@@ -11,7 +11,7 @@ use App\Form\EventType;
 use App\Form\EventEditType;
 use App\Repository\EventRepository;
 use App\Repository\CategoryRepository;
-use App\Service\EventService;
+use App\Service\EventServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,10 +42,16 @@ class EventController extends AbstractController
         name: 'app_event_index',
         methods: ['GET']
     )]
-    public function index(Request $request): Response
+    public function index(Request $request, CategoryRepository $categoryRepository): Response
     {
+        $page = $request->query->getInt('page', 1);
+        //$categoryId = $request->query->getInt('categoryId');
+        $categoryId = $request->query->get('categoryId');
+        $categoryId = is_numeric($categoryId) ? (int)$categoryId : null;
+
         $pagination = $this->eventService->getPaginatedList(
-            $request->query->getInt('page', 1)
+            $page,
+            $categoryId
         );
         $event = new Event();
         $createForm = $this->createForm(EventType::class, new Event(), [
@@ -58,6 +64,8 @@ class EventController extends AbstractController
 
         return $this->render('event/index.html.twig', [
             'pagination' => $pagination,
+            'categories' => $categoryRepository->findAll(),
+            'currentCategory' => $categoryId ?: null,
             'createForm' => $createForm->createView(),
             'editForm' => $editForm->createView(),
         ]);

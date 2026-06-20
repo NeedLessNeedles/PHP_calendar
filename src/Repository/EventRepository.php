@@ -23,33 +23,19 @@ class EventRepository extends ServiceEntityRepository
      *
      * @return QueryBuilder Query builder
      */
-    public function queryAll(): QueryBuilder
+    public function queryAll(?int $categoryId = null): QueryBuilder
     {
-        return $this->createQueryBuilder('event');
+        $queryBuilder = $this->createQueryBuilder('event')
+            ->leftJoin('event.category', 'category')
+            ->addSelect('category');
+
+        if (null !== $categoryId) {
+            $queryBuilder
+                ->andWhere('category.id = :categoryId')
+                ->setParameter('categoryId', $categoryId);
+        }
+
+        return $queryBuilder;
     }
 
-    //    /**
-    //     * @return Event[] Returns an array of Event objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('e.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Event
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

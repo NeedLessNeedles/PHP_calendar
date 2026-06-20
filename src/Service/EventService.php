@@ -31,10 +31,10 @@ class EventService implements EventServiceInterface
     ) {
     }
 
-    public function getPaginatedList(int $page): PaginationInterface
+    public function getPaginatedList(int $page, ?int $categoryId = null): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->eventRepository->queryAll(),
+            $this->eventRepository->queryAll($categoryId),
             $page,
             self::PAGINATOR_ITEMS_PER_PAGE,
             [

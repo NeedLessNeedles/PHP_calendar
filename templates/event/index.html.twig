@@ -6,6 +6,26 @@
 
     <h1>Events list</h1>
 
+    <div class="mb-3" style="max-width: 200px;">
+        <label for="categoryFilter" class="form-label">Filter by: Category</label>
+        <select
+            id="categoryFilter"
+            class="form-select"
+            onchange="location = this.value"
+        >
+            <option value="{{ path('app_event_index') }}"
+                    {% if currentCategory is null %}selected{% endif %}>
+                All categories
+            </option>
+            {% for category in categories %}
+                <option value="{{ path('app_event_index', {categoryId: category.id}) }}"
+                        {% if currentCategory == category.id %}selected{% endif %}>
+                    {{ category.title }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
     <table class="table">
         <colgroup>
             {# ID #}
@@ -38,9 +58,6 @@
                 <th>Status</th>
                 <th>Category</th>
                 <th>Actions</th>
-{#                {% if app.user %}#}
-
-{#                {% endif %}#}
             </tr>
         </thead>
         <tbody>
@@ -54,6 +71,7 @@
                 <td>{{ event.location }}</td>
                 <td>{{ event.status }}</td>
                 <td>{{ event.category }}</td>
+
                 {% if app.user %}
                     <td>
                         <button class="btn btn-primary btn-sm edit-event-btn" data-id="{{ event.id }}" type="button" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
