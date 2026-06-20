@@ -27,6 +27,34 @@
             </select>
         </div>
 
+        <div class="mb-2" style="max-width: 190px;">
+            <label for="tagFilter" class="form-label">Filter by: Tag</label>
+            <select
+                id="tagFilter"
+                class="form-select"
+                onchange="location = this.value"
+            >
+                <option value="{{ path('app_event_index', {
+                    categoryId: currentCategory,
+                    title: title
+                }) }}"
+                        {% if currentTag is null %}selected{% endif %}>
+                    All
+                </option>
+
+                {% for tag in tags %}
+                    <option value="{{ path('app_event_index', {
+                        categoryId: currentCategory,
+                        tagId: tag.id,
+                        title: title
+                    }) }}"
+                            {% if currentTag == tag.id %}selected{% endif %}>
+                        #{{ tag.title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
         <div class="mb-2">
             <label class="form-label">Search events</label>
             <form method="get" class="d-flex gap-2">

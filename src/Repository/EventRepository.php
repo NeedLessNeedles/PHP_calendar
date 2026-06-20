@@ -23,16 +23,24 @@ class EventRepository extends ServiceEntityRepository
      *
      * @return QueryBuilder Query builder
      */
-    public function queryAll(?int $categoryId = null, ?string $title = null): QueryBuilder
+    public function queryAll(?int $categoryId = null, ?string $title = null, ?int $tagId = null): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('event')
             ->leftJoin('event.category', 'category')
-            ->addSelect('category');
+            ->addSelect('category')
+            ->leftJoin('event.tags', 'tag')
+            ->addSelect('tag');
 
         if (null !== $categoryId) {
             $queryBuilder
                 ->andWhere('category.id = :categoryId')
                 ->setParameter('categoryId', $categoryId);
+        }
+
+        if ($tagId !== null) {
+            $queryBuilder
+                ->andWhere(':tagId MEMBER OF event.tags')
+                ->setParameter('tagId', $tagId);
         }
 
         if (null !== $title && $title !== '') {
