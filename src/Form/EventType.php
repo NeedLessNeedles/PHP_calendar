@@ -34,7 +34,9 @@ class EventType extends AbstractType
             ])
             ->add('tags', EntityType::class, [
                 'class' => Tag::class,
-                'choice_label' => 'title',
+                'choice_label' => function(Tag $tag) {
+                    return '#' . $tag->getTitle();
+                },
                 'multiple' => true,
                 'expanded' => false,
                 'required' => false,

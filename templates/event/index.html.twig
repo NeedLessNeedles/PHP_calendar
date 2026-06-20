@@ -50,10 +50,10 @@
 
     <table class="table">
         <colgroup>
-            {# ID #}
-            <col style="width: 5%;">
+{#            #}{# ID #}
+{#            <col style="width: 5%;">#}
             {# Title #}
-            <col style="width: 15%;">
+            <col style="width: 10%;">
             {# Description #}
             <col style="width: 15%;">
             {# Start Date #}
@@ -66,12 +66,14 @@
             <col style="width: 10%;">
             {# Category #}
             <col style="width: 10%;">
+            {# Tag #}
+            <col style="width: 10%;">
             {# Actions #}
             <col style="width: 10%;">
         </colgroup>
         <thead>
             <tr>
-                <th>ID</th>
+{#                <th>ID</th>#}
                 <th>Title</th>
                 <th>Description</th>
                 <th>{{ knp_pagination_sortable(pagination, 'Start Date', 'event.startDate') }}</th>
@@ -79,13 +81,14 @@
                 <th>Location</th>
                 <th>Status</th>
                 <th>Category</th>
+                <th>Tags</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for event in pagination.items %}
             <tr>
-                <td>{{ event.id }}</td>
+{#                <td>{{ event.id }}</td>#}
                 <td>{{ event.title }}</td>
                 <td>{{ event.description }}</td>
                 <td>{{ event.startDate ? event.startDate|date('Y-m-d H:i') : '' }}</td>
@@ -93,6 +96,15 @@
                 <td>{{ event.location }}</td>
                 <td>{{ event.status }}</td>
                 <td>{{ event.category }}</td>
+                <td>
+                    {% for tag in event.tags %}
+                        <span class="badge bg-secondary">
+                            #{{ tag.title }}
+                        </span>
+                    {% else %}
+                        -
+                    {% endfor %}
+                </td>
 
                 {% if app.user %}
                     <td>
