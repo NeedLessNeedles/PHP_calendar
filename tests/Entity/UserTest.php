@@ -23,18 +23,18 @@ class UserTest extends TestCase
         $user = new User();
         $user->setEmail('user.email@service.com');
 
-        $this->assertEquals('Event title', $user->getEmail());
+        $this->assertEquals('user.email@service.com', $user->getEmail());
     }
 
     /**
-     * Test set() and get() for Roles column.
+     * Test get() for user identifier.
      */
-    public function testRoles(): void
+    public function testUserIdentifier(): void
     {
         $user = new User();
-        $user->setRoles(['ROLE_USER']);
+        $user->setEmail('user.email@service.com');
 
-        $this->assertEquals('ROLE_USER', $user->getRoles());
+        $this->assertEquals('user.email@service.com', $user->getUserIdentifier());
     }
 
     /**
@@ -46,5 +46,59 @@ class UserTest extends TestCase
         $user->setPassword('examplePASSWORD123');
 
         $this->assertEquals('examplePASSWORD123', $user->getPassword());
+    }
+
+    /**
+     * Test set() and get() for Roles column.
+     */
+    public function testRoles(): void
+    {
+        $user = new User();
+        $user->setRoles(['ROLE_ADMIN']);
+        $roles = $user->getRoles();
+
+        $this->assertContains('ROLE_ADMIN', $roles);
+        $this->assertContains('ROLE_USER', $roles);
+    }
+
+    /**
+     * Tests if User role is being granted by default.
+     */
+    public function testUserRole(): void
+    {
+        $user = new User();
+        $roles = $user->getRoles();
+
+        $this->assertContains('ROLE_USER', $roles);
+    }
+
+    /**
+     * Tests users blocking by admin.
+     */
+    public function testBlockStatus(): void
+    {
+        $user = new User();
+        $this->assertFalse($user->isBlocked());
+        $user->setIsBlocked(true);
+
+        $this->assertTrue($user->isBlocked());
+    }
+
+    /**
+     * Tests __serialize() function.
+     */
+    public function testSerialize(): void
+    {
+        $user = new User();
+        $user->setEmail('user@email.com');
+        $user->setPassword('secret');
+        $data = $user->__serialize();
+
+        $this->assertIsArray($data);
+        $this->assertNotEmpty($data);
+        $this->assertArrayHasKey(
+            "\0App\Entity\User\0password",
+            $data
+        );
     }
 }

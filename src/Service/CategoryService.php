@@ -8,6 +8,7 @@ namespace App\Service;
 
 use App\Entity\Category;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\EventRepository;
 
 /**
  * Class CategoryService.
@@ -18,8 +19,9 @@ class CategoryService implements CategoryServiceInterface
      * Constructor.
      *
      * @param EntityManagerInterface $entityManager Entity manager
+     * @param EventRepository $eventRepository Event repository
      */
-    public function __construct(private readonly EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly EventRepository $eventRepository)
     {
     }
 

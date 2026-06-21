@@ -72,4 +72,63 @@ class RegistrationControllerTest extends WebTestCase
         // self::assertResponseRedirects('/'); @TODO: set the appropriate path that the user is redirected to.
         self::assertCount(1, $this->userRepository->findAll());
     }
+
+    public function testRegisterPageLoads(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/register');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('form');
+    }
+
+    public function testRegisterNewUser(): void
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request('GET', '/register');
+
+        $form = $crawler->selectButton('Register')->form([
+            'registration_form[email]' => 'new.user@example.com',
+            'registration_form[plainPassword]' => 'password123',
+            'registration_form[agreeTerms]' => true,
+        ]);
+
+        $client->submit($form);
+
+        $this->assertResponseRedirects();
+
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = $em->getRepository(User::class)->findOneBy([
+            'email' => 'new.user@example.com',
+        ]);
+
+        $this->assertNotNull($user);
+        $this->assertContains('ROLE_USER', $user->getRoles());
+    }
+
+    public function testPasswordIsHashed(): void
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request('GET', '/register');
+
+        $client->submit($crawler->selectButton('Register')->form([
+            'registration_form[email]' => 'hash.test@example.com',
+            'registration_form[plainPassword]' => 'password123',
+            'registration_form[agreeTerms]' => true,
+        ]));
+
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = $em->getRepository(User::class)->findOneBy([
+            'email' => 'hash.test@example.com',
+        ]);
+
+        $passwordHasher = static::getContainer()->get(UserPasswordHasherInterface::class);
+
+        $this->assertTrue(
+            $passwordHasher->isPasswordValid($user, 'password123')
+        );
+    }
 }

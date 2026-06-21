@@ -20,6 +20,7 @@
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
+
         </testsuite>
     </testsuites>
 
@@ -31,6 +32,10 @@
         <include>
             <directory>src</directory>
         </include>
+<!--        <exclude>-->
+<!--            <directory>tests/Form</directory>-->
+<!--            <directory>tests/Repository</directory>-->
+<!--        </exclude>-->
 
         <deprecationTrigger>
             <method>Doctrine\Deprecations\Deprecation::trigger</method>
