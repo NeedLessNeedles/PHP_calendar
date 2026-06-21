@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Admin service.
  */
@@ -43,5 +44,4 @@ class AdminService implements AdminServiceInterface
 
         $targetUser->setIsBlocked(!$targetUser->isBlocked());
     }
-
 }

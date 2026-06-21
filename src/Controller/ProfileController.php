@@ -9,12 +9,11 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Form\ProfileEmailType;
 use App\Form\ChangePasswordType;
+use App\Service\ProfileServiceInterface;
 
 /**
  * Class ProfileController.
@@ -23,11 +22,19 @@ use App\Form\ChangePasswordType;
 class ProfileController extends AbstractController
 {
     /**
+     * Constructor.
+     *
+     * @param ProfileServiceInterface $profileService Profile service
+     */
+    public function __construct(private readonly ProfileServiceInterface $profileService)
+    {
+    }
+
+    /**
      * Index action.
      *
-     * @param Request                     $request        request
-     * @param EntityManagerInterface      $entityManager  entityManager
-     * @param UserPasswordHasherInterface $passwordHasher passwordHasher
+     * @param Request                $request       request
+     * @param EntityManagerInterface $entityManager entityManager
      *
      * @return Response HTTP response
      */
@@ -35,24 +42,32 @@ class ProfileController extends AbstractController
         name: 'app_profile',
         methods: ['GET', 'POST']
     )]
-    public function index(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
 
+        // FORM: email
         $emailForm = $this->createForm(ProfileEmailType::class, $user);
-        $passwordForm = $this->createForm(ChangePasswordType::class);
         $emailForm->handleRequest($request);
+
+        // FORM: password
+        $passwordForm = $this->createForm(ChangePasswordType::class);
         $passwordForm->handleRequest($request);
 
+        // email update
         if ($emailForm->isSubmitted() && $emailForm->isValid()) {
             $entityManager->flush();
         }
 
+        // password update
         if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
             $data = $passwordForm->getData();
-            $user->setPassword(
-                $passwordHasher->hashPassword($user, $data['newPassword'])
+
+            $this->profileService->changePassword(
+                $user,
+                $data['newPassword']
             );
+
             $entityManager->flush();
         }
 

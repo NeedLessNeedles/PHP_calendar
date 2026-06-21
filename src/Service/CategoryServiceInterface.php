@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Category service interface.
  */
@@ -6,8 +7,6 @@
 namespace App\Service;
 
 use App\Entity\Category;
-use App\Entity\Event;
-use App\Entity\User;
 
 /**
  * Interface CategoryServiceInterface.
@@ -15,4 +14,6 @@ use App\Entity\User;
 interface CategoryServiceInterface
 {
     public function edit(Category $category, string $title): void;
+
+    public function delete(Category $category): void;
 }

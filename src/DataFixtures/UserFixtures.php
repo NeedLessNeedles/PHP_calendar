@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User fixtures.
  */
@@ -23,6 +24,7 @@ class UserFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
     {
         $this->passwordHasher = $passwordHasher;
     }
+
     public static function getGroups(): array
     {
         return ['main'];
@@ -39,7 +41,7 @@ class UserFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
             'user.second@gmail.com',
         ];
 
-        foreach($admins as $admin) {
+        foreach ($admins as $admin) {
             $user = new User();
             $user->setEmail($admin);
             $user->setRoles(['ROLE_ADMIN']);
@@ -53,7 +55,7 @@ class UserFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
             $this->manager->persist($user);
         }
 
-        foreach($defaultUsers as $defaultUser) {
+        foreach ($defaultUsers as $defaultUser) {
             $user = new User();
             $user->setEmail($defaultUser);
             $user->setRoles(['ROLE_USER']);

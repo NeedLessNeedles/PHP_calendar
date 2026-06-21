@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Registration service interface.
  */
@@ -13,5 +14,4 @@ use App\Entity\User;
 interface RegistrationServiceInterface
 {
     public function registerUser(User $user, string $plainPassword): void;
-
 }

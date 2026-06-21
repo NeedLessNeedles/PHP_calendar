@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Category service.
  */
@@ -17,6 +18,7 @@ class CategoryService implements CategoryServiceInterface
         private readonly EntityManagerInterface $entityManager,
     ) {
     }
+
     public function edit(Category $category, string $title): void
     {
         $category->setTitle($title);
@@ -26,7 +28,7 @@ class CategoryService implements CategoryServiceInterface
     public function delete(Category $category): void
     {
         $usedByEvents = $this->eventRepository->count([
-            'category' => $category
+            'category' => $category,
         ]);
 
         if ($usedByEvents > 0) {

@@ -6,7 +6,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Tag;
 use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;

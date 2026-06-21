@@ -9,17 +9,17 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusExce
 
 class UserChecker implements UserCheckerInterface
 {
-//    public function checkPreAuth(User $user): void
-//    {
-//        if ($user->isBlocked()) {
-//            throw new CustomUserMessageAccountStatusException('Account is blocked.');
-//        }
-//    }
-//
-//    public function checkPostAuth(User $user): void
-//    {
-//        // optional
-//    }
+    //    public function checkPreAuth(User $user): void
+    //    {
+    //        if ($user->isBlocked()) {
+    //            throw new CustomUserMessageAccountStatusException('Account is blocked.');
+    //        }
+    //    }
+    //
+    //    public function checkPostAuth(User $user): void
+    //    {
+    //        // optional
+    //    }
     public function checkPreAuth(UserInterface $user): void
     {
         if ($user instanceof User && $user->isBlocked()) {

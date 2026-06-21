@@ -28,14 +28,14 @@ class EventType extends AbstractType
             ])
             ->add('category', EntityType::class, [
                 'class' => Category::class,
-                'choice_label' => function(Category $category) {
+                'choice_label' => function (Category $category) {
                     return $category->getTitle();
                 },
             ])
             ->add('tags', EntityType::class, [
                 'class' => Tag::class,
-                'choice_label' => function(Tag $tag) {
-                    return '#' . $tag->getTitle();
+                'choice_label' => function (Tag $tag) {
+                    return '#'.$tag->getTitle();
                 },
                 'multiple' => true,
                 'expanded' => false,

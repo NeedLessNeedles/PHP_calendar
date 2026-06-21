@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Event fixtures.
  */
@@ -8,7 +9,6 @@ namespace App\DataFixtures;
 use App\Entity\Event;
 use App\Entity\Category;
 use App\Entity\Tag;
-use App\DataFixtures\CategoryFixtures;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
@@ -24,6 +24,7 @@ class EventFixtures extends AbstractBaseFixtures implements DependentFixtureInte
     {
         return ['main'];
     }
+
     public function getDependencies(): array
     {
         return [
@@ -31,6 +32,7 @@ class EventFixtures extends AbstractBaseFixtures implements DependentFixtureInte
             TagFixtures::class,
         ];
     }
+
     public function loadData(): void
     {
         $categories = $this->manager
@@ -46,7 +48,7 @@ class EventFixtures extends AbstractBaseFixtures implements DependentFixtureInte
             $event->setDescription($this->faker->sentence);
             $event->setLocation($this->faker->city());
             $event->setStartDate(
-                ($this->faker->dateTimeBetween('-10 days', '+1 days'))
+                $this->faker->dateTimeBetween('-10 days', '+1 days')
             );
             $event->setStatus('approved');
             $event->setCategory(

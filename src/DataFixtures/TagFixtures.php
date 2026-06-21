@@ -6,9 +6,7 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Event;
 use App\Entity\Tag;
-use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 
 class TagFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
@@ -20,6 +18,7 @@ class TagFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
     {
         return ['main'];
     }
+
     public function loadData(): void
     {
         $tags = [
@@ -31,7 +30,7 @@ class TagFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
             'family_friendly',
             'private',
             'open',
-            'ticketed'
+            'ticketed',
         ];
 
         foreach ($tags as $title) {

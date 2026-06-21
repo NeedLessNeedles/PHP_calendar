@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Tag controller.
+ */
+
 namespace App\Controller;
 
 use App\Entity\Tag;
@@ -9,10 +13,30 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\TagServiceInterface;
 
+/**
+ * Class TagController.
+ */
 #[Route('/tag')]
 class TagController extends AbstractController
 {
+    /**
+     * Constructor.
+     *
+     * @param TagServiceInterface $tagService Tag service
+     */
+    public function __construct(private readonly TagServiceInterface $tagService)
+    {
+    }
+
+    /**
+     * Index action.
+     *
+     * @param TagRepository $tagRepository Tag repository
+     *
+     * @return Response HTTP response
+     */
     #[Route(
         name: 'app_tag_index',
         methods: ['GET', 'POST']
@@ -25,12 +49,20 @@ class TagController extends AbstractController
         ]);
     }
 
+    /**
+     * New action.
+     *
+     * @param Request                $request       request
+     * @param EntityManagerInterface $entityManager entityManager
+     *
+     * @return Response HTTP response
+     */
     #[Route(
         '/new',
         name: 'app_tag_new',
         methods: ['GET', 'POST']
     )]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -39,13 +71,20 @@ class TagController extends AbstractController
         $tag->setTitle($request->request->get('title'));
 
         if ($tag->getTitle()) {
-            $em->persist($tag);
-            $em->flush();
+            $entityManager->persist($tag);
+            $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_tag_index');
     }
 
+    /**
+     * Show action.
+     *
+     * @param Tag $tag Tag
+     *
+     * @return Response HTTP response
+     */
     #[Route(
         '/{id}',
         name: 'app_tag_show',
@@ -59,13 +98,22 @@ class TagController extends AbstractController
         ]);
     }
 
+    /**
+     * Edit action.
+     *
+     * @param Request                $request       request
+     * @param Tag                    $tag           Tag
+     * @param EntityManagerInterface $entityManager entityManager
+     *
+     * @return Response HTTP response
+     */
     #[Route(
         '/{id}/edit',
         name: 'app_tag_edit',
         requirements: ['id' => '[1-9]\d*'],
         methods: ['POST']
     )]
-    public function edit(Request $request, Tag $tag, EntityManagerInterface $em): Response
+    public function edit(Request $request, Tag $tag, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -73,31 +121,38 @@ class TagController extends AbstractController
             throw $this->createAccessDeniedException('Invalid CSRF');
         }
 
-        $tag->setTitle($request->request->get('title'));
+        $title = $request->request->get('title');
+        $this->tagService->edit($tag, $title);
 
-        $em->flush();
+        $entityManager->flush();
 
         $this->addFlash('success', 'Tag updated');
 
         return $this->redirectToRoute('app_tag_index');
     }
 
+    /**
+     * Delete action.
+     *
+     * @param Request $request request
+     * @param Tag     $tag     Tag
+     *
+     * @return Response HTTP response
+     */
     #[Route(
         '/{id}',
         name: 'app_tag_delete',
         requirements: ['id' => '[1-9]\d*'],
         methods: ['POST']
     )]
-    public function delete(Request $request, Tag $tag, EntityManagerInterface $em): Response
+    public function delete(Request $request, Tag $tag): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        if (!$this->isCsrfTokenValid('delete' . $tag->getId(), $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid('delete'.$tag->getId(), $request->request->get('_token'))) {
             return $this->redirectToRoute('app_tag_index');
         }
-
-        $em->remove($tag);
-        $em->flush();
+        $this->tagService->delete($tag);
 
         return $this->redirectToRoute('app_tag_index');
     }

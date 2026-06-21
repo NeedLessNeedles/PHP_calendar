@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Event service.
  */
@@ -18,11 +19,12 @@ use Doctrine\ORM\EntityManagerInterface;
 class EventService implements EventServiceInterface
 {
     public const PAGINATOR_ITEMS_PER_PAGE = 5;
+
     /**
      * Constructor.
      *
-     * @param EventRepository     $eventRepository Event repository
-     * @param PaginatorInterface $paginator      Paginator
+     * @param EventRepository    $eventRepository Event repository
+     * @param PaginatorInterface $paginator       Paginator
      */
     public function __construct(
         private readonly EventRepository $eventRepository,

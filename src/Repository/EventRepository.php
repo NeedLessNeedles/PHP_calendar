@@ -13,6 +13,7 @@ use Doctrine\ORM\QueryBuilder;
 class EventRepository extends ServiceEntityRepository
 {
     public const PAGINATOR_ITEMS_PER_PAGE = 5;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Event::class);
@@ -37,19 +38,18 @@ class EventRepository extends ServiceEntityRepository
                 ->setParameter('categoryId', $categoryId);
         }
 
-        if ($tagId !== null) {
+        if (null !== $tagId) {
             $queryBuilder
                 ->andWhere(':tagId MEMBER OF event.tags')
                 ->setParameter('tagId', $tagId);
         }
 
-        if (null !== $title && $title !== '') {
+        if (null !== $title && '' !== $title) {
             $queryBuilder
                 ->andWhere('LOWER(event.title) LIKE LOWER(:title)')
-                ->setParameter('title', '%' . $title . '%');
+                ->setParameter('title', '%'.$title.'%');
         }
 
         return $queryBuilder;
     }
-
 }

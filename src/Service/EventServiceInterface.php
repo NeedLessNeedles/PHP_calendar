@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Event service interface.
  */
@@ -24,5 +25,4 @@ interface EventServiceInterface
     public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null): PaginationInterface;
 
     public function create(Event $event, ?User $user): void;
-
 }

@@ -18,10 +18,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Security\Voter\EventVoter;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * Class EventController.
@@ -29,13 +27,21 @@ use Knp\Component\Pager\PaginatorInterface;
 #[Route('/event')]
 class EventController extends AbstractController
 {
+    /**
+     * Constructor.
+     *
+     * @param EventServiceInterface $eventService Event service
+     */
     public function __construct(private readonly EventServiceInterface $eventService)
     {
     }
+
     /**
      * Index action.
      *
-     * @param EventRepository $eventRepository Event repository
+     * @param Request            $request            request
+     * @param CategoryRepository $categoryRepository Category repository
+     * @param TagRepository      $tagRepository      Tag repository
      *
      * @return Response HTTP response
      */
@@ -47,9 +53,9 @@ class EventController extends AbstractController
     {
         $page = $request->query->getInt('page', 1);
         $categoryId = $request->query->get('categoryId');
-        $categoryId = is_numeric($categoryId) ? (int)$categoryId : null;
+        $categoryId = is_numeric($categoryId) ? (int) $categoryId : null;
         $tagId = $request->query->get('tagId');
-        $tagId = is_numeric($tagId) ? (int)$tagId : null;
+        $tagId = is_numeric($tagId) ? (int) $tagId : null;
         $title = $request->query->get('title');
 
         $pagination = $this->eventService->getPaginatedList(
@@ -58,7 +64,6 @@ class EventController extends AbstractController
             $title,
             $tagId
         );
-        //$event = new Event();
         $createForm = $this->createForm(EventType::class, new Event(), [
             'action' => $this->generateUrl('app_event_new'),
         ]);
@@ -82,9 +87,7 @@ class EventController extends AbstractController
     /**
      * New action.
      *
-     * @param Request                $request            request
-     * @param EntityManagerInterface $entityManager      Entity manager
-     * @param CategoryRepository     $categoryRepository Category repo
+     * @param Request $request request
      *
      * @return Response HTTP response
      */
@@ -101,7 +104,6 @@ class EventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //$user = $this->getUser();
             $this->eventService->create($event, $this->getUser());
 
             return $this->redirectToRoute('app_event_calendar', [], Response::HTTP_SEE_OTHER);
@@ -205,7 +207,7 @@ class EventController extends AbstractController
      *
      * @param EventRepository $eventRepository event repository
      *
-     * @return JsonResponse HTTP response
+     * @return JsonResponse JSON response
      */
     #[Route(
         '/json',
@@ -230,6 +232,13 @@ class EventController extends AbstractController
         return $this->json($data);
     }
 
+    /**
+     * editEventJson action.
+     *
+     * @param Event $event event
+     *
+     * @return JsonResponse JSON response
+     */
     #[Route(
         '/{id}/json',
         name: 'app_event_json_edit',
@@ -263,7 +272,6 @@ class EventController extends AbstractController
     {
         $event = new Event();
         $event->setOwner($this->getUser());
-//        $createForm = $this->createForm(EventType::class, $event);
         $createForm = $this->createForm(EventType::class, new Event(), [
             'action' => $this->generateUrl('app_event_new'),
         ]);
@@ -273,7 +281,7 @@ class EventController extends AbstractController
 
         return $this->render('event/calendar.html.twig', [
             'createForm' => $createForm->createView(),
-            'editForm' => $editForm->createView()
+            'editForm' => $editForm->createView(),
         ]);
     }
 }

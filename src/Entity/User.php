@@ -129,6 +129,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsBlocked(bool $isBlocked): static
     {
         $this->isBlocked = $isBlocked;
+
         return $this;
     }
 
