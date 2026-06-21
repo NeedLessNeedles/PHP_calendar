@@ -23,16 +23,24 @@ class EventService implements EventServiceInterface
     /**
      * Constructor.
      *
-     * @param EventRepository    $eventRepository Event repository
-     * @param PaginatorInterface $paginator       Paginator
+     * @param EventRepository        $eventRepository Event repository
+     * @param PaginatorInterface     $paginator       Paginator
+     * @param EntityManagerInterface $entityManager   Entity manager
      */
-    public function __construct(
-        private readonly EventRepository $eventRepository,
-        private readonly PaginatorInterface $paginator,
-        private readonly EntityManagerInterface $entityManager,
-    ) {
+    public function __construct(private readonly EventRepository $eventRepository, private readonly PaginatorInterface $paginator, private readonly EntityManagerInterface $entityManager)
+    {
     }
 
+    /**
+     * Get paginated list.
+     *
+     * @param int         $page       Page number
+     * @param int|null    $categoryId Category ID
+     * @param string|null $title      Title
+     * @param int|null    $tagId      Tag ID
+     *
+     * @return PaginationInterface Paginated list
+     */
     public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null): PaginationInterface
     {
         return $this->paginator->paginate(
@@ -47,6 +55,12 @@ class EventService implements EventServiceInterface
         );
     }
 
+    /**
+     * Create event.
+     *
+     * @param Event     $event Event
+     * @param User|null $user  User
+     */
     public function create(Event $event, ?User $user): void
     {
         if ($user && in_array('ROLE_ADMIN', $user->getRoles(), true)) {

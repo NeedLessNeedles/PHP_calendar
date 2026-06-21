@@ -16,20 +16,33 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 class UserFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
 {
     /**
-     * Load data.
+     * Password hasher.
      */
     private UserPasswordHasherInterface $passwordHasher;
 
+    /**
+     * Constructor.
+     *
+     * @param UserPasswordHasherInterface $passwordHasher Password hasher
+     */
     public function __construct(UserPasswordHasherInterface $passwordHasher)
     {
         $this->passwordHasher = $passwordHasher;
     }
 
+    /**
+     * Get destined fixture groups.
+     *
+     * @return array Group name list
+     */
     public static function getGroups(): array
     {
         return ['main'];
     }
 
+    /**
+     * Load data.
+     */
     public function loadData(): void
     {
         $admins = [

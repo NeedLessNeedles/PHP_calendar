@@ -15,12 +15,22 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 class RegistrationService implements RegistrationServiceInterface
 {
-    public function __construct(
-        private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly EntityManagerInterface $entityManager,
-    ) {
+    /**
+     * Constructor.
+     *
+     * @param UserPasswordHasherInterface $passwordHasher Password hasher
+     * @param EntityManagerInterface      $entityManager  Entity manager
+     */
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher, private readonly EntityManagerInterface $entityManager)
+    {
     }
 
+    /**
+     * User registration.
+     *
+     * @param User   $user          User
+     * @param string $plainPassword Plain password
+     */
     public function registerUser(User $user, string $plainPassword): void
     {
         $user->setPassword(

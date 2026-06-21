@@ -9,16 +9,24 @@ namespace App\DataFixtures;
 use App\Entity\Tag;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 
+/**
+ * Class TagFixtures.
+ */
 class TagFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
 {
     /**
-     * Load data.
+     * Get destined fixture groups.
+     *
+     * @return array Group name list
      */
     public static function getGroups(): array
     {
         return ['main'];
     }
 
+    /**
+     * Load data.
+     */
     public function loadData(): void
     {
         $tags = [

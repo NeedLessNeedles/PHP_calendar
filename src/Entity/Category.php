@@ -12,15 +12,15 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Class Category.
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
+ *
+ * @ORM\Table(name="category")
  */
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[ORM\Table(name: 'categories')]
 #[ORM\UniqueConstraint(name: 'uq_categories_title', columns: ['title'])]
 #[UniqueEntity(fields: ['title'])]
-
-/**
- * Class Category.
- */
 class Category
 {
     /**
@@ -49,6 +49,22 @@ class Category
     #[ORM\Column(type: 'datetime_immutable')]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    /**
+     * Category constructor.
+     */
+    public function __construct()
+    {
+        $now = new \DateTimeImmutable();
+
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
+    }
+
+    /**
+     * Title conversion to string.
+     *
+     * @return string Title
+     */
     public function __toString(): string
     {
         return $this->title;
@@ -122,13 +138,5 @@ class Category
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
-    }
-
-    public function __construct()
-    {
-        $now = new \DateTimeImmutable();
-
-        $this->createdAt = $now;
-        $this->updatedAt = $now;
     }
 }

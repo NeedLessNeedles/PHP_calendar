@@ -18,11 +18,20 @@ interface EventServiceInterface
     /**
      * Get paginated list.
      *
-     * @param int $page Page number
+     * @param int         $page       Page number
+     * @param int|null    $categoryId Category ID
+     * @param string|null $title      Title
+     * @param int|null    $tagId      Tag ID
      *
-     * @return PaginationInterface<string, mixed> Paginated list
+     * @return PaginationInterface Paginated list
      */
     public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null): PaginationInterface;
 
+    /**
+     * Create event.
+     *
+     * @param Event     $event Event
+     * @param User|null $user  User
+     */
     public function create(Event $event, ?User $user): void;
 }

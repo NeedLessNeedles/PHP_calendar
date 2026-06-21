@@ -15,11 +15,21 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 class AdminService implements AdminServiceInterface
 {
-    public function __construct(
-        private readonly UserPasswordHasherInterface $passwordHasher,
-    ) {
+    /**
+     * Constructor.
+     *
+     * @param UserPasswordHasherInterface $passwordHasher Password hasher
+     */
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
+    {
     }
 
+    /**
+     * Change password.
+     *
+     * @param User   $user     User
+     * @param string $password Password
+     */
     public function changePassword(User $user, string $password): void
     {
         $user->setPassword(
@@ -27,11 +37,22 @@ class AdminService implements AdminServiceInterface
         );
     }
 
+    /**
+     * Approve event.
+     *
+     * @param Event $event Event
+     */
     public function approveEvent(Event $event): void
     {
         $event->setStatus('approved');
     }
 
+    /**
+     * Toggle user block.
+     *
+     * @param User $targetUser  Target user
+     * @param User $currentUser Current user
+     */
     public function toggleBlock(User $targetUser, User $currentUser): void
     {
         if ($targetUser->getId() === $currentUser->getId()) {

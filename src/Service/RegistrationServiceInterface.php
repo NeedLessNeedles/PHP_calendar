@@ -13,5 +13,11 @@ use App\Entity\User;
  */
 interface RegistrationServiceInterface
 {
+    /**
+     * User registration.
+     *
+     * @param User   $user          User
+     * @param string $plainPassword Plain password
+     */
     public function registerUser(User $user, string $plainPassword): void;
 }

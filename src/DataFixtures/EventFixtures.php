@@ -18,13 +18,20 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 class EventFixtures extends AbstractBaseFixtures implements DependentFixtureInterface, FixtureGroupInterface
 {
     /**
-     * Load data.
+     * Get destined fixture groups.
+     *
+     * @return array Group name list
      */
     public static function getGroups(): array
     {
         return ['main'];
     }
 
+    /**
+     * Get dependent fixture to create first.
+     *
+     * @return array Fixtures name list
+     */
     public function getDependencies(): array
     {
         return [
@@ -33,6 +40,9 @@ class EventFixtures extends AbstractBaseFixtures implements DependentFixtureInte
         ];
     }
 
+    /**
+     * Load data.
+     */
     public function loadData(): void
     {
         $categories = $this->manager

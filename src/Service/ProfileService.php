@@ -14,11 +14,21 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 class ProfileService implements ProfileServiceInterface
 {
-    public function __construct(
-        private readonly UserPasswordHasherInterface $passwordHasher,
-    ) {
+    /**
+     * Constructor.
+     *
+     * @param UserPasswordHasherInterface $passwordHasher Password hasher
+     */
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
+    {
     }
 
+    /**
+     * Change password.
+     *
+     * @param User   $user     User
+     * @param string $password Password
+     */
     public function changePassword(User $user, string $password): void
     {
         $user->setPassword(
