@@ -8,6 +8,8 @@ namespace App\Tests\Entity;
 
 use App\Entity\User;
 use App\Entity\Event;
+use App\Entity\Category;
+use App\Entity\Tag;
 use PHPUnit\Framework\TestCase;
 use function PHPUnit\Framework\assertEquals;
 
@@ -80,7 +82,7 @@ class EventTest extends TestCase
         $date = new \DateTime('2025-01-01 12:00');
         $event->setStartDate($date);
 
-        $this->assertSame($date, $event->getStartDate());
+        $this->assertEquals($date, $event->getStartDate());
     }
 
     /**
@@ -104,9 +106,7 @@ class EventTest extends TestCase
 
         $event->setEndDate(null);
 
-        $this->assertNull(
-            $event->getEndDate()
-        );
+        $this->assertNull($event->getEndDate());
     }
 
     /**
@@ -116,10 +116,9 @@ class EventTest extends TestCase
     {
         $event = new Event();
         $user = new User();
-
         $event->setOwner($user);
 
-        $this->assertSame($user, $event->getOwner());
+        $this->assertEquals($user, $event->getOwner());
     }
 
     /**
@@ -142,5 +141,54 @@ class EventTest extends TestCase
         $event->setStatus('approved');
 
         $this->assertEquals('approved', $event->getStatus());
+    }
+
+    public function testCategory(): void
+    {
+        $event = new Event();
+        $category = new Category();
+        $category->setTitle('Technology');
+        $event->setCategory($category);
+
+        $this->assertEquals($category, $event->getCategory());
+    }
+
+    public function testTagsInitialized(): void
+    {
+        $event = new Event();
+
+        $this->assertCount(0, $event->getTags());
+    }
+
+    public function testAddTag(): void
+    {
+        $event = new Event();
+        $tag = new Tag();
+        $tag->setTitle('online');
+        $event->addTag($tag);
+
+        $this->assertCount(1, $event->getTags());
+        $this->assertTrue($event->getTags()->contains($tag));
+    }
+
+    public function testTagsDoesntDuplicate(): void
+    {
+        $event = new Event();
+        $tag = new Tag();
+        $event->addTag($tag);
+        $event->addTag($tag);
+
+        $this->assertCount(1, $event->getTags());
+    }
+
+    public function testRemoveTag(): void
+    {
+        $event = new Event();
+        $tag = new Tag();
+        $event->addTag($tag);
+
+        $this->assertCount(1, $event->getTags());
+        $event->removeTag($tag);
+        $this->assertCount(0, $event->getTags());
     }
 }

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Event voter.
+ */
+
 namespace App\Security\Voter;
 
 use App\Entity\Event;
@@ -8,17 +12,32 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-final class EventVoter extends Voter
+/**
+ * Class EventVoter.
+ */
+class EventVoter extends Voter
 {
     public const EDIT = 'EVENT_EDIT';
     public const VIEW = 'EVENT_VIEW';
     public const DELETE = 'EVENT_DELETE';
 
-    public function __construct(
-        private Security $security,
-    ) {
+    /**
+     * Constructor.
+     *
+     * @param Security $security Admin Login security
+     */
+    public function __construct(private readonly Security $security)
+    {
     }
 
+    /**
+     * Supports action.
+     *
+     * @param string $attribute Attribute
+     * @param mixed  $subject   Subject
+     *
+     * @return bool Action
+     */
     protected function supports(string $attribute, mixed $subject): bool
     {
         return $subject instanceof Event
@@ -29,11 +48,17 @@ final class EventVoter extends Voter
             ], true);
     }
 
-    protected function voteOnAttribute(
-        string $attribute,
-        mixed $subject,
-        TokenInterface $token,
-    ): bool {
+    /**
+     * Vote on attribute action.
+     *
+     * @param string         $attribute Attribute
+     * @param mixed          $subject   Subject
+     * @param TokenInterface $token     Token
+     *
+     * @return bool Vote
+     */
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    {
         $user = $token->getUser();
 
         /** @var Event $event */

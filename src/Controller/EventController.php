@@ -11,15 +11,15 @@ use App\Form\EventType;
 use App\Form\EventEditType;
 use App\Repository\EventRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\TagRepository;
+use App\Service\EventServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Security\Voter\EventVoter;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * Class EventController.
@@ -28,9 +28,20 @@ use Knp\Component\Pager\PaginatorInterface;
 class EventController extends AbstractController
 {
     /**
+     * Constructor.
+     *
+     * @param EventServiceInterface $eventService Event service
+     */
+    public function __construct(private readonly EventServiceInterface $eventService)
+    {
+    }
+
+    /**
      * Index action.
      *
-     * @param EventRepository $eventRepository Event repository
+     * @param Request            $request            request
+     * @param CategoryRepository $categoryRepository Category repository
+     * @param TagRepository      $tagRepository      Tag repository
      *
      * @return Response HTTP response
      */
@@ -38,20 +49,21 @@ class EventController extends AbstractController
         name: 'app_event_index',
         methods: ['GET']
     )]
-    public function index(Request $request, EventRepository $eventRepository, PaginatorInterface $paginator): Response
+    public function index(Request $request, CategoryRepository $categoryRepository, TagRepository $tagRepository): Response
     {
-        //$events = $eventRepository->findAll();
-        $pagination = $paginator->paginate(
-            $eventRepository->queryAll(),
-            $request->query->getInt('page', 1),
-            EventRepository::PAGINATOR_ITEMS_PER_PAGE,
-            [
-                'sortFieldAllowList' => ['event.startDate', 'event.title'],
-                'defaultSortFieldName' => 'event.startDate',
-                'defaultSortDirection' => 'desc',
-            ]
+        $page = $request->query->getInt('page', 1);
+        $categoryId = $request->query->get('categoryId');
+        $categoryId = is_numeric($categoryId) ? (int) $categoryId : null;
+        $tagId = $request->query->get('tagId');
+        $tagId = is_numeric($tagId) ? (int) $tagId : null;
+        $title = $request->query->get('title');
+
+        $pagination = $this->eventService->getPaginatedList(
+            $page,
+            $categoryId,
+            $title,
+            $tagId
         );
-        $event = new Event();
         $createForm = $this->createForm(EventType::class, new Event(), [
             'action' => $this->generateUrl('app_event_new'),
         ]);
@@ -62,17 +74,20 @@ class EventController extends AbstractController
 
         return $this->render('event/index.html.twig', [
             'pagination' => $pagination,
+            'categories' => $categoryRepository->findAll(),
+            'currentCategory' => $categoryId ?: null,
+            'tags' => $tagRepository->findAll(),
+            'currentTag' => $tagId,
             'createForm' => $createForm->createView(),
             'editForm' => $editForm->createView(),
+            'title' => $title,
         ]);
     }
 
     /**
      * New action.
      *
-     * @param Request                $request            request
-     * @param EntityManagerInterface $entityManager      Entity manager
-     * @param CategoryRepository     $categoryRepository Category repo
+     * @param Request $request request
      *
      * @return Response HTTP response
      */
@@ -81,34 +96,15 @@ class EventController extends AbstractController
         name: 'app_event_new',
         methods: ['GET', 'POST']
     )]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request): Response
     {
         $event = new Event();
+
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
-//        if ($form->isSubmitted()) {
-//            dd($form->isValid(), (string) $form->getErrors(true));
-//        }
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
-
-            if ($user && in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-                $event->setStatus('approved');
-            } elseif ($user) {
-                $event->setStatus('approved');
-            } else {
-                $event->setStatus('pending');
-            }
-
-            if (!$event->getCategory()) {
-                throw $this->createNotFoundException('Category is required');
-            }
-            $event->setOwner($user);
-
-            $entityManager->persist($event);
-            $entityManager->flush();
+            $this->eventService->create($event, $this->getUser());
 
             return $this->redirectToRoute('app_event_calendar', [], Response::HTTP_SEE_OTHER);
         }
@@ -211,7 +207,7 @@ class EventController extends AbstractController
      *
      * @param EventRepository $eventRepository event repository
      *
-     * @return JsonResponse HTTP response
+     * @return JsonResponse JSON response
      */
     #[Route(
         '/json',
@@ -236,6 +232,13 @@ class EventController extends AbstractController
         return $this->json($data);
     }
 
+    /**
+     * editEventJson action.
+     *
+     * @param Event $event event
+     *
+     * @return JsonResponse JSON response
+     */
     #[Route(
         '/{id}/json',
         name: 'app_event_json_edit',
@@ -269,7 +272,6 @@ class EventController extends AbstractController
     {
         $event = new Event();
         $event->setOwner($this->getUser());
-//        $createForm = $this->createForm(EventType::class, $event);
         $createForm = $this->createForm(EventType::class, new Event(), [
             'action' => $this->generateUrl('app_event_new'),
         ]);
@@ -279,7 +281,7 @@ class EventController extends AbstractController
 
         return $this->render('event/calendar.html.twig', [
             'createForm' => $createForm->createView(),
-            'editForm' => $editForm->createView()
+            'editForm' => $editForm->createView(),
         ]);
     }
 }

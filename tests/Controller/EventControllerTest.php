@@ -7,6 +7,7 @@
 namespace App\Tests\Controller;
 
 use App\Entity\Event;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -34,6 +35,22 @@ class EventControllerTest extends WebTestCase
         }
 
         $this->manager->flush();
+    }
+
+    private function getUser($client, string $email): User
+    {
+        return $client->getContainer()
+            ->get('doctrine')
+            ->getRepository(User::class)
+            ->findOneBy(['email' => $email]);
+    }
+
+    private function getEvent($client): ?Event
+    {
+        return $client->getContainer()
+            ->get('doctrine')
+            ->getRepository(Event::class)
+            ->findOneBy([]);
     }
 
     public function testIndex(): void
@@ -139,4 +156,103 @@ class EventControllerTest extends WebTestCase
 
         $this->markTestIncomplete('This test was generated');
     }
+
+    public function testNewEventAsUser(): void
+    {
+        $client = static::createClient();
+
+        $user = $this->getUser($client, 'user.first@gmail.com');
+        $client->loginUser($user);
+
+        $client->request('POST', '/event/new', [
+            'event' => [
+                'title' => 'Test event',
+                'description' => 'desc',
+                'location' => 'Warsaw',
+            ],
+        ]);
+
+        $this->assertResponseRedirects('/event/calendar');
+    }
+
+    public function testEditEventDeniedWithoutPermission(): void
+    {
+        $client = static::createClient();
+
+        $event = $this->getEvent($client);
+        $this->assertNotNull($event);
+
+        $client->request('POST', '/event/' . $event->getId() . '/edit', [
+            'event' => [
+                'title' => 'Changed title',
+            ],
+        ]);
+
+        $this->assertResponseRedirects();
+    }
+
+    public function testEditEventAsOwner(): void
+    {
+        $client = static::createClient();
+
+        $user = $this->getUser($client, 'user.first@gmail.com');
+        $event = $this->getEvent($client);
+
+        $client->loginUser($user);
+
+        $client->request('POST', '/event/' . $event->getId() . '/edit', [
+            'event' => [
+                'title' => 'Updated event',
+            ],
+        ]);
+
+        $this->assertResponseRedirects('/event');
+    }
+
+    public function testDeleteEventAsOwner(): void
+    {
+        $client = static::createClient();
+
+        $user = $this->getUser($client, 'user.first@gmail.com');
+        $event = $this->getEvent($client);
+
+        $client->loginUser($user);
+
+        $client->request('POST', '/event/' . $event->getId(), [
+            '_token' => 'delete' . $event->getId(),
+        ]);
+
+        $this->assertResponseRedirects('/event');
+    }
+
+    public function testJsonEvents(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/event/json');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('content-type', 'application/json');
+    }
+
+    public function testSingleEventJson(): void
+    {
+        $client = static::createClient();
+
+        $event = $this->getEvent($client);
+
+        $client->request('GET', '/event/' . $event->getId() . '/json');
+
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testCalendarPage(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/event/calendar');
+
+        $this->assertResponseIsSuccessful();
+    }
+
 }

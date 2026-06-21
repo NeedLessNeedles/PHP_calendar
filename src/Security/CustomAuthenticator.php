@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Custom authenticator.
+ */
+
 namespace App\Security;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -16,16 +20,31 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
+/**
+ * Class CustomAuthenticator.
+ */
 class CustomAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
 
     public const LOGIN_ROUTE = 'app_login';
 
+    /**
+     * Constructor.
+     *
+     * @param UrlGeneratorInterface $urlGenerator URL generator
+     */
     public function __construct(private UrlGeneratorInterface $urlGenerator)
     {
     }
 
+    /**
+     * Authenticate.
+     *
+     * @param Request $request request
+     *
+     * @return Passport Passport
+     */
     public function authenticate(Request $request): Passport
     {
         $email = $request->getPayload()->getString('email');
@@ -42,16 +61,31 @@ class CustomAuthenticator extends AbstractLoginFormAuthenticator
         );
     }
 
+    /**
+     * On authentication success.
+     *
+     * @param Request        $request      request
+     * @param TokenInterface $token        Token
+     * @param string         $firewallName Firewall Name
+     *
+     * @return Response|null Authentication
+     */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
 
-        // Default redirection:
         return new RedirectResponse($this->urlGenerator->generate('app_event_index'));
     }
 
+    /**
+     * Get login URL.
+     *
+     * @param Request $request request
+     *
+     * @return string login URL
+     */
     protected function getLoginUrl(Request $request): string
     {
         return $this->urlGenerator->generate(self::LOGIN_ROUTE);

@@ -12,12 +12,12 @@ use App\Form\ProfileEmailType;
 use App\Form\AdminChangePasswordType;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\EventRepository;
+use App\Service\AdminServiceInterface;
 
 /**
  * Class AdminController.
@@ -26,6 +26,15 @@ use App\Repository\EventRepository;
 #[Route('/admin')]
 class AdminController extends AbstractController
 {
+    /**
+     * Constructor.
+     *
+     * @param AdminServiceInterface $adminService Admin service
+     */
+    public function __construct(private readonly AdminServiceInterface $adminService)
+    {
+    }
+
     /**
      * Index action.
      *
@@ -66,10 +75,9 @@ class AdminController extends AbstractController
     /**
      * Edit action.
      *
-     * @param User                        $user           user
-     * @param Request                     $request        request
-     * @param EntityManagerInterface      $entityManager  entityManager
-     * @param UserPasswordHasherInterface $passwordHasher passwordHasher
+     * @param User                   $user          user
+     * @param Request                $request       request
+     * @param EntityManagerInterface $entityManager entityManager
      *
      * @return Response HTTP response
      */
@@ -79,7 +87,7 @@ class AdminController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['GET', 'POST']
     )]
-    public function edit(User $user, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    public function edit(User $user, Request $request, EntityManagerInterface $entityManager): Response
     {
         // FORM: email
         $emailForm = $this->createForm(ProfileEmailType::class, $user);
@@ -89,17 +97,18 @@ class AdminController extends AbstractController
         $passwordForm = $this->createForm(AdminChangePasswordType::class);
         $passwordForm->handleRequest($request);
 
-        // EMAIL UPDATE
+        // email update
         if ($emailForm->isSubmitted() && $emailForm->isValid()) {
             $entityManager->flush();
         }
 
-        // PASSWORD UPDATE
+        // password update
         if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
             $data = $passwordForm->getData();
 
-            $user->setPassword(
-                $passwordHasher->hashPassword($user, $data['newPassword'])
+            $this->adminService->changePassword(
+                $user,
+                $data['newPassword']
             );
 
             $entityManager->flush();
@@ -113,9 +122,31 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Block action.
+     *
+     * @param User                   $user          user
+     * @param EntityManagerInterface $entityManager entityManager
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/users/{id}/block',
+        name: 'app_admin_users_block',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['POST']
+    )]
+    public function block(User $user, EntityManagerInterface $entityManager): Response
+    {
+        $this->adminService->toggleBlock($user, $this->getUser());
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_admin_users');
+    }
+
+    /**
      * Requests action.
      *
-     * @param EventRepository $eventRepository eventRepository
+     * @param EventRepository $eventRepository Event Repository
      *
      * @return Response HTTP response
      */
@@ -138,8 +169,8 @@ class AdminController extends AbstractController
     /**
      * Approve action.
      *
-     * @param Event                  $event event
-     * @param EntityManagerInterface $em    entityManager
+     * @param Event                  $event         event
+     * @param EntityManagerInterface $entityManager Entity Manager
      *
      * @return Response HTTP response
      */
@@ -149,11 +180,11 @@ class AdminController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['POST']
     )]
-    public function approve(Event $event, EntityManagerInterface $em): Response
+    public function approve(Event $event, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $event->setStatus('approved');
-        $em->flush();
+        $this->adminService->approveEvent($event);
+        $entityManager->flush();
 
         return $this->redirectToRoute('app_admin_requests');
     }
@@ -161,8 +192,8 @@ class AdminController extends AbstractController
     /**
      * Reject action.
      *
-     * @param Event                  $event event
-     * @param EntityManagerInterface $em    entityManager
+     * @param Event                  $event         event
+     * @param EntityManagerInterface $entityManager Entity Manager
      *
      * @return Response HTTP response
      */
@@ -172,11 +203,11 @@ class AdminController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['POST']
     )]
-    public function reject(Event $event, EntityManagerInterface $em): Response
+    public function reject(Event $event, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $em->remove($event);
-        $em->flush();
+        $entityManager->remove($event);
+        $entityManager->flush();
 
         return $this->redirectToRoute('app_admin_requests');
     }

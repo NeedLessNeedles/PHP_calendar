@@ -13,5 +13,6 @@
 
 {% block javascripts %}
     {{ parent() }}
+{#    const EVENTS_URL = "{{ path('app_event_json') }}";#}
     <script type="module" src="{{ asset('js/calendar.js') }}"></script>
 {% endblock %}

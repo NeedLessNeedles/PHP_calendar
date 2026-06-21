@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User fixtures.
  */
@@ -15,19 +16,33 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 class UserFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
 {
     /**
-     * Load data.
+     * Password hasher.
      */
     private UserPasswordHasherInterface $passwordHasher;
 
+    /**
+     * Constructor.
+     *
+     * @param UserPasswordHasherInterface $passwordHasher Password hasher
+     */
     public function __construct(UserPasswordHasherInterface $passwordHasher)
     {
         $this->passwordHasher = $passwordHasher;
     }
+
+    /**
+     * Get destined fixture groups.
+     *
+     * @return array Group name list
+     */
     public static function getGroups(): array
     {
         return ['main'];
     }
 
+    /**
+     * Load data.
+     */
     public function loadData(): void
     {
         $admins = [
@@ -39,7 +54,7 @@ class UserFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
             'user.second@gmail.com',
         ];
 
-        foreach($admins as $admin) {
+        foreach ($admins as $admin) {
             $user = new User();
             $user->setEmail($admin);
             $user->setRoles(['ROLE_ADMIN']);
@@ -48,10 +63,12 @@ class UserFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
                 'admin123'
             );
             $user->setPassword($hashedPassword);
+            $user->setIsBlocked(false);
+
             $this->manager->persist($user);
         }
 
-        foreach($defaultUsers as $defaultUser) {
+        foreach ($defaultUsers as $defaultUser) {
             $user = new User();
             $user->setEmail($defaultUser);
             $user->setRoles(['ROLE_USER']);
@@ -60,6 +77,8 @@ class UserFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
                 'user123'
             );
             $user->setPassword($hashedPassword);
+            $user->setIsBlocked(false);
+
             $this->manager->persist($user);
         }
 

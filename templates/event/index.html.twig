@@ -6,12 +6,82 @@
 
     <h1>Events list</h1>
 
+    <div class="d-flex flex-direction-row align-items-center gap-3">
+        <div class="mb-2" style="max-width: 190px;">
+            <label for="categoryFilter" class="form-label">Filter by: Category</label>
+            <select
+                id="categoryFilter"
+                class="form-select"
+                onchange="location = this.value"
+            >
+                <option value="{{ path('app_event_index') }}"
+                        {% if currentCategory is null %}selected{% endif %}>
+                    All
+                </option>
+                {% for category in categories %}
+                    <option value="{{ path('app_event_index', {categoryId: category.id}) }}"
+                            {% if currentCategory == category.id %}selected{% endif %}>
+                        {{ category.title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-2" style="max-width: 190px;">
+            <label for="tagFilter" class="form-label">Filter by: Tag</label>
+            <select
+                id="tagFilter"
+                class="form-select"
+                onchange="location = this.value"
+            >
+                <option value="{{ path('app_event_index', {
+                    categoryId: currentCategory,
+                    title: title
+                }) }}"
+                        {% if currentTag is null %}selected{% endif %}>
+                    All
+                </option>
+
+                {% for tag in tags %}
+                    <option value="{{ path('app_event_index', {
+                        categoryId: currentCategory,
+                        tagId: tag.id,
+                        title: title
+                    }) }}"
+                            {% if currentTag == tag.id %}selected{% endif %}>
+                        #{{ tag.title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">Search events</label>
+            <form method="get" class="d-flex gap-2">
+                <input type="text"
+                       name="title"
+                       value="{{ app.request.get('title') }}"
+                       class="form-control"
+                       placeholder="Search by title">
+
+                <button class="btn btn-primary">Search</button>
+
+                <a href="{{ path('app_event_index') }}" class="btn btn-secondary">
+                    Reset
+                </a>
+
+            </form>
+        </div>
+
+    </div>
+
+
     <table class="table">
         <colgroup>
-            {# ID #}
-            <col style="width: 5%;">
+{#            #}{# ID #}
+{#            <col style="width: 5%;">#}
             {# Title #}
-            <col style="width: 15%;">
+            <col style="width: 10%;">
             {# Description #}
             <col style="width: 15%;">
             {# Start Date #}
@@ -24,12 +94,14 @@
             <col style="width: 10%;">
             {# Category #}
             <col style="width: 10%;">
+            {# Tag #}
+            <col style="width: 10%;">
             {# Actions #}
             <col style="width: 10%;">
         </colgroup>
         <thead>
             <tr>
-                <th>ID</th>
+{#                <th>ID</th>#}
                 <th>Title</th>
                 <th>Description</th>
                 <th>{{ knp_pagination_sortable(pagination, 'Start Date', 'event.startDate') }}</th>
@@ -37,15 +109,14 @@
                 <th>Location</th>
                 <th>Status</th>
                 <th>Category</th>
-                {% if app.user %}
-                    <th>Actions</th>
-                {% endif %}
+                <th>Tags</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for event in pagination.items %}
             <tr>
-                <td>{{ event.id }}</td>
+{#                <td>{{ event.id }}</td>#}
                 <td>{{ event.title }}</td>
                 <td>{{ event.description }}</td>
                 <td>{{ event.startDate ? event.startDate|date('Y-m-d H:i') : '' }}</td>
@@ -53,6 +124,16 @@
                 <td>{{ event.location }}</td>
                 <td>{{ event.status }}</td>
                 <td>{{ event.category }}</td>
+                <td>
+                    {% for tag in event.tags %}
+                        <span class="badge bg-secondary">
+                            #{{ tag.title }}
+                        </span>
+                    {% else %}
+                        -
+                    {% endfor %}
+                </td>
+
                 {% if app.user %}
                     <td>
                         <button class="btn btn-primary btn-sm edit-event-btn" data-id="{{ event.id }}" type="button" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
@@ -72,6 +153,8 @@
                             </button>
                         </form>
                     </td>
+                {% else %}
+                    <td>-</td>
                 {% endif %}
             </tr>
         {% else %}

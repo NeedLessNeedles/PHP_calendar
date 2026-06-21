@@ -14,6 +14,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class User.
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ *
+ * @ORM\Table(name="user")
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -28,6 +32,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
+    /**
+     * Email.
+     */
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
@@ -38,21 +45,44 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = [];
 
     /**
-     * @var string The hashed password
+     * @var string|null The hashed password
      */
     #[ORM\Column]
     private ?string $password = null;
 
+    /**
+     * @var bool Block status
+     */
+    #[ORM\Column(type: 'boolean')]
+    private bool $isBlocked = false;
+
+    /**
+     * Getter for Id.
+     *
+     * @return int|null Id
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * Getter for email.
+     *
+     * @return string|null Email
+     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
+    /**
+     * Setter for email.
+     *
+     * @param string $email Email
+     *
+     * @return static Email
+     */
     public function setEmail(string $email): static
     {
         $this->email = $email;
@@ -61,9 +91,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * A visual identifier that represents this user.
+     * Getter for identifier.
      *
      * @see UserInterface
+     *
+     * @return string Identifier
      */
     public function getUserIdentifier(): string
     {
@@ -71,7 +103,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Getter for roles.
+     *
      * @see UserInterface
+     *
+     * @return array Roles
      */
     public function getRoles(): array
     {
@@ -83,7 +119,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Setter for roles.
+     *
      * @param list<string> $roles
+     *
+     * @return static Roles
      */
     public function setRoles(array $roles): static
     {
@@ -93,13 +133,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Getter for password.
+     *
      * @see PasswordAuthenticatedUserInterface
+     *
+     * @return string|null Password
      */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
+    /**
+     * Setter for password.
+     *
+     * @param string $password Password
+     *
+     * @return static Password
+     */
     public function setPassword(string $password): static
     {
         $this->password = $password;
@@ -108,7 +159,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
+     * Checker for unusual characters or smth idk.
+     *
+     * @return array uhhhh data
      */
     public function __serialize(): array
     {
@@ -118,6 +171,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $data;
     }
 
+    /**
+     * Check the block status.
+     *
+     * @return bool Status
+     */
+    public function isBlocked(): bool
+    {
+        return $this->isBlocked;
+    }
+
+    /**
+     * Setter for block status.
+     *
+     * @param bool $isBlocked Status
+     *
+     * @return static Status
+     */
+    public function setIsBlocked(bool $isBlocked): static
+    {
+        $this->isBlocked = $isBlocked;
+
+        return $this;
+    }
+
+    /**
+     * Erase credentials.
+     */
     #[\Deprecated]
     public function eraseCredentials(): void
     {

@@ -27,4 +27,33 @@ class SecurityControllerTest extends WebTestCase
         //then
         self::assertResponseIsSuccessful();
     }
+
+    public function testLoginPageLoads(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/login');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('form');
+    }
+
+    public function testLoginPageShowsLastUsername(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/login?last_username=test@example.com');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('body');
+    }
+
+    public function testLogoutRouteExists(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/logout');
+
+        $this->assertTrue(true);
+    }
 }

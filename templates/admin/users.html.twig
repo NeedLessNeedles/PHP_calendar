@@ -13,6 +13,7 @@
                     <th>ID</th>
                     <th>Name</th>
                     <th>Role</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -29,8 +30,30 @@
                             {% endif %}
                         </td>
                         <td>
+                            {% if user.isBlocked %}
+                                <span class="badge bg-danger">Blocked</span>
+                            {% else %}
+                                <span class="badge bg-success">Active</span>
+                            {% endif %}
+                        </td>
+                        <td>
                             <a href="{{ path('app_admin_users_edit', {'id': user.id}) }}" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="{{ path('app_admin_users_edit', {'id': user.id}) }}" class="btn btn-warning btn-sm">Block</a>
+                            <form method="post"
+                                  action="{{ path('app_admin_users_block', {'id': user.id}) }}"
+                                  style="display:inline">
+                                {% if app.user.id != user.id and 'ROLE_ADMIN' not in user.roles %}
+                                    <form method="post"
+                                          action="{{ path('app_admin_users_block', {'id': user.id}) }}"
+                                          style="display:inline">
+
+                                        <button class="btn btn-warning btn-sm">
+                                            {{ user.isBlocked ? 'Unblock' : 'Block' }}
+                                        </button>
+
+                                    </form>
+                                {% endif %}
+
+                            </form>
                         </td>
                     </tr>
                 {% else %}
@@ -40,9 +63,6 @@
                 {% endfor %}
                 </tbody>
             </table>
-{#            <div class="d-flex justify-content-center gap-2 mt-2 mb-2">#}
-{#                <a href="{{ path('app_admin') }}" class="btn btn-primary"> << Back</a>#}
-{#            </div>#}
         </div>
     </div>
 {% endblock %}

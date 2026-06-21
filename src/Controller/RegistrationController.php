@@ -9,13 +9,12 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Security\CustomAuthenticator;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\RegistrationServiceInterface;
 
 /**
  * Class RegistrationController.
@@ -24,12 +23,19 @@ use Symfony\Component\Routing\Attribute\Route;
 class RegistrationController extends AbstractController
 {
     /**
+     * Constructor.
+     *
+     * @param RegistrationServiceInterface $registrationService Registration service
+     */
+    public function __construct(private readonly RegistrationServiceInterface $registrationService)
+    {
+    }
+
+    /**
      * Register action.
      *
-     * @param Request                     $request        request
-     * @param UserPasswordHasherInterface $passwordHasher passwordHasher
-     * @param Security                    $security       login stuff
-     * @param EntityManagerInterface      $entityManager  entityManager
+     * @param Request  $request  request
+     * @param Security $security login stuff
      *
      * @return Response HTTP response
      */
@@ -37,7 +43,7 @@ class RegistrationController extends AbstractController
         name: 'app_register',
         methods: ['GET', 'POST'],
     )]
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, Security $security, EntityManagerInterface $entityManager): Response
+    public function register(Request $request, Security $security): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -47,10 +53,10 @@ class RegistrationController extends AbstractController
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
 
-            $user->setPassword($passwordHasher->hashPassword($user, $plainPassword));
-
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $this->registrationService->registerUser(
+                $user,
+                $plainPassword,
+            );
 
             return $security->login($user, CustomAuthenticator::class, 'main');
         }

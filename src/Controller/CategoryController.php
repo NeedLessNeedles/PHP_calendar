@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Category controller.
+ */
+
 namespace App\Controller;
 
 use App\Entity\Category;
@@ -10,12 +14,30 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Repository\EventRepository;
+use App\Service\CategoryServiceInterface;
 
-//#[IsGranted('ROLE_ADMIN')]
+/**
+ * Class CategoryController.
+ */
 #[Route('/category')]
 class CategoryController extends AbstractController
 {
+    /**
+     * Constructor.
+     *
+     * @param CategoryServiceInterface $categoryService Category service
+     */
+    public function __construct(private readonly CategoryServiceInterface $categoryService)
+    {
+    }
+
+    /**
+     * Index action.
+     *
+     * @param CategoryRepository $categoryRepository Category repository
+     *
+     * @return Response HTTP response
+     */
     #[Route(
         name: 'app_category_index',
         methods: ['GET', 'POST']
@@ -30,12 +52,20 @@ class CategoryController extends AbstractController
         ]);
     }
 
+    /**
+     * New action.
+     *
+     * @param Request                $request       request
+     * @param EntityManagerInterface $entityManager entityManager
+     *
+     * @return Response HTTP response
+     */
     #[Route(
         '/new',
         name: 'app_category_new',
         methods: ['GET', 'POST']
     )]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $category = new Category();
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -43,38 +73,51 @@ class CategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($category);
-            $em->flush();
+            $entityManager->persist($category);
+            $entityManager->flush();
 
             return $this->redirectToRoute('app_category_index');
         }
 
-//        return $this->render('category/index.html.twig', [
-//            'form' => $form,
-//        ]);
         return $this->redirectToRoute('app_category_index');
     }
 
-//    #[Route(
-//        '/{id}',
-//        name: 'app_category_show',
-//        requirements: ['id' => '[1-9]\d*'],
-//        methods: ['GET']
-//    )]
-//    public function show(Category $category): Response
-//    {
-//        return $this->render('category/show.html.twig', [
-//            'category' => $category,
-//        ]);
-//    }
+    /**
+     * Show action.
+     *
+     * @param Category $category Category
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/{id}',
+        name: 'app_category_show',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['GET']
+    )]
+    public function show(Category $category): Response
+    {
+        return $this->render('category/show.html.twig', [
+            'category' => $category,
+        ]);
+    }
 
+    /**
+     * Edit action.
+     *
+     * @param Request                $request       request
+     * @param Category               $category      Category
+     * @param EntityManagerInterface $entityManager entityManager
+     *
+     * @return Response HTTP response
+     */
     #[Route(
         '/{id}/edit',
         name: 'app_category_edit',
         requirements: ['id' => '[1-9]\d*'],
         methods: ['GET', 'POST'],
     )]
-    public function edit(Request $request, Category $category, EntityManagerInterface $em): Response
+    public function edit(Request $request, Category $category, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -82,40 +125,38 @@ class CategoryController extends AbstractController
             throw $this->createAccessDeniedException('Invalid CSRF');
         }
 
-        $category->setTitle($request->request->all('category')['title']);
-        $category->setUpdatedAt(new \DateTimeImmutable());
+        $title = $request->request->all('category')['title'];
+        $this->categoryService->edit($category, $title);
 
-        $em->flush();
+        $entityManager->flush();
 
         $this->addFlash('success', 'Category updated');
 
         return $this->redirectToRoute('app_category_index');
     }
 
+    /**
+     * Delete action.
+     *
+     * @param Request  $request  request
+     * @param Category $category Category
+     *
+     * @return Response HTTP response
+     */
     #[Route(
         '/{id}',
         name: 'app_category_delete',
         requirements: ['id' => '[1-9]\d*'],
         methods: ['POST']
     )]
-    public function delete(Request $request, Category $category, EntityManagerInterface $em, EventRepository $eventRepository): Response
+    public function delete(Request $request, Category $category): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         if (!$this->isCsrfTokenValid('delete'.$category->getId(), $request->request->get('_token'))) {
             return $this->redirectToRoute('app_category_index');
         }
-        $usedByEvents = $eventRepository->count([
-            'category' => $category
-        ]);
-
-        if ($usedByEvents > 0) {
-            $this->addFlash('error', 'Cannot delete category used by events.');
-            return $this->redirectToRoute('app_category_index');
-        }
-
-        $em->remove($category);
-        $em->flush();
+        $this->categoryService->delete($category);
 
         return $this->redirectToRoute('app_category_index');
     }
