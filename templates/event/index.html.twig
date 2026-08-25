@@ -1,14 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Events list{% endblock %}
+{% block title %}{{ 'title.events_list'|trans }}{% endblock %}
 
 {% block body %}
 
-    <h1>Events list</h1>
+    <h1>{{ 'title.events_list'|trans }}</h1>
 
     <div class="d-flex flex-direction-row align-items-center gap-3">
         <div class="mb-2" style="max-width: 190px;">
-            <label for="categoryFilter" class="form-label">Filter by: Category</label>
+            <label for="categoryFilter" class="form-label">{{ 'label.filter_by_category'|trans }}</label>
             <select
                 id="categoryFilter"
                 class="form-select"
@@ -16,7 +16,7 @@
             >
                 <option value="{{ path('app_event_index') }}"
                         {% if currentCategory is null %}selected{% endif %}>
-                    All
+                    {{ 'option.all'|trans }}
                 </option>
                 {% for category in categories %}
                     <option value="{{ path('app_event_index', {categoryId: category.id}) }}"
@@ -28,7 +28,7 @@
         </div>
 
         <div class="mb-2" style="max-width: 190px;">
-            <label for="tagFilter" class="form-label">Filter by: Tag</label>
+            <label for="tagFilter" class="form-label">{{ 'label.filter_by_tag'|trans }}</label>
             <select
                 id="tagFilter"
                 class="form-select"
@@ -39,7 +39,7 @@
                     title: title
                 }) }}"
                         {% if currentTag is null %}selected{% endif %}>
-                    All
+                    {{ 'option.all'|trans }}
                 </option>
 
                 {% for tag in tags %}
@@ -56,18 +56,18 @@
         </div>
 
         <div class="mb-2">
-            <label class="form-label">Search events</label>
+            <label class="form-label">{{ 'label.search_events'|trans }}</label>
             <form method="get" class="d-flex gap-2">
                 <input type="text"
                        name="title"
                        value="{{ app.request.get('title') }}"
                        class="form-control"
-                       placeholder="Search by title">
+                       placeholder="{{ 'placeholder.search_by_title'|trans }}">
 
-                <button class="btn btn-primary">Search</button>
+                <button class="btn btn-primary">{{ 'button.search'|trans }}</button>
 
                 <a href="{{ path('app_event_index') }}" class="btn btn-secondary">
-                    Reset
+                    {{ 'button.reset'|trans }}
                 </a>
 
             </form>
@@ -102,15 +102,16 @@
         <thead>
             <tr>
 {#                <th>ID</th>#}
-                <th>Title</th>
-                <th>Description</th>
-                <th>{{ knp_pagination_sortable(pagination, 'Start Date', 'event.startDate') }}</th>
-                <th>End Date</th>
-                <th>Location</th>
-                <th>Status</th>
-                <th>Category</th>
-                <th>Tags</th>
-                <th>Actions</th>
+                <th>{{ 'th.title'|trans }}</th>
+                <th>{{ 'th.description'|trans }}</th>
+{#                <th>{{ knp_pagination_sortable(pagination, {{ 'th.start_date'|trans }}, 'event.startDate') }}</th>#}
+                <th>{{ 'th.start_date'|trans }}</th>
+                <th>{{ 'th.end_date'|trans }}</th>
+                <th>{{ 'th.location'|trans }}</th>
+                <th>{{ 'th.status'|trans }}</th>
+                <th>{{ 'th.category'|trans }}</th>
+                <th>{{ 'option.tags'|trans }}</th>
+                <th>{{ 'th.actions'|trans }}</th>
             </tr>
         </thead>
         <tbody>
@@ -149,7 +150,7 @@
                                 value="{{ csrf_token('delete' ~ event.id) }}"
                             >
                             <button type="submit" class="btn btn-danger btn-sm">
-                                Delete
+                                {{ 'button.delete'|trans }}
                             </button>
                         </form>
                     </td>
@@ -159,7 +160,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">No records found</td>
+                <td colspan="6">{{ 'tr.no_records'|trans }}</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -171,7 +172,7 @@
 
     <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#eventModal">
-            Create new
+            {{ 'button.create_new'|trans }}
         </button>
     </div>
 

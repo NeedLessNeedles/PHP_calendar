@@ -38,6 +38,342 @@
         <source>title.record_view</source>
         <target>Record view #%id%</target>
       </trans-unit>
+
+      <!-- MAIN HEADER -->
+      <trans-unit id="title.browser_label">
+        <source>title.browser_label</source>
+        <target>Welcome!</target>
+      </trans-unit>
+      <trans-unit id="title.app_header_title">
+        <source>title.app_header_title</source>
+        <target>Local Events Calendar</target>
+      </trans-unit>
+      <trans-unit id="label.not_logged_in">
+        <source>label.not_logged_in</source>
+        <target>Not logged in</target>
+      </trans-unit>
+      <trans-unit id="label.user">
+        <source>label.user</source>
+        <target>User:</target>
+      </trans-unit>
+      <trans-unit id="label.role">
+        <source>label.role</source>
+        <target>Role:</target>
+      </trans-unit>
+      <trans-unit id="label.role_admin">
+        <source>label.role_admin</source>
+        <target>admin</target>
+      </trans-unit>
+      <trans-unit id="label.role_user">
+        <source>label.role_user</source>
+        <target>user</target>
+      </trans-unit>
+      <trans-unit id="label.role_unknown">
+        <source>label.role_unknown</source>
+        <target>unknown</target>
+      </trans-unit>
+
+      <trans-unit id="title.events">
+        <source>title.events</source>
+        <target>Events</target>
+      </trans-unit>
+      <trans-unit id="title.calendar">
+        <source>title.calendar</source>
+        <target>Calendar</target>
+      </trans-unit>
+      <trans-unit id="title.profile">
+        <source>title.profile</source>
+        <target>Profile</target>
+      </trans-unit>
+      <trans-unit id="title.admin_panel">
+        <source>title.admin_panel</source>
+        <target>Admin panel</target>
+      </trans-unit>
+      <trans-unit id="option.users">
+        <source>option.users</source>
+        <target>Users</target>
+      </trans-unit>
+      <trans-unit id="option.requests">
+        <source>option.requests</source>
+        <target>Requests</target>
+      </trans-unit>
+      <trans-unit id="option.categories">
+        <source>option.categories</source>
+        <target>Categories</target>
+      </trans-unit>
+      <trans-unit id="option.tags">
+        <source>option.tags</source>
+        <target>Tags</target>
+      </trans-unit>
+
+      <!-- BUTTONS -->
+      <trans-unit id="button.logout">
+        <source>button.logout</source>
+        <target>Logout</target>
+      </trans-unit>
+      <trans-unit id="button.login">
+        <source>button.login</source>
+        <target>Login</target>
+      </trans-unit>
+      <trans-unit id="button.register">
+        <source>button.register</source>
+        <target>Register</target>
+      </trans-unit>
+      <trans-unit id="button.search">
+        <source>button.search</source>
+        <target>Search</target>
+      </trans-unit>
+      <trans-unit id="button.reset">
+        <source>button.reset</source>
+        <target>Reset</target>
+      </trans-unit>
+      <trans-unit id="button.edit">
+        <source>button.edit</source>
+        <target>Edit</target>
+      </trans-unit>
+      <trans-unit id="button.delete">
+        <source>button.delete</source>
+        <target>Delete</target>
+      </trans-unit>
+      <trans-unit id="button.create_new">
+        <source>button.create_new</source>
+        <target>Create new</target>
+      </trans-unit>
+      <trans-unit id="button.cancel">
+        <source>button.cancel</source>
+        <target>Cancel</target>
+      </trans-unit>
+      <trans-unit id="button.save">
+        <source>button.save</source>
+        <target>Save</target>
+      </trans-unit>
+      <trans-unit id="button.back">
+        <source>button.back</source>
+        <target>Back</target>
+      </trans-unit>
+      <trans-unit id="button.change_email">
+        <source>button.change_email</source>
+        <target>Change email</target>
+      </trans-unit>
+      <trans-unit id="button.change_password">
+        <source>button.change_password</source>
+        <target>Change password</target>
+      </trans-unit>
+      <trans-unit id="button.approve">
+        <source>button.approve</source>
+        <target>Approve</target>
+      </trans-unit>
+      <trans-unit id="button.reject">
+        <source>button.reject</source>
+        <target>Reject</target>
+      </trans-unit>
+      <trans-unit id="button.block">
+        <source>button.block</source>
+        <target>Block</target>
+      </trans-unit>
+      <trans-unit id="button.unblock">
+        <source>button.unblock</source>
+        <target>Unblock</target>
+      </trans-unit>
+
+      <!-- /home -->
+      <trans-unit id="text.welcome_home">
+        <source>text.welcome_home</source>
+        <target>Welcome to the local events calendar application.</target>
+      </trans-unit>
+
+      <!-- /login -->
+      <trans-unit id="title.please_sign">
+        <source>title.please_sign</source>
+        <target>Please sign in</target>
+      </trans-unit>
+      <trans-unit id="label.email">
+        <source>label.email</source>
+        <target>Email</target>
+      </trans-unit>
+      <trans-unit id="label.password">
+        <source>label.password</source>
+        <target>Password</target>
+      </trans-unit>
+      <trans-unit id="label.remember_me">
+        <source>label.remember_me</source>
+        <target>Remember me</target>
+      </trans-unit>
+      <trans-unit id="label.dont_have_account">
+        <source>label.dont_have_account</source>
+        <target>Don't have account yet?</target>
+      </trans-unit>
+      <trans-unit id="label.create_one">
+        <source>label.create_one</source>
+        <target>Create one here.</target>
+      </trans-unit>
+
+      <!-- /register -->
+        <trans-unit id="title.please_sign_in">
+          <source>title.please_sign_in</source>
+          <target>Please sign in</target>
+        </trans-unit>
+        <trans-unit id="label.agree_terms">
+          <source>label.agree_terms</source>
+          <target>Agree terms</target>
+        </trans-unit>
+        <trans-unit id="label.already_have">
+          <source>label.already_have</source>
+          <target>Already have account?</target>
+        </trans-unit>
+        <trans-unit id="label.sign_in_here">
+          <source>label.sign_in_here</source>
+          <target>Sign in here.</target>
+        </trans-unit>
+
+      <!-- /event -->
+        <trans-unit id="title.events_list">
+          <source>title.events_list</source>
+          <target>Events list</target>
+        </trans-unit>
+        <trans-unit id="label.filter_by_category">
+          <source>label.filter_by_category</source>
+          <target>Filter by: Category</target>
+        </trans-unit>
+        <trans-unit id="option.all">
+          <source>option.all</source>
+          <target>All</target>
+        </trans-unit>
+        <trans-unit id="label.filter_by_tag">
+          <source>label.filter_by_tag</source>
+          <target>Filter by: Tag</target>
+        </trans-unit>
+        <trans-unit id="label.search_events">
+          <source>label.search_events</source>
+          <target>Search events</target>
+        </trans-unit>
+        <trans-unit id="placeholder.search_by_title">
+          <source>placeholder.search_by_title</source>
+          <target>Search by title</target>
+        </trans-unit>
+        <trans-unit id="th.title">
+          <source>th.title</source>
+          <target>Title</target>
+        </trans-unit>
+        <trans-unit id="th.description">
+          <source>th.description</source>
+          <target>Description</target>
+        </trans-unit>
+        <trans-unit id="th.start_date">
+          <source>th.start_date</source>
+          <target>Start Date</target>
+        </trans-unit>
+        <trans-unit id="th.end_date">
+          <source>th.end_date</source>
+          <target>End Date</target>
+        </trans-unit>
+        <trans-unit id="th.location">
+          <source>th.location</source>
+          <target>Location</target>
+        </trans-unit>
+        <trans-unit id="th.status">
+          <source>th.status</source>
+          <target>Status</target>
+        </trans-unit>
+        <trans-unit id="th.category">
+          <source>th.category</source>
+          <target>Category</target>
+        </trans-unit>
+        <trans-unit id="th.actions">
+          <source>th.actions</source>
+          <target>Actions</target>
+        </trans-unit>
+        <trans-unit id="tr.no_records">
+          <source>tr.no_records</source>
+          <target>No records found</target>
+        </trans-unit>
+
+        <trans-unit id="title.edit_event">
+          <source>title.edit_event</source>
+          <target>Edit event</target>
+        </trans-unit>
+        <trans-unit id="title.create_new_event">
+          <source>title.create_new_event</source>
+          <target>Create new event</target>
+        </trans-unit>
+        <trans-unit id="title.new_event">
+          <source>title.new_event</source>
+          <target>New event</target>
+        </trans-unit>
+        <trans-unit id="title.event">
+          <source>title.event</source>
+          <target>Event</target>
+        </trans-unit>
+        <trans-unit id="th.id">
+          <source>th.id</source>
+          <target>ID</target>
+        </trans-unit>
+
+      <!-- /profile -->
+      <trans-unit id="title.user_info">
+        <source>title.user_info</source>
+        <target>User info</target>
+      </trans-unit>
+
+      <!-- /category -->
+      <trans-unit id="th.created_at">
+        <source>th.created_at</source>
+        <target>Created at</target>
+      </trans-unit>
+      <trans-unit id="th.updated_at">
+        <source>th.updated_at</source>
+        <target>Updated at</target>
+      </trans-unit>
+      <trans-unit id="title.create_new_category">
+        <source>title.create_new_category</source>
+        <target>Create new category</target>
+      </trans-unit>
+
+      <!-- /admin/requests -->
+      <trans-unit id="th.start">
+        <source>th.start</source>
+        <target>Start</target>
+      </trans-unit>
+      <trans-unit id="th.owner">
+        <source>th.owner</source>
+        <target>Owner</target>
+      </trans-unit>
+      <trans-unit id="title.pending_events">
+        <source>title.pending_events</source>
+        <target>Pending events</target>
+      </trans-unit>
+
+      <!-- /admin/users -->
+      <trans-unit id="th.name">
+        <source>th.name</source>
+        <target>Name</target>
+      </trans-unit>
+      <trans-unit id="status.blocked">
+        <source>status.blocked</source>
+        <target>Blocked</target>
+      </trans-unit>
+      <trans-unit id="status.active">
+        <source>status.active</source>
+        <target>Active</target>
+      </trans-unit>
+
+      <!-- /tag -->
+      <trans-unit id="title.create_new_tag">
+        <source>title.create_new_tag</source>
+        <target>Create new tag</target>
+      </trans-unit>
+      <trans-unit id="title.tag_title">
+        <source>title.tag_title</source>
+        <target>Tag title</target>
+      </trans-unit>
+      <trans-unit id="title.edit_tag">
+        <source>title.edit_tag</source>
+        <target>Edit tag</target>
+      </trans-unit>
+      <trans-unit id="title.change_tag_name">
+        <source>title.change_tag_name</source>
+        <target>Change tag name</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

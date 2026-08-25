@@ -1,24 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Profile{% endblock %}
+{% block title %}{{ 'title.profile'|trans }}{% endblock %}
 
 {% block body %}
     <div class="container d-flex justify-content-center align-items-center mt-3">
         <div class="auth-card d-flex flex-column gap-1">
-            <h1 class="h3 mb-2 font-weight-normal">User info</h1>
+            <h1 class="h3 mb-2 font-weight-normal">{{ 'title.user_info'|trans }}</h1>
             <div>
-                <label>Email:</label>
+                <label>{{ 'label.email'|trans }}:</label>
                 <strong>{{ app.user.email }}</strong>
             </div>
             {% set roles = app.user.roles %}
             <div>
-                <label>Role:</label>
+                <label>{{ 'label.role'|trans }}</label>
                 {% if 'ROLE_ADMIN' in roles %}
-                    <strong>admin</strong>
+                    <strong>{{ 'label.role_admin'|trans }}</strong>
                 {% elseif 'ROLE_USER' in roles %}
-                    <strong>user</strong>
+                    <strong>{{ 'label.role_user'|trans }}</strong>
                 {% else %}
-                    <strong>unknown</strong>
+                    <strong>{{ 'label.role_unknown'|trans }}</strong>
                 {% endif %}
             </div>
 
@@ -29,7 +29,7 @@
                     data-bs-toggle="collapse"
                     data-bs-target="#editProfileCollapse"
                 >
-                    Change email
+                    {{ 'button.change_email'|trans }}
                 </button>
                 <button
                     class="btn btn-outline-primary"
@@ -37,7 +37,7 @@
                     data-bs-toggle="collapse"
                     data-bs-target="#changePasswordCollapse"
                 >
-                    Change password
+                    {{ 'button.change_password'|trans }}
                 </button>
             </div>
 
@@ -48,7 +48,7 @@
                         {{ form_row(emailForm.email) }}
                         <div class="d-flex justify-content-center gap-2 mt-2">
                             <button class="btn btn-success" type="submit">
-                                Save
+                                {{ 'button.save'|trans }}
                             </button>
                         </div>
                         {{ form_end(emailForm) }}
@@ -62,7 +62,7 @@
                         {{ form_row(passwordForm.newPassword) }}
                         <div class="d-flex justify-content-center gap-2 mt-1">
                             <button class="btn btn-success" type="submit">
-                                Save
+                                {{ 'button.save'|trans }}
                             </button>
                         </div>
                         {{ form_end(passwordForm) }}

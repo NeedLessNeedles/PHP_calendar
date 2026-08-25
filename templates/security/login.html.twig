@@ -5,30 +5,29 @@
 {% block body %}
     <div class="container d-flex justify-content-center align-items-center mt-4">
         <form method="post" class="auth-card d-flex flex-column gap-2">
-            <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+            <h1 class="h3 mb-3 font-weight-normal">{{ 'title.please_sign'|trans }}</h1>
             {% if error %}
                 <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
             {% endif %}
-            <label for="inputEmail">Email</label>
+            <label for="inputEmail">{{ 'label.email'|trans }}</label>
             <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-            <label for="inputPassword">Password</label>
+            <label for="inputPassword">{{ 'label.password'|trans }}</label>
             <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
             <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
 
             <div class="checkbox mb-2">
                 <label style="cursor: pointer;">
-                    <input type="checkbox" name="_remember_me" style="transform: scale(1.3)"> Remember me
+                    <input type="checkbox" name="_remember_me" style="transform: scale(1.3)"> {{ 'label.remember_me'|trans }}
                 </label>
             </div>
 
             <div class="d-flex flex-direction-row gap-2">
-                <p>Don't have account yet?</p>
-                <a href="{{ path('app_register') }}">Create one here.</a>
+                <p>{{ 'label.dont_have_account'|trans }}</p>
+                <a href="{{ path('app_register') }}">{{ 'label.create_one'|trans }}</a>
             </div>
 
             <div class="d-flex justify-content-center gap-2">
-{#                <a href="{{ path('app_home') }}" class="btn btn-primary"> << Back</a>#}
-                <button class="btn btn-success" type="submit">Login</button>
+                <button class="btn btn-success" type="submit">{{ 'button.login'|trans }}</button>
             </div>
         </form>
     </div>
