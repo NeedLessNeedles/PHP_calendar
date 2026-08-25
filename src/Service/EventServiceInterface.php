@@ -25,7 +25,7 @@ interface EventServiceInterface
      *
      * @return PaginationInterface Paginated list
      */
-    public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null): PaginationInterface;
+    public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): PaginationInterface;
 
     /**
      * Create event.

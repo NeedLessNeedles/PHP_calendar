@@ -18,7 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 class EventService implements EventServiceInterface
 {
-    public const PAGINATOR_ITEMS_PER_PAGE = 5;
+    public const PAGINATOR_ITEMS_PER_PAGE = 2;
 
     /**
      * Constructor.
@@ -41,10 +41,10 @@ class EventService implements EventServiceInterface
      *
      * @return PaginationInterface Paginated list
      */
-    public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null): PaginationInterface
+    public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->eventRepository->queryAll($categoryId, $title, $tagId),
+            $this->eventRepository->queryAll($categoryId, $title, $tagId, $status),
             $page,
             self::PAGINATOR_ITEMS_PER_PAGE,
             [

@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\EventRepository;
+use App\Service\EventServiceInterface;
 use App\Service\AdminServiceInterface;
 
 /**
@@ -31,7 +32,7 @@ class AdminController extends AbstractController
      *
      * @param AdminServiceInterface $adminService Admin service
      */
-    public function __construct(private readonly AdminServiceInterface $adminService)
+    public function __construct(private readonly AdminServiceInterface $adminService, private readonly EventServiceInterface $eventService)
     {
     }
 
@@ -146,6 +147,7 @@ class AdminController extends AbstractController
     /**
      * Requests action.
      *
+     * @param Request            $request            request
      * @param EventRepository $eventRepository Event Repository
      *
      * @return Response HTTP response
@@ -155,14 +157,20 @@ class AdminController extends AbstractController
         name: 'app_admin_requests',
         methods: ['GET']
     )]
-    public function requests(EventRepository $eventRepository): Response
+    public function requests(Request $request, EventRepository $eventRepository): Response
     {
+        $page = $request->query->getInt('page', 1);
+        $pagination = $this->eventService->getPaginatedList(
+            $page,
+            status: 'pending'
+        );
         $events = $eventRepository->findBy([
             'status' => 'pending',
         ]);
 
         return $this->render('admin/requests.html.twig', [
             'events' => $events,
+            'pagination' => $pagination,
         ]);
     }
 

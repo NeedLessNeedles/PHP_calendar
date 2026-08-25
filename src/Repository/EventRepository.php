@@ -35,7 +35,7 @@ class EventRepository extends ServiceEntityRepository
      *
      * @return QueryBuilder Query builder
      */
-    public function queryAll(?int $categoryId = null, ?string $title = null, ?int $tagId = null): QueryBuilder
+    public function queryAll(?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('event')
             ->leftJoin('event.category', 'category')
@@ -59,6 +59,12 @@ class EventRepository extends ServiceEntityRepository
             $queryBuilder
                 ->andWhere('LOWER(event.title) LIKE LOWER(:title)')
                 ->setParameter('title', '%'.$title.'%');
+        }
+
+        if (null !== $status) {
+            $queryBuilder
+                ->andWhere('event.status = :status')
+                ->setParameter('status', $status);
         }
 
         return $queryBuilder;
