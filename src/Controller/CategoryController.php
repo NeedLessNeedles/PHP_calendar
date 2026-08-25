@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\CategoryServiceInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CategoryController.
@@ -27,7 +28,7 @@ class CategoryController extends AbstractController
      *
      * @param CategoryServiceInterface $categoryService Category service
      */
-    public function __construct(private readonly CategoryServiceInterface $categoryService)
+    public function __construct(private readonly CategoryServiceInterface $categoryService, private readonly TranslatorInterface $translator)
     {
     }
 
@@ -80,6 +81,11 @@ class CategoryController extends AbstractController
             $entityManager->persist($category);
             $entityManager->flush();
 
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.created_successfully')
+            );
+
             return $this->redirectToRoute('app_category_index');
         }
 
@@ -131,10 +137,10 @@ class CategoryController extends AbstractController
 
         $title = $request->request->all('category')['title'];
         $this->categoryService->edit($category, $title);
-
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Category updated');
+        $this->addFlash(
+            'success',
+            $this->translator->trans('message.updated_successfully')
+        );
 
         return $this->redirectToRoute('app_category_index');
     }
@@ -153,7 +159,7 @@ class CategoryController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['POST']
     )]
-    public function delete(Request $request, Category $category): Response
+    public function delete(Request $request, Category $category, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -161,6 +167,10 @@ class CategoryController extends AbstractController
             return $this->redirectToRoute('app_category_index');
         }
         $this->categoryService->delete($category);
+        $this->addFlash(
+            'success',
+            $this->translator->trans('message.deleted_successfully')
+        );
 
         return $this->redirectToRoute('app_category_index');
     }

@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\TagServiceInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class TagController.
@@ -26,7 +27,7 @@ class TagController extends AbstractController
      *
      * @param TagServiceInterface $tagService Tag service
      */
-    public function __construct(private readonly TagServiceInterface $tagService)
+    public function __construct(private readonly TagServiceInterface $tagService, private readonly TranslatorInterface $translator)
     {
     }
 
@@ -80,6 +81,11 @@ class TagController extends AbstractController
             $entityManager->flush();
         }
 
+        $this->addFlash(
+            'success',
+            $this->translator->trans('message.created_successfully')
+        );
+
         return $this->redirectToRoute('app_tag_index');
     }
 
@@ -131,7 +137,10 @@ class TagController extends AbstractController
 
         $entityManager->flush();
 
-        $this->addFlash('success', 'Tag updated');
+        $this->addFlash(
+            'success',
+            $this->translator->trans('message.updated_successfully')
+        );
 
         return $this->redirectToRoute('app_tag_index');
     }
@@ -158,6 +167,11 @@ class TagController extends AbstractController
             return $this->redirectToRoute('app_tag_index');
         }
         $this->tagService->delete($tag);
+
+        $this->addFlash(
+            'success',
+            $this->translator->trans('message.deleted_successfully')
+        );
 
         return $this->redirectToRoute('app_tag_index');
     }
