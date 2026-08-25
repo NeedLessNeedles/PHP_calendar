@@ -41,7 +41,7 @@ class TagService implements TagServiceInterface
             $page,
             self::PAGINATOR_ITEMS_PER_PAGE,
             [
-                'sortFieldAllowList' => ['tag.id'],
+                'sortFieldAllowList' => ['tag.id', 'tag.title'],
                 'defaultSortFieldName' => 'tag.id',
                 'defaultSortDirection' => 'desc',
             ]

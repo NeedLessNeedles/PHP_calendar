@@ -11,14 +11,15 @@
                 <thead>
                 <tr>
                     <th>{{ 'th.id'|trans }}</th>
-                    <th>{{ 'th.name'|trans }}</th>
+{#                    <th>{{ 'th.name'|trans }}</th>#}
+                    <th>{{ knp_pagination_sortable(pagination, 'th.name'|trans, 'user.email') }}</th>
                     <th>{{ 'label.role'|trans }}</th>
                     <th>{{ 'th.status'|trans }}</th>
                     <th>{{ 'th.actions'|trans }}</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for user in users %}
+                {% for user in pagination.items %}
                     <tr>
                         <td>{{ user.id }}</td>
                         <td>{{ user.email }}</td>
@@ -63,6 +64,9 @@
                 {% endfor %}
                 </tbody>
             </table>
+            <div class="d-flex justify-content-center navigation mt-1">
+                {{ knp_pagination_render(pagination) }}
+            </div>
         </div>
     </div>
 {% endblock %}

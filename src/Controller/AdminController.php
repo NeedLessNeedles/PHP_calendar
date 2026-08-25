@@ -19,6 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\EventRepository;
 use App\Service\EventServiceInterface;
 use App\Service\AdminServiceInterface;
+use App\Service\ProfileServiceInterface;
 
 /**
  * Class AdminController.
@@ -32,7 +33,7 @@ class AdminController extends AbstractController
      *
      * @param AdminServiceInterface $adminService Admin service
      */
-    public function __construct(private readonly AdminServiceInterface $adminService, private readonly EventServiceInterface $eventService)
+    public function __construct(private readonly ProfileServiceInterface $profileService, private readonly AdminServiceInterface $adminService, private readonly EventServiceInterface $eventService)
     {
     }
 
@@ -65,11 +66,14 @@ class AdminController extends AbstractController
         name: 'app_admin_users',
         methods: ['GET']
     )]
-    public function show(UserRepository $userRepository): Response
+    public function show(Request $request, UserRepository $userRepository): Response
     {
+        $page = $request->query->getInt('page', 1);
+        $pagination = $this->profileService->getPaginatedList($page);
 
         return $this->render('admin/users.html.twig', [
             'users' => $userRepository->findAll(),
+            'pagination' => $pagination,
         ]);
     }
 

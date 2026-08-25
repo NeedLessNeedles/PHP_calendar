@@ -7,12 +7,19 @@
 namespace App\Service;
 
 use App\Entity\User;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 
 /**
  * Interface ProfileServiceInterface.
  */
 interface ProfileServiceInterface
 {
+    /**
+     * Get paginated list.
+     *
+     * @param int $page Page number
+     */
+    public function getPaginatedList(int $page): PaginationInterface;
     /**
      * Change password.
      *

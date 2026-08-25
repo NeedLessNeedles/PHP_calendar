@@ -13,7 +13,8 @@
                     <tr>
                         <th>{{ knp_pagination_sortable(pagination, 'th.id'|trans, 'tag.id') }}</th>
 {#                        <th>{{ 'th.id'|trans }}</th>#}
-                        <th>{{ 'th.title'|trans }}</th>
+{#                        <th>{{ 'th.title'|trans }}</th>#}
+                        <th>{{ knp_pagination_sortable(pagination, 'th.title'|trans, 'tag.title') }}</th>
                         <th>{{ 'th.actions'|trans }}</th>
                     </tr>
                     </thead>
