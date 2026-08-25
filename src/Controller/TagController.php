@@ -33,6 +33,7 @@ class TagController extends AbstractController
     /**
      * Index action.
      *
+     * @param Request            $request            request
      * @param TagRepository $tagRepository Tag repository
      *
      * @return Response HTTP response
@@ -41,10 +42,14 @@ class TagController extends AbstractController
         name: 'app_tag_index',
         methods: ['GET', 'POST']
     )]
-    public function index(TagRepository $tagRepository): Response
+    public function index(Request $request, TagRepository $tagRepository): Response
     {
+        $page = $request->query->getInt('page', 1);
+        $pagination = $this->tagService->getPaginatedList($page);
+
         return $this->render('tag/index.html.twig', [
             'tags' => $tagRepository->findAll(),
+            'pagination' => $pagination,
             'tag' => new Tag(),
         ]);
     }

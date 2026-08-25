@@ -11,14 +11,15 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>{{ 'th.id'|trans }}</th>
+                        <th>{{ knp_pagination_sortable(pagination, 'th.id'|trans, 'tag.id') }}</th>
+{#                        <th>{{ 'th.id'|trans }}</th>#}
                         <th>{{ 'th.title'|trans }}</th>
                         <th>{{ 'th.actions'|trans }}</th>
                     </tr>
                     </thead>
 
                     <tbody>
-                    {% for tag in tags %}
+                    {% for tag in pagination.items %}
                         <tr>
                             <td>{{ tag.id }}</td>
                             <td>{{ tag.title }}</td>
@@ -54,6 +55,9 @@
                     {% endfor %}
                     </tbody>
                 </table>
+            </div>
+            <div class="d-flex justify-content-center navigation mt-1">
+                {{ knp_pagination_render(pagination) }}
             </div>
             <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
                 <button

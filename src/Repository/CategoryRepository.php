@@ -18,7 +18,6 @@ use Doctrine\ORM\QueryBuilder;
  */
 class CategoryRepository extends ServiceEntityRepository
 {
-    public const PAGINATOR_ITEMS_PER_PAGE = 5;
     /**
      * Constructor.
      *
@@ -36,10 +35,6 @@ class CategoryRepository extends ServiceEntityRepository
      */
     public function queryAll(): QueryBuilder
     {
-//        $queryBuilder = $this->createQueryBuilder('category')
-//            ->orderBy('category.createdAt', 'DESC');
-//
-//        return $queryBuilder;
         return $this->createQueryBuilder('category');
     }
 }
