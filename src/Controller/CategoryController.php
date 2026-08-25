@@ -34,6 +34,7 @@ class CategoryController extends AbstractController
     /**
      * Index action.
      *
+     * @param Request            $request            request
      * @param CategoryRepository $categoryRepository Category repository
      *
      * @return Response HTTP response
@@ -42,12 +43,15 @@ class CategoryController extends AbstractController
         name: 'app_category_index',
         methods: ['GET', 'POST']
     )]
-    public function index(CategoryRepository $categoryRepository): Response
+    public function index(Request $request, CategoryRepository $categoryRepository): Response
     {
+        $page = $request->query->getInt('page', 1);
+        $pagination = $this->categoryService->getPaginatedList($page);
         $form = $this->createForm(CategoryType::class, new Category());
 
         return $this->render('category/index.html.twig', [
             'categories' => $categoryRepository->findAll(),
+            'pagination' => $pagination,
             'form' => $form->createView(),
         ]);
     }

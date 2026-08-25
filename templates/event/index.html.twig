@@ -78,8 +78,6 @@
 
     <table class="table">
         <colgroup>
-{#            #}{# ID #}
-{#            <col style="width: 5%;">#}
             {# Title #}
             <col style="width: 10%;">
             {# Description #}
@@ -101,11 +99,9 @@
         </colgroup>
         <thead>
             <tr>
-{#                <th>ID</th>#}
                 <th>{{ 'th.title'|trans }}</th>
                 <th>{{ 'th.description'|trans }}</th>
-{#                <th>{{ knp_pagination_sortable(pagination, {{ 'th.start_date'|trans }}, 'event.startDate') }}</th>#}
-                <th>{{ 'th.start_date'|trans }}</th>
+                <th>{{ knp_pagination_sortable(pagination, 'th.start_date'|trans, 'event.startDate') }}</th>
                 <th>{{ 'th.end_date'|trans }}</th>
                 <th>{{ 'th.location'|trans }}</th>
                 <th>{{ 'th.status'|trans }}</th>
@@ -117,7 +113,6 @@
         <tbody>
         {% for event in pagination.items %}
             <tr>
-{#                <td>{{ event.id }}</td>#}
                 <td>{{ event.title }}</td>
                 <td>{{ event.description }}</td>
                 <td>{{ event.startDate ? event.startDate|date('Y-m-d H:i') : '' }}</td>
