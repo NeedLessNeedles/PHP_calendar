@@ -31,23 +31,33 @@ class EventType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title')
-            ->add('description')
-            ->add('location')
+            ->add('title', null, [
+                'label' => 'th.title',
+            ])
+            ->add('description', null, [
+                'label' => 'th.description',
+            ])
+            ->add('location', null, [
+                'label' => 'th.location',
+            ])
             ->add('startDate', DateTimeType::class, [
+                'label' => 'th.start_date',
                 'widget' => 'single_text',
             ])
             ->add('endDate', DateTimeType::class, [
+                'label' => 'th.end_date',
                 'widget' => 'single_text',
                 'required' => false,
             ])
             ->add('category', EntityType::class, [
+                'label' => 'th.category',
                 'class' => Category::class,
                 'choice_label' => function (Category $category) {
                     return $category->getTitle();
                 },
             ])
             ->add('tags', EntityType::class, [
+                'label' => 'option.tags',
                 'class' => Tag::class,
                 'choice_label' => function (Tag $tag) {
                     return '#'.$tag->getTitle();

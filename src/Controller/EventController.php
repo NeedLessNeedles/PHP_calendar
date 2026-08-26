@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Security\Voter\EventVoter;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class EventController.
@@ -32,7 +33,7 @@ class EventController extends AbstractController
      *
      * @param EventServiceInterface $eventService Event service
      */
-    public function __construct(private readonly EventServiceInterface $eventService)
+    public function __construct(private readonly EventServiceInterface $eventService, private readonly TranslatorInterface $translator)
     {
     }
 
@@ -106,7 +107,12 @@ class EventController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->eventService->create($event, $this->getUser());
 
-            return $this->redirectToRoute('app_event_calendar', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.created_successfully')
+            );
+
+            return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('event/new.html.twig', [
@@ -167,9 +173,15 @@ class EventController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-            $this->addFlash('success', 'Event updated');
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.updated_successfully')
+            );
         } else {
-            $this->addFlash('error', 'Validation failed');
+            $this->addFlash(
+                'error',
+                $this->translator->trans('message.validation_failed')
+            );
         }
 
         return $this->redirectToRoute('app_event_index');

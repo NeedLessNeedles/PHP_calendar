@@ -115,8 +115,9 @@
             <tr>
                 <td>{{ event.title }}</td>
                 <td>{{ event.description }}</td>
-                <td>{{ event.startDate ? event.startDate|date('Y-m-d H:i') : '' }}</td>
-                <td>{{ event.endDate ? event.endDate|date('Y-m-d H:i') : '-' }}</td>
+{#                <td>{{ event.startDate ? event.startDate|date('Y-m-d H:i') : '' }}</td>#}
+                <td>{{ event.startDate ? event.startDate|format_date('medium') : '' }}</td>
+                <td>{{ event.endDate ? event.endDate|format_date('medium') : '-' }}</td>
                 <td>{{ event.location }}</td>
                 <td>{{ event.status }}</td>
                 <td>{{ event.category }}</td>

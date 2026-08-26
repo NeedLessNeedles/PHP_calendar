@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Categories{% endblock %}
+{% block title %}{{ 'option.categories'|trans }}{% endblock %}
 
 {% block body %}
     <div class="container d-flex justify-content-center align-items-center mt-3">
@@ -18,15 +18,16 @@
                         <th>{{ 'th.actions'|trans }}</th>
                     </tr>
                     </thead>
+{#                    "none", "short", "medium", "long", "full", "relative_short", "relative_medium", "relative_long", "relative_full"#}
 
                     <tbody>
                     {% for category in pagination.items %}
                         <tr>
                             <td>{{ category.id }}</td>
                             <td>{{ category.title }}</td>
-                            <td>{{ category.createdAt|date('Y-m-d H:i') }}</td>
-{#                            <td>{{ category.createdAt ? category.createdAt|date('Y-m-d H:i') : '' }}</td>#}
-                            <td>{{ category.updatedAt|date('Y-m-d H:i') }}</td>
+{#                            <td>{{ category.createdAt|date('Y-m-d H:i') }}</td>#}
+                            <td>{{ category.createdAt ? category.createdAt|format_date('medium') : '' }}</td>
+                            <td>{{ category.updatedAt|format_date('medium') }}</td>
                             <td>
                                 <button
                                     class="btn btn-primary btn-sm edit-category-btn"
@@ -42,7 +43,7 @@
                                     method="post"
                                     action="{{ path('app_category_delete', {'id': category.id}) }}"
                                     style="display:inline;"
-                                    onsubmit="return confirm('Delete category?');"
+                                    onsubmit="return confirm({{ 'alert.delete_category'|trans }});"
                                 >
                                     <input
                                         type="hidden"
@@ -101,7 +102,7 @@
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content auth-card p-3">
 
-                        <h4>Edit category</h4>
+                        <h4>{{ 'title.edit_category'|trans }}</h4>
                         <form id="editCategoryForm" method="post">
                             <input
                                 type="hidden"
@@ -110,7 +111,7 @@
                             >
                             <div class="mb-3">
                                 <label class="form-label">
-                                    Change the category name
+                                    {{ 'label.change_category_name'|trans }}
                                 </label>
                                 <input
                                     type="text"
@@ -125,13 +126,13 @@
                                     class="btn btn-secondary"
                                     data-bs-dismiss="modal"
                                 >
-                                    Cancel
+                                    {{ 'button.cancel'|trans }}
                                 </button>
                                 <button
                                     type="submit"
                                     class="btn btn-success"
                                 >
-                                    Save
+                                    {{ 'button.save'|trans }}
                                 </button>
                             </div>
                         </form>

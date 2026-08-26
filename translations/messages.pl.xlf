@@ -330,6 +330,18 @@
         <source>title.create_new_category</source>
         <target>Utwórz nową kategorię</target>
       </trans-unit>
+      <trans-unit id="title.edit_category">
+        <source>title.edit_category</source>
+        <target>Edytuj kategorię</target>
+      </trans-unit>
+      <trans-unit id="label.change_category_name">
+        <source>label.change_category_name</source>
+        <target>Zmień nazwę kategorii</target>
+      </trans-unit>
+      <trans-unit id="alert.delete_category">
+        <source>alert.delete_category</source>
+        <target>Usunąć kategorię?</target>
+      </trans-unit>
 
       <!-- /admin/requests -->
       <trans-unit id="th.start">
@@ -375,6 +387,37 @@
       <trans-unit id="title.change_tag_name">
         <source>title.change_tag_name</source>
         <target>Zmień nazwę tagu</target>
+      </trans-unit>
+
+      <!-- Flash messages -->
+      <trans-unit id="message.created_successfully">
+        <source>message.created_successfully</source>
+        <target>Obiekt utworzony pomyślnie!</target>
+      </trans-unit>
+      <trans-unit id="message.deleted_successfully">
+        <source>message.deleted_successfully</source>
+        <target>Obiekt usunięty pomyślnie!</target>
+      </trans-unit>
+      <trans-unit id="message.updated_successfully">
+        <source>message.updated_successfully</source>
+        <target>Obiekt zmodyfikowany pomyślnie!</target>
+      </trans-unit>
+      <trans-unit id="message.validation_failed">
+        <source>message.validation_failed</source>
+        <target>Walidacja nie powiodła się!</target>
+      </trans-unit>
+
+      <trans-unit id="label.new_password">
+        <source>label.new_password</source>
+        <target>Nowe hasło</target>
+      </trans-unit>
+      <trans-unit id="label.current_password">
+        <source>label.current_password</source>
+        <target>Bieżące hasło</target>
+      </trans-unit>
+      <trans-unit id="label.repeat_password">
+        <source>label.repeat_password</source>
+        <target>Powtórz hasło</target>
       </trans-unit>
     </body>
   </file>

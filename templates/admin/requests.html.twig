@@ -13,8 +13,7 @@
                     <tr>
                         <th>{{ 'th.id'|trans }}</th>
                         <th>{{ 'th.title'|trans }}</th>
-{#                        <th>{{ 'th.start'|trans }}</th>#}
-                        <th>{{ knp_pagination_sortable(pagination, 'th.start'|trans, 'event.startDate') }}</th>
+                        <th>{{ knp_pagination_sortable(pagination, 'th.start_date'|trans, 'event.startDate') }}</th>
                         <th>{{ 'th.owner'|trans }}</th>
                         <th>{{ 'th.actions'|trans }}</th>
                     </tr>
@@ -25,7 +24,7 @@
                         <tr>
                             <td>{{ event.id }}</td>
                             <td>{{ event.title }}</td>
-                            <td>{{ event.startDate|date('Y-m-d H:i') }}</td>
+                            <td>{{ event.startDate|format_date('medium') }}</td>
                             <td>{{ event.owner ? event.owner.email : 'guest' }}</td>
                             <td class="d-flex gap-2">
 

@@ -209,9 +209,9 @@
       </trans-unit>
 
       <!-- /register -->
-        <trans-unit id="title.please_sign_in">
-          <source>title.please_sign_in</source>
-          <target>Please sign in</target>
+        <trans-unit id="title.please_sign_up">
+          <source>title.please_sign_up</source>
+          <target>Please sign up</target>
         </trans-unit>
         <trans-unit id="label.agree_terms">
           <source>label.agree_terms</source>
@@ -328,6 +328,18 @@
         <source>title.create_new_category</source>
         <target>Create new category</target>
       </trans-unit>
+      <trans-unit id="title.edit_category">
+        <source>title.edit_category</source>
+        <target>Edit category</target>
+      </trans-unit>
+      <trans-unit id="label.change_category_name">
+        <source>label.change_category_name</source>
+        <target>Change the category name</target>
+      </trans-unit>
+      <trans-unit id="alert.delete_category">
+        <source>alert.delete_category</source>
+        <target>Delete category?</target>
+      </trans-unit>
 
       <!-- /admin/requests -->
       <trans-unit id="th.start">
@@ -375,7 +387,7 @@
         <target>Change tag name</target>
       </trans-unit>
 
-
+      <!-- Flash messages -->
       <trans-unit id="message.created_successfully">
         <source>message.created_successfully</source>
         <target>Item created successfully!</target>
@@ -387,6 +399,36 @@
       <trans-unit id="message.updated_successfully">
         <source>message.updated_successfully</source>
         <target>Item updated successfully!</target>
+      </trans-unit>
+      <trans-unit id="message.validation_failed">
+        <source>message.validation_failed</source>
+        <target>Validation failed!</target>
+      </trans-unit>
+
+      <trans-unit id="message.agree_terms">
+        <source>message.agree_terms</source>
+        <target>You should agree to our terms!</target>
+      </trans-unit>
+      <trans-unit id="message.enter_password">
+        <source>message.enter_password</source>
+        <target>Please enter a password</target>
+      </trans-unit>
+      <trans-unit id="message.but_at_least">
+        <source>message.but_at_least</source>
+        <target>Your password should be at least 8 characters</target>
+      </trans-unit>
+
+      <trans-unit id="label.new_password">
+        <source>label.new_password</source>
+        <target>New password</target>
+      </trans-unit>
+      <trans-unit id="label.current_password">
+        <source>label.current_password</source>
+        <target>Current password</target>
+      </trans-unit>
+      <trans-unit id="label.repeat_password">
+        <source>label.repeat_password</source>
+        <target>Repeat password</target>
       </trans-unit>
     </body>
   </file>
