@@ -209,6 +209,16 @@ class EventController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->request->get('_token'))) {
             $entityManager->remove($event);
             $entityManager->flush();
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.deleted_successfully')
+            );
+        } else {
+            $this->addFlash(
+                'error',
+                $this->translator->trans('message.validation_failed')
+            );
         }
 
         return $this->redirectToRoute('app_event_index');

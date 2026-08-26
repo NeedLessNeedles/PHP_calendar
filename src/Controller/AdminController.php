@@ -20,6 +20,7 @@ use App\Repository\EventRepository;
 use App\Service\EventServiceInterface;
 use App\Service\AdminServiceInterface;
 use App\Service\ProfileServiceInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class AdminController.
@@ -31,9 +32,12 @@ class AdminController extends AbstractController
     /**
      * Constructor.
      *
+     * @param ProfileServiceInterface $profileService Profile service
      * @param AdminServiceInterface $adminService Admin service
+     * @param EventServiceInterface $eventService Event service
+     * @param TranslatorInterface $translator Translator
      */
-    public function __construct(private readonly ProfileServiceInterface $profileService, private readonly AdminServiceInterface $adminService, private readonly EventServiceInterface $eventService)
+    public function __construct(private readonly ProfileServiceInterface $profileService, private readonly AdminServiceInterface $adminService, private readonly EventServiceInterface $eventService, private readonly TranslatorInterface $translator)
     {
     }
 
@@ -57,6 +61,7 @@ class AdminController extends AbstractController
     /**
      * Show action.
      *
+     * @param Request $request Request
      * @param UserRepository $userRepository User repository
      *
      * @return Response HTTP response
@@ -105,6 +110,11 @@ class AdminController extends AbstractController
         // email update
         if ($emailForm->isSubmitted() && $emailForm->isValid()) {
             $entityManager->flush();
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.deleted_successfully')
+            );
         }
 
         // password update
