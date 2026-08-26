@@ -5,99 +5,100 @@
 {% block body %}
 
     <h1>{{ 'title.events_list'|trans }}</h1>
+    {% if app.user %}
 
-    <div class="d-flex flex-direction-row align-items-center gap-3">
-        <div class="mb-2" style="max-width: 190px;">
-            <label for="categoryFilter" class="form-label">{{ 'label.filter_by_category'|trans }}</label>
-            <select
-                id="categoryFilter"
-                class="form-select"
-                onchange="location = this.value"
-            >
-                <option value="{{ path('app_event_index') }}"
-                        {% if currentCategory is null %}selected{% endif %}>
-                    {{ 'option.all'|trans }}
-                </option>
-                {% for category in categories %}
-                    <option value="{{ path('app_event_index', {categoryId: category.id}) }}"
-                            {% if currentCategory == category.id %}selected{% endif %}>
-                        {{ category.title }}
+        <div class="d-flex flex-direction-row align-items-center gap-3">
+            <div class="mb-2" style="max-width: 190px;">
+                <label for="categoryFilter" class="form-label">{{ 'label.filter_by_category'|trans }}</label>
+                <select
+                    id="categoryFilter"
+                    class="form-select"
+                    onchange="location = this.value"
+                >
+                    <option value="{{ path('app_event_index') }}"
+                            {% if currentCategory is null %}selected{% endif %}>
+                        {{ 'option.all'|trans }}
                     </option>
-                {% endfor %}
-            </select>
-        </div>
+                    {% for category in categories %}
+                        <option value="{{ path('app_event_index', {categoryId: category.id}) }}"
+                                {% if currentCategory == category.id %}selected{% endif %}>
+                            {{ category.title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <div class="mb-2" style="max-width: 190px;">
-            <label for="tagFilter" class="form-label">{{ 'label.filter_by_tag'|trans }}</label>
-            <select
-                id="tagFilter"
-                class="form-select"
-                onchange="location = this.value"
-            >
-                <option value="{{ path('app_event_index', {
-                    categoryId: currentCategory,
-                    title: title
-                }) }}"
-                        {% if currentTag is null %}selected{% endif %}>
-                    {{ 'option.all'|trans }}
-                </option>
-
-                {% for tag in tags %}
+            <div class="mb-2" style="max-width: 190px;">
+                <label for="tagFilter" class="form-label">{{ 'label.filter_by_tag'|trans }}</label>
+                <select
+                    id="tagFilter"
+                    class="form-select"
+                    onchange="location = this.value"
+                >
                     <option value="{{ path('app_event_index', {
                         categoryId: currentCategory,
-                        tagId: tag.id,
                         title: title
                     }) }}"
-                            {% if currentTag == tag.id %}selected{% endif %}>
-                        #{{ tag.title }}
+                            {% if currentTag is null %}selected{% endif %}>
+                        {{ 'option.all'|trans }}
                     </option>
-                {% endfor %}
-            </select>
+
+                    {% for tag in tags %}
+                        <option value="{{ path('app_event_index', {
+                            categoryId: currentCategory,
+                            tagId: tag.id,
+                            title: title
+                        }) }}"
+                                {% if currentTag == tag.id %}selected{% endif %}>
+                            #{{ tag.title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label">{{ 'label.search_events'|trans }}</label>
+                <form method="get" class="d-flex gap-2">
+                    <input type="text"
+                           name="title"
+                           value="{{ app.request.get('title') }}"
+                           class="form-control"
+                           placeholder="{{ 'placeholder.search_by_title'|trans }}">
+
+                    <button class="btn btn-primary">{{ 'button.search'|trans }}</button>
+
+                    <a href="{{ path('app_event_index') }}" class="btn btn-secondary">
+                        {{ 'button.reset'|trans }}
+                    </a>
+
+                </form>
+            </div>
+
         </div>
 
-        <div class="mb-2">
-            <label class="form-label">{{ 'label.search_events'|trans }}</label>
-            <form method="get" class="d-flex gap-2">
-                <input type="text"
-                       name="title"
-                       value="{{ app.request.get('title') }}"
-                       class="form-control"
-                       placeholder="{{ 'placeholder.search_by_title'|trans }}">
 
-                <button class="btn btn-primary">{{ 'button.search'|trans }}</button>
-
-                <a href="{{ path('app_event_index') }}" class="btn btn-secondary">
-                    {{ 'button.reset'|trans }}
-                </a>
-
-            </form>
-        </div>
-
-    </div>
-
-
-    <table class="table">
-        <colgroup>
-            {# Title #}
-            <col style="width: 10%;">
-            {# Description #}
-            <col style="width: 15%;">
-            {# Start Date #}
-            <col style="width: 15%;">
-            {# End Date #}
-            <col style="width: 10%;">
-            {# Location #}
-            <col style="width: 10%;">
-            {# Status #}
-            <col style="width: 10%;">
-            {# Category #}
-            <col style="width: 10%;">
-            {# Tag #}
-            <col style="width: 10%;">
-            {# Actions #}
-            <col style="width: 10%;">
-        </colgroup>
-        <thead>
+        <table class="table">
+            <colgroup>
+                {# Title #}
+                <col style="width: 10%;">
+                {# Description #}
+                <col style="width: 15%;">
+                {# Start Date #}
+                <col style="width: 15%;">
+                {# End Date #}
+                <col style="width: 10%;">
+                {# Location #}
+                <col style="width: 10%;">
+                {# Status #}
+                <col style="width: 10%;">
+                {# Category #}
+                <col style="width: 10%;">
+                {# Tag #}
+                <col style="width: 10%;">
+                {# Actions #}
+                <col style="width: 10%;">
+            </colgroup>
+            <thead>
             <tr>
                 <th>{{ 'th.title'|trans }}</th>
                 <th>{{ 'th.description'|trans }}</th>
@@ -109,62 +110,66 @@
                 <th>{{ 'option.tags'|trans }}</th>
                 <th>{{ 'th.actions'|trans }}</th>
             </tr>
-        </thead>
-        <tbody>
-        {% for event in pagination.items %}
-            <tr>
-                <td>{{ event.title }}</td>
-                <td>{{ event.description }}</td>
-{#                <td>{{ event.startDate ? event.startDate|date('Y-m-d H:i') : '' }}</td>#}
-                <td>{{ event.startDate ? event.startDate|format_date('medium') : '' }}</td>
-                <td>{{ event.endDate ? event.endDate|format_date('medium') : '-' }}</td>
-                <td>{{ event.location }}</td>
-                <td>{{ event.status }}</td>
-                <td>{{ event.category }}</td>
-                <td>
-                    {% for tag in event.tags %}
-                        <span class="badge bg-secondary">
+            </thead>
+            <tbody>
+            {% for event in pagination.items and app.user %}
+                <tr>
+                    <td>{{ event.title }}</td>
+                    <td>{{ event.description }}</td>
+                    <td>{{ event.startDate ? event.startDate|format_date('medium') : '' }}</td>
+                    <td>{{ event.endDate ? event.endDate|format_date('medium') : '-' }}</td>
+                    <td>{{ event.location }}</td>
+                    <td>{{ event.status }}</td>
+                    <td>{{ event.category }}</td>
+                    <td>
+                        {% for tag in event.tags %}
+                            <span class="badge bg-secondary">
                             #{{ tag.title }}
                         </span>
-                    {% else %}
-                        -
-                    {% endfor %}
-                </td>
-
-                {% if app.user %}
-                    <td>
-                        <button class="btn btn-primary btn-sm edit-event-btn" data-id="{{ event.id }}" type="button" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
-                        <form
-                            method="post"
-                            action="{{ path('app_event_delete', {'id': event.id}) }}"
-                            style="display:inline;"
-                            onsubmit="return confirm('Delete event?');"
-                        >
-                            <input
-                                type="hidden"
-                                name="_token"
-                                value="{{ csrf_token('delete' ~ event.id) }}"
-                            >
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                {{ 'button.delete'|trans }}
-                            </button>
-                        </form>
+                        {% else %}
+                            -
+                        {% endfor %}
                     </td>
-                {% else %}
-                    <td>-</td>
-                {% endif %}
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">{{ 'tr.no_records'|trans }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
 
-    <div class="d-flex justify-content-center navigation mt-1">
-        {{ knp_pagination_render(pagination) }}
-    </div>
+                    {% if app.user %}
+                        <td>
+                            <button class="btn btn-primary btn-sm edit-event-btn" data-id="{{ event.id }}" type="button" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
+                            <form
+                                method="post"
+                                action="{{ path('app_event_delete', {'id': event.id}) }}"
+                                style="display:inline;"
+                                onsubmit="return confirm('Delete event?');"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="_token"
+                                    value="{{ csrf_token('delete' ~ event.id) }}"
+                                >
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    {{ 'button.delete'|trans }}
+                                </button>
+                            </form>
+                        </td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6">{{ 'tr.no_records'|trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-center navigation mt-1">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    {% else %}
+        <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
+            <h3>Sign in to view the existing records or create the new event proposal above.</h3>
+        </div>
+    {% endif %}
 
     <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#eventModal">

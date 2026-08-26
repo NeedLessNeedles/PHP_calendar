@@ -251,7 +251,6 @@
         <source>placeholder.search_by_title</source>
         <target>Szukaj po tytule</target>
       </trans-unit>
-
       <trans-unit id="th.title">
         <source>th.title</source>
         <target>Tytuł</target>
@@ -287,6 +286,10 @@
       <trans-unit id="tr.no_records">
         <source>tr.no_records</source>
         <target>Nie znaleziono pozycji</target>
+      </trans-unit>
+      <trans-unit id="header.not_logged_info">
+        <source>header.not_logged_info</source>
+        <target>Zaloguj się aby zarządzać wydarzeniami lub utwórz propozycję wydarzenia poniżej.</target>
       </trans-unit>
 
       <trans-unit id="title.edit_event">

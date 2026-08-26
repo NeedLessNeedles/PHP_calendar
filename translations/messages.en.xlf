@@ -287,6 +287,10 @@
           <source>tr.no_records</source>
           <target>No records found</target>
         </trans-unit>
+        <trans-unit id="header.not_logged_info">
+          <source>header.not_logged_info</source>
+          <target>Sign in to view the existing records or create the new event proposal above.</target>
+        </trans-unit>
 
         <trans-unit id="title.edit_event">
           <source>title.edit_event</source>
