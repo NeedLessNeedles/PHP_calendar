@@ -133,7 +133,7 @@
 
                     {% if app.user %}
                         <td>
-                            <button class="btn btn-primary btn-sm edit-event-btn" data-id="{{ event.id }}" type="button" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
+                            <a class="btn btn-primary btn-sm edit-event-btn" href="{{ path('app_event_edit', {'id': event.id}) }}">{{ 'button.edit'|trans }}</a>
                             <form
                                 method="post"
                                 action="{{ path('app_event_delete', {'id': event.id}) }}"

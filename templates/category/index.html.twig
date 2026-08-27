@@ -18,14 +18,14 @@
                         <th>{{ 'th.actions'|trans }}</th>
                     </tr>
                     </thead>
-{#                    "none", "short", "medium", "long", "full", "relative_short", "relative_medium", "relative_long", "relative_full"#}
+                    {#                    "none", "short", "medium", "long", "full", "relative_short", "relative_medium", "relative_long", "relative_full"#}
 
                     <tbody>
                     {% for category in pagination.items %}
                         <tr>
                             <td>{{ category.id }}</td>
                             <td>{{ category.title }}</td>
-{#                            <td>{{ category.createdAt|date('Y-m-d H:i') }}</td>#}
+                            {#                            <td>{{ category.createdAt|date('Y-m-d H:i') }}</td>#}
                             <td>{{ category.createdAt ? category.createdAt|format_date('medium') : '' }}</td>
                             <td>{{ category.updatedAt|format_date('medium') }}</td>
                             <td>
@@ -85,7 +85,7 @@
                                 id: 'createCategoryForm'
                             }
                         }) }}
-                            {{ form_row(form.title) }}
+                        {{ form_row(form.title) }}
                         {{ form_end(form) }}
 
                         <div class="d-flex flex-row justify-content-center align-items-center gap-2">

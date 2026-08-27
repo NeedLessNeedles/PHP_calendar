@@ -160,9 +160,9 @@ class EventController extends AbstractController
         '/{id}/edit',
         name: 'app_event_edit',
         requirements: ['id' => '[1-9]\d*'],
-        methods: ['POST']
+        methods: ['GET', 'POST']
     )]
-    public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Event $event, EntityManagerInterface $entityManager, int $id): Response
     {
         $this->denyAccessUnlessGranted(
             EventVoter::EDIT,
@@ -178,14 +178,14 @@ class EventController extends AbstractController
                 'success',
                 $this->translator->trans('message.updated_successfully')
             );
-        } else {
-            $this->addFlash(
-                'error',
-                $this->translator->trans('message.validation_failed')
-            );
+
+            return $this->redirectToRoute('app_event_index');
         }
 
-        return $this->redirectToRoute('app_event_index');
+        return $this->render(
+            'event/edit.html.twig',
+            ['form' => $form->createView()],
+        );
     }
 
     /**
