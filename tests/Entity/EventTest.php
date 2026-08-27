@@ -73,6 +73,16 @@ class EventTest extends TestCase
     }
 
     /**
+     * Tests if ID column can be null.
+     */
+    public function testIdCanBeNull(): void
+    {
+        $event = new Event();
+
+        $this->assertNull($event->getId());
+    }
+
+    /**
      * Test set() and get() for StartDate column.
      */
     public function testStartDate(): void
@@ -142,6 +152,9 @@ class EventTest extends TestCase
         $this->assertEquals('approved', $event->getStatus());
     }
 
+    /**
+     * Test if category can be given a title.
+     */
     public function testCategory(): void
     {
         $event = new Event();
@@ -152,6 +165,9 @@ class EventTest extends TestCase
         $this->assertEquals($category, $event->getCategory());
     }
 
+    /**
+     * Test for tag initialization.
+     */
     public function testTagsInitialized(): void
     {
         $event = new Event();
@@ -159,6 +175,9 @@ class EventTest extends TestCase
         $this->assertCount(0, $event->getTags());
     }
 
+    /**
+     * Test if tag can be added.
+     */
     public function testAddTag(): void
     {
         $event = new Event();
@@ -170,6 +189,9 @@ class EventTest extends TestCase
         $this->assertTrue($event->getTags()->contains($tag));
     }
 
+    /**
+     * Test if tags does not duplicate.
+     */
     public function testTagsDoesntDuplicate(): void
     {
         $event = new Event();
@@ -180,6 +202,9 @@ class EventTest extends TestCase
         $this->assertCount(1, $event->getTags());
     }
 
+    /**
+     * Test if tag can be removed from the event.
+     */
     public function testRemoveTag(): void
     {
         $event = new Event();
