@@ -12,7 +12,17 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class CategoryControllerTest extends WebTestCase
 {
-    private function getUser($client, string $email): User
+    private const CATEGORY_ROUTE = '/category';
+
+    /**
+     * Test getUser()
+     *
+     * @param User $user
+     * @param $email
+     *
+     * @return User
+     */
+    private function getUser($client, string $email): ?User
     {
         return $client->getContainer()
             ->get('doctrine')
@@ -28,51 +38,116 @@ class CategoryControllerTest extends WebTestCase
             ->findOneBy([]);
     }
 
+    /**
+     * Test index route.
+     *
+     */
     public function testIndex(): void
     {
+        // given
         $client = static::createClient();
 
-        $client->request('GET', '/category');
+        // when
+        $client->request('GET', self::CATEGORY_ROUTE);
 
+        // then
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('table');
+    }
+
+    /**
+     * Test show category.
+     *
+     */
+    public function testShowCategory(): void
+    {
+        // given
+        $client = static::createClient();
+        $category = $this->getCategory($client);
+
+        $this->assertNotNull($category);
+
+        // when
+        $client->request(
+            'GET',
+            self::CATEGORY_ROUTE.'/'.$category->getId()
+        );
+
+        // then
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('body');
     }
 
-    public function testShowCategory(): void
-    {
-        $client = static::createClient();
-
-        $category = $this->getCategory($client);
-        $this->assertNotNull($category);
-
-        $client->request('GET', '/category/'.$category->getId());
-
-        $this->assertResponseIsSuccessful();
-    }
-
+    /**
+     * Tests if new category can be created only by admin.
+     *
+     */
     public function testNewRequiresAdmin(): void
     {
+        // given
         $client = static::createClient();
 
-        $client->request('GET', '/category/new');
+        // when
+        $client->request('GET', self::CATEGORY_ROUTE.'/new');
 
+        // then
         $this->assertResponseRedirects();
+    }
+
+    /**
+     * Tests for regular user case.
+     *
+     */
+    public function testNewRequiresAdminForRegularUser(): void
+    {
+        // given
+        $client = static::createClient();
+
+        $user = $this->getUser(
+            $client,
+            'user.first@gmail.com'
+        );
+
+        $this->assertNotNull($user);
+        $client->loginUser($user);
+
+        // when
+        $client->request(
+            'GET',
+            self::CATEGORY_ROUTE.'/new'
+        );
+
+        // then
+        $this->assertResponseStatusCodeSame(403);
     }
 
     public function testNewAsAdmin(): void
     {
+        // given
         $client = static::createClient();
-
-        $admin = $this->getUser($client, 'admin.first@gmail.com');
+        $admin = $this->getUser(
+            $client,
+            'admin.first@gmail.com'
+        );
+        $this->assertNotNull($admin);
         $client->loginUser($admin);
 
-        $client->request('POST', '/category/new', [
+        // when
+        $client->request('POST', self::CATEGORY_ROUTE.'/new', [
             'category' => [
                 'title' => 'Test category',
             ],
         ]);
 
-        $this->assertResponseRedirects('/category');
+        // then
+        $this->assertResponseRedirects(self::CATEGORY_ROUTE);
+        $repository = static::getContainer()
+            ->get('doctrine')
+            ->getRepository(Category::class);
+        $category = $repository->findOneBy([
+            'title' => 'Test category',
+        ]);
+        $this->assertNotNull($category);
     }
 
     public function testEditCategory(): void
@@ -96,19 +171,80 @@ class CategoryControllerTest extends WebTestCase
         $this->assertResponseRedirects('/category');
     }
 
-    public function testDeleteCategory(): void
+    /**
+     * Test for invalid token.
+     *
+     */
+    public function testEditCategoryWithInvalidCsrfToken(): void
     {
+        // given
         $client = static::createClient();
-
-        $admin = $this->getUser($client, 'admin.first@gmail.com');
+        $admin = $this->getUser(
+            $client,
+            'admin.first@gmail.com'
+        );
         $category = $this->getCategory($client);
+
+        $this->assertNotNull($admin);
+        $this->assertNotNull($category);
 
         $client->loginUser($admin);
 
-        $client->request('POST', '/category/'.$category->getId(), [
-            '_token' => 'delete'.$category->getId(),
-        ]);
+        // when
+        $client->request(
+            'POST',
+            self::CATEGORY_ROUTE.'/'.$category->getId().'/edit',
+            [
+                '_token' => 'invalid-token',
+                'category' => [
+                    'title' => 'Should not be saved',
+                ],
+            ]
+        );
 
-        $this->assertResponseRedirects('/category');
+        // then
+        $this->assertResponseStatusCodeSame(403);
+    }
+
+    /**
+     * Test for category removal.
+     *
+     */
+    public function testDeleteCategoryWithInvalidCsrfToken(): void
+    {
+        // given
+        $client = static::createClient();
+
+        $admin = $this->getUser(
+            $client,
+            'admin.first@gmail.com'
+        );
+
+        $category = $this->getCategory($client);
+
+        $this->assertNotNull($admin);
+        $this->assertNotNull($category);
+
+        $client->loginUser($admin);
+
+        $categoryId = $category->getId();
+
+        // when
+        $client->request(
+            'POST',
+            self::CATEGORY_ROUTE.'/'.$categoryId,
+            [
+                '_token' => 'invalid-token',
+            ]
+        );
+
+        // then
+        $this->assertResponseRedirects(self::CATEGORY_ROUTE);
+
+        $repository = static::getContainer()
+            ->get('doctrine')
+            ->getRepository(Category::class);
+
+        $this->assertNotNull($repository->find($categoryId));
     }
 }
