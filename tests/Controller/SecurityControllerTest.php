@@ -18,13 +18,13 @@ class SecurityControllerTest extends WebTestCase
      */
     public function testIndex(): void
     {
-        //given
+        // given
         $client = static::createClient();
 
-        //when
+        // when
         $client->request('GET', '/login');
 
-        //then
+        // then
         self::assertResponseIsSuccessful();
     }
 

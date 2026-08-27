@@ -62,7 +62,7 @@ class AdminServiceTest extends KernelTestCase
         $user->setEmail('user@test.com');
         $reflection = new \ReflectionClass($admin);
         $prop = $reflection->getProperty('roles');
-        //$prop->setAccessible(true);
+        // $prop->setAccessible(true);
         $prop->setValue($admin, ['ROLE_ADMIN']);
 
         $this->expectException(\LogicException::class);
@@ -76,7 +76,7 @@ class AdminServiceTest extends KernelTestCase
 
         $reflection = new \ReflectionClass($user);
         $prop = $reflection->getProperty('id');
-        //$prop->setAccessible(true);
+        // $prop->setAccessible(true);
         $prop->setValue($user, 1);
 
         $this->expectException(\LogicException::class);
@@ -92,7 +92,6 @@ class AdminServiceTest extends KernelTestCase
         $current->setEmail('admin@test.com');
 
         $this->adminService->toggleBlock($target, $current);
-        $this->assertTrue($target->isBlocked() || $target->isBlocked() === false);
+        $this->assertTrue($target->isBlocked() || false === $target->isBlocked());
     }
-
 }

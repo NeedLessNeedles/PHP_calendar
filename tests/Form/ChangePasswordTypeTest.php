@@ -69,5 +69,4 @@ class ChangePasswordTypeTest extends TypeTestCase
 
         $this->assertNull($form->getConfig()->getDataClass());
     }
-
 }

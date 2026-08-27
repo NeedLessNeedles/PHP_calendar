@@ -55,5 +55,4 @@ class CategoryTest extends TestCase
 
         $this->assertEquals('Music', (string) $category);
     }
-
 }

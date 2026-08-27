@@ -44,5 +44,4 @@ class UserRepositoryTest extends KernelTestCase
         $this->userRepository->upgradePassword($user, 'new-hash');
         $this->assertSame('new-hash', $user->getPassword());
     }
-
 }

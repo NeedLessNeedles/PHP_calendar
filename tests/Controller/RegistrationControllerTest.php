@@ -21,13 +21,13 @@ class RegistrationControllerTest extends WebTestCase
      */
     public function testIndex(): void
     {
-        //given
+        // given
         $client = static::createClient();
 
-        //when
+        // when
         $client->request('GET', '/register');
 
-        //then
+        // then
         self::assertResponseIsSuccessful();
     }
 

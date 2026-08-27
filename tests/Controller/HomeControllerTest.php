@@ -18,13 +18,13 @@ class HomeControllerTest extends WebTestCase
      */
     public function testIndex(): void
     {
-        //given
+        // given
         $client = static::createClient();
 
-        //when
+        // when
         $client->request('GET', '/home');
 
-        //then
+        // then
         self::assertResponseIsSuccessful();
     }
 

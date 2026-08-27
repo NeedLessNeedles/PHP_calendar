@@ -11,7 +11,6 @@ use App\Entity\Event;
 use App\Entity\Category;
 use App\Entity\Tag;
 use PHPUnit\Framework\TestCase;
-use function PHPUnit\Framework\assertEquals;
 
 /**
  * Class EventTest.

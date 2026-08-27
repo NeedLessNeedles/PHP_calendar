@@ -6,9 +6,6 @@
 
 namespace App\Tests\Repository;
 
-use App\Entity\Category;
-use App\Entity\Event;
-use App\Entity\Tag;
 use App\Repository\EventRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

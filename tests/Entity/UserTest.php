@@ -7,7 +7,6 @@
 namespace App\Tests\Entity;
 
 use App\Entity\User;
-use App\Entity\Event;
 use PHPUnit\Framework\TestCase;
 
 /**

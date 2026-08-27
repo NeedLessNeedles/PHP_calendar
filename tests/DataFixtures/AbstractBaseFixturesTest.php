@@ -17,8 +17,10 @@ class AbstractBaseFixturesTest extends TestCase
 {
     public function testCreateManyThrows(): void
     {
-        $fixture = new class extends AbstractBaseFixtures {
-            protected function loadData(): void {}
+        $fixture = new class () extends AbstractBaseFixtures {
+            protected function loadData(): void
+            {
+            }
         };
         $manager = $this->createMock(ObjectManager::class);
 
@@ -32,8 +34,10 @@ class AbstractBaseFixturesTest extends TestCase
 
     public function testGetRandomReferenceThrows(): void
     {
-        $fixture = new class extends AbstractBaseFixtures {
-            protected function loadData(): void {}
+        $fixture = new class () extends AbstractBaseFixtures {
+            protected function loadData(): void
+            {
+            }
         };
 
         $manager = $this->createMock(ObjectManager::class);
@@ -41,7 +45,7 @@ class AbstractBaseFixturesTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $ref = new \ReflectionMethod($fixture, 'getRandomReference');
-        //$ref->setAccessible(true);
+        // $ref->setAccessible(true);
 
         $ref->invoke($fixture, 'nonexistent', \stdClass::class);
     }

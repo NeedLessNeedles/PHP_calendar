@@ -60,5 +60,4 @@ class TagTest extends TestCase
         $tag->removeEvent($event);
         $this->assertCount(0, $tag->getEvents());
     }
-
 }

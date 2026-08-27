@@ -51,7 +51,7 @@ class RegistrationFormTypeTest extends TypeTestCase
             'plainPassword' => 'secret123',
         ]);
 
-        $this->assertTrue($form->get('agreeTerms')->getConfig()->getMapped() === false);
+        $this->assertTrue(false === $form->get('agreeTerms')->getConfig()->getMapped());
     }
 
     public function testPlainPasswordIsNotMapped(): void
@@ -63,7 +63,6 @@ class RegistrationFormTypeTest extends TypeTestCase
             'plainPassword' => 'secret123',
         ]);
 
-        $this->assertTrue($form->get('plainPassword')->getConfig()->getMapped() === false);
+        $this->assertTrue(false === $form->get('plainPassword')->getConfig()->getMapped());
     }
-
 }

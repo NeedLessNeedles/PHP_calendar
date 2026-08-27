@@ -18,13 +18,13 @@ class ProfileControllerTest extends WebTestCase
      */
     public function testIndex(): void
     {
-        //given
+        // given
         $client = static::createClient();
 
-        //when
+        // when
         $client->request('GET', '/profile');
 
-        //then
+        // then
         self::assertResponseIsSuccessful();
     }
 

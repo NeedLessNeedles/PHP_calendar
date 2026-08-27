@@ -66,7 +66,7 @@ class AdminControllerTest extends WebTestCase
         $admin = $this->getUser($client, 'admin.first@gmail.com');
         $user = $this->getUser($client, 'user.first@gmail.com');
         $client->loginUser($admin);
-        $client->request('POST', '/admin/users/' . $user->getId() . '/block');
+        $client->request('POST', '/admin/users/'.$user->getId().'/block');
 
         $this->assertResponseRedirects('/admin/users');
     }
@@ -88,7 +88,7 @@ class AdminControllerTest extends WebTestCase
         $event = $this->getEvent($client, 'pending');
         $this->assertNotNull($event);
         $client->loginUser($admin);
-        $client->request('POST', '/admin/requests/' . $event->getId() . '/approve');
+        $client->request('POST', '/admin/requests/'.$event->getId().'/approve');
 
         $this->assertResponseRedirects('/admin/requests');
     }
@@ -100,7 +100,7 @@ class AdminControllerTest extends WebTestCase
         $event = $this->getEvent($client, 'pending');
         $this->assertNotNull($event);
         $client->loginUser($admin);
-        $client->request('POST', '/admin/requests/' . $event->getId() . '/reject');
+        $client->request('POST', '/admin/requests/'.$event->getId().'/reject');
 
         $this->assertResponseRedirects('/admin/requests');
     }

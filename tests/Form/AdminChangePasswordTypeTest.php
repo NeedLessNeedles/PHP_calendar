@@ -31,6 +31,7 @@ class AdminChangePasswordTypeTest extends TypeTestCase
 
         $this->assertTrue($form->isSynchronized());
     }
+
     public function testFormHasExpectedField(): void
     {
         $form = $this->factory->create(AdminChangePasswordType::class);
@@ -64,5 +65,4 @@ class AdminChangePasswordTypeTest extends TypeTestCase
 
         $this->assertNull($form->getConfig()->getDataClass());
     }
-
 }

@@ -62,8 +62,7 @@ class EventTypeTest extends TypeTestCase
             'tags',
         ];
 
-        foreach ($fields as $field)
-        {
+        foreach ($fields as $field) {
             self::assertTrue($form->has($field));
         }
     }
@@ -86,5 +85,4 @@ class EventTypeTest extends TypeTestCase
 
         self::assertSame(Category::class, $config->getOption('class'));
     }
-
 }

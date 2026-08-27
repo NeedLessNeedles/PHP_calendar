@@ -182,7 +182,7 @@ class EventControllerTest extends WebTestCase
         $event = $this->getEvent($client);
         $this->assertNotNull($event);
 
-        $client->request('POST', '/event/' . $event->getId() . '/edit', [
+        $client->request('POST', '/event/'.$event->getId().'/edit', [
             'event' => [
                 'title' => 'Changed title',
             ],
@@ -200,7 +200,7 @@ class EventControllerTest extends WebTestCase
 
         $client->loginUser($user);
 
-        $client->request('POST', '/event/' . $event->getId() . '/edit', [
+        $client->request('POST', '/event/'.$event->getId().'/edit', [
             'event' => [
                 'title' => 'Updated event',
             ],
@@ -218,8 +218,8 @@ class EventControllerTest extends WebTestCase
 
         $client->loginUser($user);
 
-        $client->request('POST', '/event/' . $event->getId(), [
-            '_token' => 'delete' . $event->getId(),
+        $client->request('POST', '/event/'.$event->getId(), [
+            '_token' => 'delete'.$event->getId(),
         ]);
 
         $this->assertResponseRedirects('/event');
@@ -241,7 +241,7 @@ class EventControllerTest extends WebTestCase
 
         $event = $this->getEvent($client);
 
-        $client->request('GET', '/event/' . $event->getId() . '/json');
+        $client->request('GET', '/event/'.$event->getId().'/json');
 
         $this->assertResponseIsSuccessful();
     }
@@ -254,5 +254,4 @@ class EventControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
     }
-
 }

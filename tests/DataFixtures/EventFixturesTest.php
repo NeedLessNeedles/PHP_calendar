@@ -23,7 +23,7 @@ class EventFixturesTest extends TestCase
         $fixtures = new EventFixtures();
         $categoryRepo = $this->createMock(ObjectRepository::class);
         $tagRepo = $this->createMock(ObjectRepository::class);
-        $categoryRepo->method('findAll')->willReturn([(new Category())->setTitle('Test'),]);
+        $categoryRepo->method('findAll')->willReturn([(new Category())->setTitle('Test')]);
 
         $tagRepo->method('findAll')->willReturn([
             new Tag(),

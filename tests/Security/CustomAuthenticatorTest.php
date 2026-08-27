@@ -11,7 +11,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
 /**
  * Class CustomAuthenticatorTest.
@@ -29,7 +28,7 @@ class CustomAuthenticatorTest extends TestCase
 
         $ref = new \ReflectionClass($authenticator);
         $method = $ref->getMethod('getLoginUrl');
-        //$method->setAccessible(true);
+        // $method->setAccessible(true);
         $request = new Request();
 
         $this->assertSame('/login', $method->invoke($authenticator, $request));

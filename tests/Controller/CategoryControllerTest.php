@@ -45,7 +45,7 @@ class CategoryControllerTest extends WebTestCase
         $category = $this->getCategory($client);
         $this->assertNotNull($category);
 
-        $client->request('GET', '/category/' . $category->getId());
+        $client->request('GET', '/category/'.$category->getId());
 
         $this->assertResponseIsSuccessful();
     }
@@ -84,9 +84,9 @@ class CategoryControllerTest extends WebTestCase
 
         $client->loginUser($admin);
 
-        $crawler = $client->request('GET', '/category/' . $category->getId() . '/edit');
+        $crawler = $client->request('GET', '/category/'.$category->getId().'/edit');
 
-        $client->request('POST', '/category/' . $category->getId() . '/edit', [
+        $client->request('POST', '/category/'.$category->getId().'/edit', [
             '_token' => 'category_edit',
             'category' => [
                 'title' => 'Updated title',
@@ -105,8 +105,8 @@ class CategoryControllerTest extends WebTestCase
 
         $client->loginUser($admin);
 
-        $client->request('POST', '/category/' . $category->getId(), [
-            '_token' => 'delete' . $category->getId(),
+        $client->request('POST', '/category/'.$category->getId(), [
+            '_token' => 'delete'.$category->getId(),
         ]);
 
         $this->assertResponseRedirects('/category');
