@@ -28,7 +28,7 @@ class CategoryService implements CategoryServiceInterface
      * @param PaginatorInterface     $paginator          Paginator
      * @param EventRepository        $eventRepository    Event repository
      */
-    public function __construct(private readonly CategoryRepository $categoryRepository, private readonly PaginatorInterface $paginator, private readonly EntityManagerInterface $entityManager, private readonly EventRepository $eventRepository)
+    public function __construct(private readonly CategoryRepository $categoryRepository, private readonly EntityManagerInterface $entityManager, private readonly PaginatorInterface $paginator, private readonly EventRepository $eventRepository)
     {
     }
 

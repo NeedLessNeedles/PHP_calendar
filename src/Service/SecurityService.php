@@ -13,7 +13,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
  */
 class SecurityService implements SecurityServiceInterface
 {
-
     /**
      * Constructor.
      *

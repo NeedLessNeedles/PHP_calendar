@@ -33,6 +33,11 @@ class EventRepository extends ServiceEntityRepository
     /**
      * Query all records.
      *
+     * @param int|null    $categoryId Category ID
+     * @param string|null $title      Title
+     * @param int|null    $tagId      Tag ID
+     * @param string|null $status     Status
+     *
      * @return QueryBuilder Query builder
      */
     public function queryAll(?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): QueryBuilder

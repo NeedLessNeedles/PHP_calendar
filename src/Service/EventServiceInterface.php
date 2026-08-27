@@ -22,6 +22,7 @@ interface EventServiceInterface
      * @param int|null    $categoryId Category ID
      * @param string|null $title      Title
      * @param int|null    $tagId      Tag ID
+     * @param string|null $status     Status
      *
      * @return PaginationInterface Paginated list
      */

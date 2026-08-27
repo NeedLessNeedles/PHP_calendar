@@ -10,19 +10,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\SecurityServiceInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class SecurityController.
  */
 class SecurityController extends AbstractController
 {
-
     /**
      * Constructor.
      *
      * @param SecurityServiceInterface $securityService Security service
-     * @param TranslatorInterface     $translator     Translator
      */
     public function __construct(private readonly SecurityServiceInterface $securityService)
     {

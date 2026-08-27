@@ -22,6 +22,8 @@ class ProfileService implements ProfileServiceInterface
     /**
      * Constructor.
      *
+     * @param UserRepository              $userRepository User repository
+     * @param PaginatorInterface          $paginator      Paginator
      * @param UserPasswordHasherInterface $passwordHasher Password hasher
      */
     public function __construct(private readonly UserRepository $userRepository, private readonly PaginatorInterface $paginator, private readonly UserPasswordHasherInterface $passwordHasher)
