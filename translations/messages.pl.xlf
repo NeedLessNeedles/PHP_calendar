@@ -409,6 +409,35 @@
         <source>message.validation_failed</source>
         <target>Walidacja nie powiodła się!</target>
       </trans-unit>
+      <trans-unit id="message.blocked_user">
+        <source>message.blocked_user</source>
+        <target>Użytkownik zablokowany pomyślnie!</target>
+      </trans-unit>
+      <trans-unit id="message.request_approved">
+        <source>message.request_approved</source>
+        <target>Żądanie zaakceptowane pomyślnie!</target>
+      </trans-unit>
+      <trans-unit id="message.request_rejected">
+        <source>message.request_rejected</source>
+        <target>Żądanie odrzucone pomyślnie!</target>
+      </trans-unit>
+      <trans-unit id="message.user_registered">
+        <source>message.user_registered</source>
+        <target>Użytkownik zarejestrowany pomyślnie!</target>
+      </trans-unit>
+
+      <trans-unit id="message.agree_terms">
+        <source>message.agree_terms</source>
+        <target>Zaakceptuj warunki!</target>
+      </trans-unit>
+      <trans-unit id="message.enter_password">
+        <source>message.enter_password</source>
+        <target>Wprowadź hasło</target>
+      </trans-unit>
+      <trans-unit id="message.but_at_least">
+        <source>message.but_at_least</source>
+        <target>Twoje hasło powinno mieć conajmniej 8 znkaów</target>
+      </trans-unit>
 
       <trans-unit id="label.new_password">
         <source>label.new_password</source>

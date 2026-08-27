@@ -18,6 +18,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class ProfileService implements ProfileServiceInterface
 {
     public const PAGINATOR_ITEMS_PER_PAGE = 2;
+
     /**
      * Constructor.
      *
@@ -30,7 +31,7 @@ class ProfileService implements ProfileServiceInterface
     /**
      * Get paginated list.
      *
-     * @param int         $page       Page number
+     * @param int $page Page number
      *
      * @return PaginationInterface Paginated list
      */

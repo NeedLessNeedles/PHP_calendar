@@ -21,6 +21,7 @@ use App\Service\EventServiceInterface;
 use App\Service\AdminServiceInterface;
 use App\Service\ProfileServiceInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Class AdminController.
@@ -33,9 +34,9 @@ class AdminController extends AbstractController
      * Constructor.
      *
      * @param ProfileServiceInterface $profileService Profile service
-     * @param AdminServiceInterface $adminService Admin service
-     * @param EventServiceInterface $eventService Event service
-     * @param TranslatorInterface $translator Translator
+     * @param AdminServiceInterface   $adminService   Admin service
+     * @param EventServiceInterface   $eventService   Event service
+     * @param TranslatorInterface     $translator     Translator
      */
     public function __construct(private readonly ProfileServiceInterface $profileService, private readonly AdminServiceInterface $adminService, private readonly EventServiceInterface $eventService, private readonly TranslatorInterface $translator)
     {
@@ -61,7 +62,7 @@ class AdminController extends AbstractController
     /**
      * Show action.
      *
-     * @param Request $request Request
+     * @param Request        $request        Request
      * @param UserRepository $userRepository User repository
      *
      * @return Response HTTP response
@@ -113,7 +114,12 @@ class AdminController extends AbstractController
 
             $this->addFlash(
                 'success',
-                $this->translator->trans('message.deleted_successfully')
+                $this->translator->trans('message.updated_successfully')
+            );
+        } else {
+            $this->addFlash(
+                'error',
+                $this->translator->trans('message.validation_failed')
             );
         }
 
@@ -125,8 +131,17 @@ class AdminController extends AbstractController
                 $user,
                 $data['newPassword']
             );
-
             $entityManager->flush();
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.updated_successfully')
+            );
+        } else {
+            $this->addFlash(
+                'error',
+                $this->translator->trans('message.validation_failed')
+            );
         }
 
         return $this->render('admin/edit.html.twig', [
@@ -155,13 +170,18 @@ class AdminController extends AbstractController
         $this->adminService->toggleBlock($user, $this->getUser());
         $entityManager->flush();
 
+        $this->addFlash(
+            'success',
+            $this->translator->trans('message.blocked_user')
+        );
+
         return $this->redirectToRoute('app_admin_users');
     }
 
     /**
      * Requests action.
      *
-     * @param Request            $request            request
+     * @param Request         $request         request
      * @param EventRepository $eventRepository Event Repository
      *
      * @return Response HTTP response
@@ -208,6 +228,11 @@ class AdminController extends AbstractController
         $this->adminService->approveEvent($event);
         $entityManager->flush();
 
+        $this->addFlash(
+            'success',
+            $this->translator->trans('message.request_approved')
+        );
+
         return $this->redirectToRoute('app_admin_requests');
     }
 
@@ -230,6 +255,11 @@ class AdminController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $entityManager->remove($event);
         $entityManager->flush();
+
+        $this->addFlash(
+            'success',
+            $this->translator->trans('message.request_rejected')
+        );
 
         return $this->redirectToRoute('app_admin_requests');
     }

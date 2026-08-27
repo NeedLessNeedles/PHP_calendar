@@ -408,6 +408,22 @@
         <source>message.validation_failed</source>
         <target>Validation failed!</target>
       </trans-unit>
+      <trans-unit id="message.blocked_user">
+        <source>message.blocked_user</source>
+        <target>User blocked successfully!</target>
+      </trans-unit>
+      <trans-unit id="message.request_approved">
+        <source>message.request_approved</source>
+        <target>Request approved successfully!</target>
+      </trans-unit>
+      <trans-unit id="message.request_rejected">
+        <source>message.request_rejected</source>
+        <target>Request rejected successfully!</target>
+      </trans-unit>
+      <trans-unit id="message.user_registered">
+        <source>message.user_registered</source>
+        <target>User registered successfully!</target>
+      </trans-unit>
 
       <trans-unit id="message.agree_terms">
         <source>message.agree_terms</source>

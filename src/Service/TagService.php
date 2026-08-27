@@ -18,6 +18,7 @@ use Knp\Component\Pager\PaginatorInterface;
 class TagService implements TagServiceInterface
 {
     public const PAGINATOR_ITEMS_PER_PAGE = 5;
+
     /**
      * Constructor.
      *
@@ -30,7 +31,7 @@ class TagService implements TagServiceInterface
     /**
      * Get paginated list.
      *
-     * @param int         $page       Page number
+     * @param int $page Page number
      *
      * @return PaginationInterface Paginated list
      */

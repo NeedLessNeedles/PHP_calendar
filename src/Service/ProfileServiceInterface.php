@@ -20,6 +20,7 @@ interface ProfileServiceInterface
      * @param int $page Page number
      */
     public function getPaginatedList(int $page): PaginationInterface;
+
     /**
      * Change password.
      *

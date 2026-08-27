@@ -27,6 +27,7 @@ class CategoryController extends AbstractController
      * Constructor.
      *
      * @param CategoryServiceInterface $categoryService Category service
+     * @param TranslatorInterface      $translator      Translator
      */
     public function __construct(private readonly CategoryServiceInterface $categoryService, private readonly TranslatorInterface $translator)
     {
@@ -115,9 +116,8 @@ class CategoryController extends AbstractController
     /**
      * Edit action.
      *
-     * @param Request                $request       request
-     * @param Category               $category      Category
-     * @param EntityManagerInterface $entityManager entityManager
+     * @param Request  $request  request
+     * @param Category $category Category
      *
      * @return Response HTTP response
      */
@@ -127,7 +127,7 @@ class CategoryController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['GET', 'POST'],
     )]
-    public function edit(Request $request, Category $category, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Category $category): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -159,7 +159,7 @@ class CategoryController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['POST']
     )]
-    public function delete(Request $request, Category $category, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Category $category): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 

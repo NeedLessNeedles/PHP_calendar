@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Form\ProfileEmailType;
 use App\Form\ChangePasswordType;
 use App\Service\ProfileServiceInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class ProfileController.
@@ -25,8 +26,9 @@ class ProfileController extends AbstractController
      * Constructor.
      *
      * @param ProfileServiceInterface $profileService Profile service
+     * @param TranslatorInterface     $translator     Translator
      */
-    public function __construct(private readonly ProfileServiceInterface $profileService)
+    public function __construct(private readonly ProfileServiceInterface $profileService, private readonly TranslatorInterface $translator)
     {
     }
 
@@ -67,8 +69,12 @@ class ProfileController extends AbstractController
                 $user,
                 $data['newPassword']
             );
-
             $entityManager->flush();
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.updated_successfully')
+            );
         }
 
         return $this->render('profile/index.html.twig', [

@@ -19,13 +19,14 @@ use App\Repository\EventRepository;
 class CategoryService implements CategoryServiceInterface
 {
     public const PAGINATOR_ITEMS_PER_PAGE = 5;
+
     /**
      * Constructor.
      *
-     * @param CategoryRepository $categoryRepository Category repository
-     * @param EntityManagerInterface $entityManager Entity manager
-     * @param PaginatorInterface $paginator Paginator
-     * @param EventRepository $eventRepository Event repository
+     * @param CategoryRepository     $categoryRepository Category repository
+     * @param EntityManagerInterface $entityManager      Entity manager
+     * @param PaginatorInterface     $paginator          Paginator
+     * @param EventRepository        $eventRepository    Event repository
      */
     public function __construct(private readonly CategoryRepository $categoryRepository, private readonly PaginatorInterface $paginator, private readonly EntityManagerInterface $entityManager, private readonly EventRepository $eventRepository)
     {
@@ -34,7 +35,7 @@ class CategoryService implements CategoryServiceInterface
     /**
      * Get paginated list.
      *
-     * @param int         $page       Page number
+     * @param int $page Page number
      *
      * @return PaginationInterface Paginated list
      */
