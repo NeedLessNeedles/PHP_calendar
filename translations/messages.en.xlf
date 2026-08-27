@@ -175,6 +175,10 @@
         <source>button.unblock</source>
         <target>Unblock</target>
       </trans-unit>
+      <trans-unit id="button.export">
+        <source>button.export</source>
+        <target>Export to ICS</target>
+      </trans-unit>
 
       <!-- /home -->
       <trans-unit id="text.welcome_home">

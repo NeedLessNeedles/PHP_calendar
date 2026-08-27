@@ -35,4 +35,12 @@ interface EventServiceInterface
      * @param User|null $user  User
      */
     public function create(Event $event, ?User $user): void;
+
+    /**
+     * Export approved current and upcoming events to ICS format.
+     *
+     * @return string ICS content
+     */
+    public function exportToIcs(): string;
+
 }

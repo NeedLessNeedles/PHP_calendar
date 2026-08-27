@@ -74,4 +74,19 @@ class EventRepository extends ServiceEntityRepository
 
         return $queryBuilder;
     }
+
+    /**
+     * Find approved current and upcoming events.
+     *
+     * @return Event[] Events
+     */
+    public function findEventsForIcsExport(): array
+    {
+        return $this->createQueryBuilder('event')
+            ->andWhere('event.status = :status')
+            ->setParameter('status', 'approved')
+            ->orderBy('event.startDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

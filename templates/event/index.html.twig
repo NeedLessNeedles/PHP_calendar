@@ -8,7 +8,7 @@
     {% if app.user %}
 
         <div class="d-flex flex-direction-row align-items-center gap-3">
-            <div class="mb-2" style="max-width: 190px;">
+            <div class="mb-2" style="max-width: 200px;">
                 <label for="categoryFilter" class="form-label">{{ 'label.filter_by_category'|trans }}</label>
                 <select
                     id="categoryFilter"
@@ -28,7 +28,7 @@
                 </select>
             </div>
 
-            <div class="mb-2" style="max-width: 190px;">
+            <div class="mb-2" style="max-width: 200px;">
                 <label for="tagFilter" class="form-label">{{ 'label.filter_by_tag'|trans }}</label>
                 <select
                     id="tagFilter"
@@ -175,6 +175,11 @@
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#eventModal">
             {{ 'button.create_new'|trans }}
         </button>
+        {% if app.user %}
+            <a href="{{ path('app_event_export_ics') }}" class="btn btn-primary">
+                {{ 'button.export'|trans }}
+            </a>
+        {% endif %}
     </div>
 
     {{ include('event/_modal_form.html.twig', { form: createForm }) }}

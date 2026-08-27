@@ -80,4 +80,86 @@ class EventService implements EventServiceInterface
         $this->entityManager->persist($event);
         $this->entityManager->flush();
     }
+
+    /**
+     * Export approved current and upcoming events to ICS format.
+     *
+     * @return string ICS content
+     */
+    public function exportToIcs(): string
+    {
+        $events = $this->eventRepository->findEventsForIcsExport();
+
+        $lines = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//Local Events Calendar//EN',
+            'CALSCALE:GREGORIAN',
+            'METHOD:PUBLISH',
+        ];
+
+        foreach ($events as $event) {
+            $lines[] = 'BEGIN:VEVENT';
+
+            $lines[] = 'UID:event-'.$event->getId().'@local-events-calendar';
+            $lines[] = 'DTSTAMP:'.gmdate('Ymd\THis\Z');
+
+            $lines[] = 'DTSTART:'.$this->formatIcsDate($event->getStartDate());
+
+            if ($event->getEndDate()) {
+                $lines[] = 'DTEND:'.$this->formatIcsDate($event->getEndDate());
+            }
+
+            $lines[] = 'SUMMARY:'.$this->escapeIcsText($event->getTitle());
+
+            if ($event->getDescription()) {
+                $lines[] = 'DESCRIPTION:'.$this->escapeIcsText($event->getDescription());
+            }
+
+            if ($event->getLocation()) {
+                $lines[] = 'LOCATION:'.$this->escapeIcsText($event->getLocation());
+            }
+
+            $lines[] = 'END:VEVENT';
+        }
+
+        $lines[] = 'END:VCALENDAR';
+
+        return implode("\r\n", $lines)."\r\n";
+    }
+
+    /**
+     * Format date for ICS.
+     *
+     * @param \DateTime|null $date Date
+     *
+     * @return string Formatted date
+     */
+    private function formatIcsDate(?\DateTime $date): string
+    {
+        if (!$date) {
+            return '';
+        }
+
+        $date = clone $date;
+        $date->setTimezone(new \DateTimeZone('UTC'));
+
+        return $date->format('Ymd\THis\Z');
+    }
+
+    /**
+     * Escape text for ICS format.
+     *
+     * @param string $text Text
+     *
+     * @return string Escaped text
+     */
+    private function escapeIcsText(string $text): string
+    {
+        return str_replace(
+            ["\\", ";", ",", "\r\n", "\r", "\n"],
+            ["\\\\", "\;", "\,", "\\n", "\\n", "\\n"],
+            $text
+        );
+    }
 }

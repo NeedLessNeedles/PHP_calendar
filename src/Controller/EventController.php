@@ -162,7 +162,7 @@ class EventController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['GET', 'POST']
     )]
-    public function edit(Request $request, Event $event, EntityManagerInterface $entityManager, int $id): Response
+    public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted(
             EventVoter::EDIT,
@@ -223,6 +223,30 @@ class EventController extends AbstractController
         }
 
         return $this->redirectToRoute('app_event_index');
+    }
+
+    /**
+     * Export events to ICS.
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/export/ics',
+        name: 'app_event_export_ics',
+        methods: ['GET']
+    )]
+    public function exportIcs(): Response
+    {
+        $icsContent = $this->eventService->exportToIcs();
+
+        return new Response(
+            $icsContent,
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'text/calendar; charset=UTF-8',
+                'Content-Disposition' => 'attachment; filename="events.ics"',
+            ]
+        );
     }
 
     /**
