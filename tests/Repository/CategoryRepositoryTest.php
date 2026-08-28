@@ -27,6 +27,9 @@ class CategoryRepositoryTest extends KernelTestCase
         $this->assertInstanceOf(CategoryRepository::class, $repo);
     }
 
+    /**
+     * Test setup.
+     */
     protected function setUp(): void
     {
         self::bootKernel();
@@ -34,8 +37,29 @@ class CategoryRepositoryTest extends KernelTestCase
         $this->categoryRepository = self::getContainer()->get(CategoryRepository::class);
     }
 
+    /**
+     * Test Repository setup.
+     */
     public function testRepositoryFromSetUp(): void
     {
         $this->assertInstanceOf(CategoryRepository::class, $this->categoryRepository);
+    }
+
+    /**
+     * Test query builder.
+     */
+    public function testQueryAll(): void
+    {
+        $qb = $this->categoryRepository->queryAll();
+
+        $this->assertStringContainsString(
+            'SELECT',
+            $qb->getDQL()
+        );
+
+        $this->assertStringContainsString(
+            'FROM App\Entity\Category',
+            $qb->getDQL()
+        );
     }
 }

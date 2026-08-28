@@ -29,12 +29,18 @@ class AdminServiceTest extends KernelTestCase
         $this->assertInstanceOf(AdminService::class, $service);
     }
 
+    /**
+     * Test setup.
+     */
     protected function setUp(): void
     {
         self::bootKernel();
         $this->adminService = self::getContainer()->get(AdminService::class);
     }
 
+    /**
+     * Tests if password can be changed.
+     */
     public function testChangePassword(): void
     {
         $user = new User();
@@ -45,6 +51,9 @@ class AdminServiceTest extends KernelTestCase
         $this->assertNotSame('plain-password', $user->getPassword());
     }
 
+    /**
+     * Test for approving the pending event.
+     */
     public function testApproveEvent(): void
     {
         $event = new Event();
@@ -54,6 +63,9 @@ class AdminServiceTest extends KernelTestCase
         $this->assertSame('approved', $event->getStatus());
     }
 
+    /**
+     * Test for blocking the user.
+     */
     public function testToggleBlock(): void
     {
         $admin = new User();
@@ -69,6 +81,9 @@ class AdminServiceTest extends KernelTestCase
         $this->adminService->toggleBlock($user, $admin);
     }
 
+    /**
+     * Tests if admin can block himself.
+     */
     public function testToggleBlockSelf(): void
     {
         $user = new User();
@@ -84,6 +99,9 @@ class AdminServiceTest extends KernelTestCase
         $this->adminService->toggleBlock($user, $user);
     }
 
+    /**
+     * Test for blocking.
+     */
     public function testToggleBlockSuccess(): void
     {
         $target = new User();
