@@ -37,4 +37,15 @@ class CategoryRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('category');
     }
+
+    /**
+     * Save entity.
+     *
+     * @param Category $category Category entity
+     */
+    public function save(Category $category): void
+    {
+        $this->getEntityManager()->persist($category);
+        $this->getEntityManager()->flush();
+    }
 }

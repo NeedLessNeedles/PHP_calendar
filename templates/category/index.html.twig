@@ -65,14 +65,15 @@
                 {{ knp_pagination_render(pagination) }}
             </div>
             <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
-                <button
-                    class="btn btn-success"
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#categoryCreateModal"
-                >
-                    {{ 'button.create_new'|trans }}
-                </button>
+{#                <button#}
+{#                    class="btn btn-success"#}
+{#                    type="button"#}
+{#                    data-bs-toggle="modal"#}
+{#                    data-bs-target="#categoryCreateModal"#}
+{#                >#}
+{#                    {{ 'button.create_new'|trans }}#}
+{#                </button>#}
+                <a class="btn btn-success" href="{{ path('app_category_new') }}">{{ 'button.create_new'|trans }}</a>
             </div>
 
             <div class="modal fade" id="categoryCreateModal" tabindex="-1">

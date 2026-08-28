@@ -28,6 +28,8 @@ class CategoryType extends AbstractType
     {
         $builder->add('title', null, [
             'label' => 'label.title',
+            'required' => true,
+            'attr' => ['max_length' => 64],
         ]);
     }
 

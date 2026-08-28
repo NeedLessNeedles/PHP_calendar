@@ -79,8 +79,9 @@ class CategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($category);
-            $entityManager->flush();
+            $this->categoryService->save($category);
+//            $entityManager->persist($category);
+//            $entityManager->flush();
 
             $this->addFlash(
                 'success',
@@ -90,7 +91,11 @@ class CategoryController extends AbstractController
             return $this->redirectToRoute('app_category_index');
         }
 
-        return $this->redirectToRoute('app_category_index');
+        //return $this->redirectToRoute('app_category_index');
+        return $this->render(
+            'category/create.html.twig',
+            ['form' => $form->createView()]
+        );
     }
 
     /**

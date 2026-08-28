@@ -84,4 +84,18 @@ class CategoryService implements CategoryServiceInterface
         $this->entityManager->remove($category);
         $this->entityManager->flush();
     }
+
+    /**
+     * Save entity.
+     *
+     * @param Category $category Category entity
+     */
+    public function save(Category $category): void
+    {
+        $category->setUpdatedAt(new \DateTimeImmutable());
+        if (null === $category->getId()) {
+            $category->setCreatedAt(new \DateTimeImmutable());
+        }
+        $this->categoryRepository->save($category);
+    }
 }
