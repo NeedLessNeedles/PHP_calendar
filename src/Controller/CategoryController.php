@@ -62,7 +62,6 @@ class CategoryController extends AbstractController
      * New action.
      *
      * @param Request                $request       request
-     * @param EntityManagerInterface $entityManager entityManager
      *
      * @return Response HTTP response
      */
@@ -71,7 +70,7 @@ class CategoryController extends AbstractController
         name: 'app_category_new',
         methods: ['GET', 'POST']
     )]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request): Response
     {
         $category = new Category();
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -80,8 +79,6 @@ class CategoryController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->categoryService->save($category);
-//            $entityManager->persist($category);
-//            $entityManager->flush();
 
             $this->addFlash(
                 'success',
@@ -91,7 +88,6 @@ class CategoryController extends AbstractController
             return $this->redirectToRoute('app_category_index');
         }
 
-        //return $this->redirectToRoute('app_category_index');
         return $this->render(
             'category/create.html.twig',
             ['form' => $form->createView()]
@@ -130,24 +126,40 @@ class CategoryController extends AbstractController
         '/{id}/edit',
         name: 'app_category_edit',
         requirements: ['id' => '[1-9]\d*'],
-        methods: ['GET', 'POST'],
+        methods: ['GET', 'PUT'],
     )]
     public function edit(Request $request, Category $category): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        if (!$this->isCsrfTokenValid('category_edit', $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF');
+        $form = $this->createForm(
+            CategoryType::class,
+            $category,
+            [
+                'method' => 'PUT',
+                'action' => $this->generateUrl('app_category_edit', ['id' => $category->getId()]),
+            ]
+        );
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->categoryService->save($category);
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.updated_successfully')
+            );
+
+            return $this->redirectToRoute('app_category_index');
         }
 
-        $title = $request->request->all('category')['title'];
-        $this->categoryService->edit($category, $title);
-        $this->addFlash(
-            'success',
-            $this->translator->trans('message.updated_successfully')
+        return $this->render(
+            'category/edit.html.twig',
+            [
+                'form' => $form->createView(),
+                'category' => $category,
+            ]
         );
-
-        return $this->redirectToRoute('app_category_index');
     }
 
     /**
@@ -159,24 +171,38 @@ class CategoryController extends AbstractController
      * @return Response HTTP response
      */
     #[Route(
-        '/{id}',
+        '/{id}/delete',
         name: 'app_category_delete',
         requirements: ['id' => '[1-9]\d*'],
-        methods: ['POST']
+        methods: ['GET', 'DELETE']
     )]
     public function delete(Request $request, Category $category): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        if (!$this->isCsrfTokenValid('delete'.$category->getId(), $request->request->get('_token'))) {
+        $form = $this->createForm(CategoryType::class, $category, [
+            'method' => 'DELETE',
+            'action' => $this->generateUrl('app_category_delete', ['id' => $category->getId()]),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->categoryService->delete($category);
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.deleted_successfully')
+            );
+
             return $this->redirectToRoute('app_category_index');
         }
-        $this->categoryService->delete($category);
-        $this->addFlash(
-            'success',
-            $this->translator->trans('message.deleted_successfully')
-        );
 
-        return $this->redirectToRoute('app_category_index');
+        return $this->render(
+            'category/delete.html.twig',
+            [
+                'form' => $form->createView(),
+                'category' => $category,
+            ]
+        );
     }
 }

@@ -81,8 +81,10 @@ class CategoryService implements CategoryServiceInterface
             throw new \DomainException('Cannot delete category used by events.');
         }
 
-        $this->entityManager->remove($category);
-        $this->entityManager->flush();
+//        $this->entityManager->remove($category);
+//        $this->entityManager->flush();
+
+        $this->categoryRepository->delete($category);
     }
 
     /**

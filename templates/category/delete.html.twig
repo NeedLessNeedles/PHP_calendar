@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'alert.delete_category'|trans({'%id%': category.id|default('')}) }}{% endblock %}
+
+{% block body %}
+    <div class="container d-flex justify-content-center align-items-center mt-2" style="max-width: 500px;">
+        <div class="auth-card d-flex flex-column gap-2">
+            <h1 class="h3 mb-1 font-weight-normal">{{ 'alert.delete_category'|trans({'%id%': category.id|default('')}) }}</h1>
+            <div>
+                {{ form_start(form) }}
+                {{ form_widget(form) }}
+
+                <div class="d-flex justify-content-center mt-2 gap-2">
+                    <a href="{{ url('app_category_index') }}" class="btn btn-secondary">{{ 'button.cancel'|trans }}</a>
+                    <input type="submit" value="{{ 'button.save'|trans }}" class="btn btn-success" />
+
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
