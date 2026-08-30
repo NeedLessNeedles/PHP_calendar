@@ -22,14 +22,6 @@ interface TagServiceInterface
     public function getPaginatedList(int $page): PaginationInterface;
 
     /**
-     * Edit tag.
-     *
-     * @param Tag    $tag   Tag
-     * @param string $title Title
-     */
-    public function edit(Tag $tag, string $title): void;
-
-    /**
      * Save entity.
      *
      * @param Tag $tag Tag entity

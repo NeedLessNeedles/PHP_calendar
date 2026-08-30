@@ -62,17 +62,6 @@ class TagService implements TagServiceInterface
     }
 
     /**
-     * Edit tag.
-     *
-     * @param Tag    $tag   Tag
-     * @param string $title Title
-     */
-    public function edit(Tag $tag, string $title): void
-    {
-        $tag->setTitle($title);
-    }
-
-    /**
      * Save entity.
      *
      * @param Tag $tag Tag entity

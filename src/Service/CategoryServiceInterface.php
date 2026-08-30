@@ -22,14 +22,6 @@ interface CategoryServiceInterface
     public function getPaginatedList(int $page): PaginationInterface;
 
     /**
-     * Edit category.
-     *
-     * @param Category $category Category
-     * @param string   $title    Title
-     */
-    public function edit(Category $category, string $title): void;
-
-    /**
      * Delete category.
      *
      * @param Category $category Category

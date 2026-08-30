@@ -54,19 +54,6 @@ class CategoryService implements CategoryServiceInterface
     }
 
     /**
-     * Edit category.
-     *
-     * @param Category $category Category
-     * @param string   $title    Title
-     */
-    public function edit(Category $category, string $title): void
-    {
-        $category->setTitle($title);
-        $category->setUpdatedAt(new \DateTimeImmutable());
-        $this->entityManager->flush();
-    }
-
-    /**
      * Save entity.
      *
      * @param Category $category Category entity
