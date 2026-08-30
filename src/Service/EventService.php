@@ -24,15 +24,15 @@ class EventService implements EventServiceInterface
      * of specifying them in app/config/config.yml.
      * See https://symfony.com/doc/current/best_practices.html#configuration
      *
-     * @constant int
+     * @varant int
      */
     private const PAGINATOR_ITEMS_PER_PAGE = 5;
 
     /**
      * Constructor.
      *
-     * @param EventRepository        $eventRepository Event repository
-     * @param PaginatorInterface     $paginator       Paginator
+     * @param EventRepository    $eventRepository Event repository
+     * @param PaginatorInterface $paginator       Paginator
      */
     public function __construct(private readonly EventRepository $eventRepository, private readonly PaginatorInterface $paginator)
     {
@@ -187,8 +187,8 @@ class EventService implements EventServiceInterface
     private function escapeIcsText(string $text): string
     {
         return str_replace(
-            ["\\", ";", ",", "\r\n", "\r", "\n"],
-            ["\\\\", "\;", "\,", "\\n", "\\n", "\\n"],
+            ['\\', ';', ',', "\r\n", "\r", "\n"],
+            ['\\\\', "\;", "\,", '\\n', '\\n', '\\n'],
             $text
         );
     }

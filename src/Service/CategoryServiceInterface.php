@@ -43,4 +43,13 @@ interface CategoryServiceInterface
      * @return bool Result
      */
     public function canBeDeleted(Category $category): bool;
+
+    /**
+     * Can Title for Category be empty?
+     *
+     * @param Category $category Category entity
+     *
+     * @return bool Result
+     */
+    public function canBeEmpty(Category $category): bool;
 }

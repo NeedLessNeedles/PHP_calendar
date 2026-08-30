@@ -34,4 +34,13 @@ interface TagServiceInterface
      * @param Tag $tag Tag
      */
     public function delete(Tag $tag): void;
+
+    /**
+     * Can Title for Tag be empty?
+     *
+     * @param Tag $tag Tag entity
+     *
+     * @return bool Result
+     */
+    public function canBeEmpty(Tag $tag): bool;
 }

@@ -436,6 +436,10 @@
         <source>message.category_contains_events</source>
         <target>You cannot delete the category that contains events!</target>
       </trans-unit>
+      <trans-unit id="message.input_fields">
+        <source>message.input_fields</source>
+        <target>Input fields cannot be empty!</target>
+      </trans-unit>
       <trans-unit id="message.blocked_user">
         <source>message.blocked_user</source>
         <target>User blocked successfully!</target>

@@ -56,5 +56,4 @@ interface EventServiceInterface
      * @return string ICS content
      */
     public function exportToIcs(): string;
-
 }

@@ -6,6 +6,7 @@
 
 namespace App\Service;
 
+use App\Entity\Category;
 use App\Entity\Tag;
 use App\Repository\TagRepository;
 use Knp\Component\Pager\Pagination\PaginationInterface;
@@ -23,15 +24,15 @@ class TagService implements TagServiceInterface
      * of specifying them in app/config/config.yml.
      * See https://symfony.com/doc/current/best_practices.html#configuration
      *
-     * @constant int
+     * @varant int
      */
     private const PAGINATOR_ITEMS_PER_PAGE = 5;
 
     /**
      * Constructor.
      *
-     * @param TagRepository          $tagRepository Tag repository
-     * @param PaginatorInterface     $paginator     Paginator
+     * @param TagRepository      $tagRepository Tag repository
+     * @param PaginatorInterface $paginator     Paginator
      */
     public function __construct(private readonly TagRepository $tagRepository, private readonly PaginatorInterface $paginator)
     {
@@ -66,6 +67,24 @@ class TagService implements TagServiceInterface
     public function save(Tag $tag): void
     {
         $this->tagRepository->save($tag);
+    }
+
+    /**
+     * Can Title for Tag be empty?
+     *
+     * @param Tag $tag Tag entity
+     *
+     * @return bool Result
+     */
+    public function canBeEmpty(Tag $tag): bool
+    {
+        if (null === $tag->getTitle() || '' === trim($tag->getTitle())) {
+            return false;
+        }
+
+//        $result = $this->eventRepository->countByCategory($category);
+
+        return true;
     }
 
     /**

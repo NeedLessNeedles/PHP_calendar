@@ -34,7 +34,7 @@ class CategoryController extends AbstractController
     /**
      * Index action.
      *
-     * @param Request            $request            request
+     * @param Request $request request
      *
      * @return Response HTTP response
      */
@@ -55,7 +55,7 @@ class CategoryController extends AbstractController
     /**
      * New action.
      *
-     * @param Request                $request       request
+     * @param Request $request request
      *
      * @return Response HTTP response
      */
@@ -71,15 +71,26 @@ class CategoryController extends AbstractController
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->categoryService->save($category);
+        if ($form->isSubmitted()) {
+            if (!$this->categoryService->canBeEmpty($category)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.input_fields')
+                );
 
-            $this->addFlash(
-                'success',
-                $this->translator->trans('message.created_successfully')
-            );
+                return $this->redirectToRoute('app_category_new');
+            }
 
-            return $this->redirectToRoute('app_category_index');
+            if ($form->isValid()) {
+                $this->categoryService->save($category);
+
+                $this->addFlash(
+                    'success',
+                    $this->translator->trans('message.created_successfully')
+                );
+
+                return $this->redirectToRoute('app_category_index');
+            }
         }
 
         return $this->render(
@@ -136,15 +147,28 @@ class CategoryController extends AbstractController
         );
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->categoryService->save($category);
+        if ($form->isSubmitted()) {
+            if (!$this->categoryService->canBeEmpty($category)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.input_fields')
+                );
 
-            $this->addFlash(
-                'success',
-                $this->translator->trans('message.updated_successfully')
-            );
+                return $this->redirectToRoute('app_category_edit', [
+                    'id' => $category->getId(),
+                ]);
+            }
 
-            return $this->redirectToRoute('app_category_index');
+            if ($form->isValid()) {
+                $this->categoryService->save($category);
+
+                $this->addFlash(
+                    'success',
+                    $this->translator->trans('message.created_successfully')
+                );
+
+                return $this->redirectToRoute('app_category_index');
+            }
         }
 
         return $this->render(

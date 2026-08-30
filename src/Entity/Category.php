@@ -37,7 +37,6 @@ class Category
      */
     #[ORM\Column(type: 'string', length: 64)]
     #[Assert\Type('string')]
-    #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 64)]
     private ?string $title = null;
 

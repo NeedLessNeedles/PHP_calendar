@@ -7,14 +7,12 @@
 namespace App\Controller;
 
 use App\Entity\Event;
-use App\Form\CategoryType;
 use App\Form\EventType;
 use App\Form\EventEditType;
 use App\Repository\EventRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\TagRepository;
 use App\Service\EventServiceInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -146,8 +144,8 @@ class EventController extends AbstractController
     /**
      * Edit action.
      *
-     * @param Request                $request       request
-     * @param Event                  $event         event
+     * @param Request $request request
+     * @param Event   $event   event
      *
      * @return Response HTTP response
      */
@@ -192,8 +190,8 @@ class EventController extends AbstractController
     /**
      * Delete action.
      *
-     * @param Request                $request       request
-     * @param Event                  $event         event
+     * @param Request $request request
+     * @param Event   $event   event
      *
      * @return Response HTTP response
      */
@@ -205,7 +203,7 @@ class EventController extends AbstractController
     )]
     public function delete(Request $request, Event $event): Response
     {
-        //$this->denyAccessUnlessGranted(EventVoter::DELETE, $event);
+        // $this->denyAccessUnlessGranted(EventVoter::DELETE, $event);
 
         $form = $this->createForm(EventType::class, $event, [
             'method' => 'DELETE',

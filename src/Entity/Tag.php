@@ -10,6 +10,8 @@ use App\Repository\TagRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Tag.
@@ -19,6 +21,9 @@ use Doctrine\Common\Collections\Collection;
  * @ORM\Table(name="tag")
  */
 #[ORM\Entity(repositoryClass: TagRepository::class)]
+#[ORM\Table(name: 'tag')]
+#[ORM\UniqueConstraint(name: 'uq_tag_title', columns: ['title'])]
+#[UniqueEntity(fields: ['title'])]
 class Tag
 {
     /**
@@ -32,7 +37,9 @@ class Tag
     /**
      * Title.
      */
-    #[ORM\Column(length: 64)]
+    #[ORM\Column(type: 'string', length: 64)]
+    #[Assert\Type('string')]
+    #[Assert\Length(min: 3, max: 64)]
     private ?string $title = null;
 
     /**
@@ -72,11 +79,11 @@ class Tag
     /**
      * Setter for title.
      *
-     * @param string $title Title
+     * @param string|null $title Title
      *
      * @return static Title
      */
-    public function setTitle(string $title): static
+    public function setTitle(?string $title): static
     {
         $this->title = $title;
 

@@ -24,16 +24,16 @@ class CategoryService implements CategoryServiceInterface
      * of specifying them in app/config/config.yml.
      * See https://symfony.com/doc/current/best_practices.html#configuration
      *
-     * @constant int
+     * @varant int
      */
     public const PAGINATOR_ITEMS_PER_PAGE = 3;
 
     /**
      * Constructor.
      *
-     * @param CategoryRepository     $categoryRepository Category repository
-     * @param PaginatorInterface     $paginator          Paginator
-     * @param EventRepository        $eventRepository    Event repository
+     * @param CategoryRepository $categoryRepository Category repository
+     * @param PaginatorInterface $paginator          Paginator
+     * @param EventRepository    $eventRepository    Event repository
      */
     public function __construct(private readonly CategoryRepository $categoryRepository, private readonly PaginatorInterface $paginator, private readonly EventRepository $eventRepository)
     {
@@ -72,6 +72,24 @@ class CategoryService implements CategoryServiceInterface
             $category->setCreatedAt(new \DateTimeImmutable());
         }
         $this->categoryRepository->save($category);
+    }
+
+    /**
+     * Can Title for Category be empty?
+     *
+     * @param Category $category Category entity
+     *
+     * @return bool Result
+     */
+    public function canBeEmpty(Category $category): bool
+    {
+        if (null === $category->getTitle() || '' === trim($category->getTitle())) {
+            return false;
+        }
+
+        $result = $this->eventRepository->countByCategory($category);
+
+        return !($result > 0);
     }
 
     /**

@@ -7,10 +7,7 @@
 namespace App\Controller;
 
 use App\Entity\Tag;
-use App\Form\CategoryType;
 use App\Form\TagType;
-use App\Repository\TagRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,7 +34,7 @@ class TagController extends AbstractController
     /**
      * Index action.
      *
-     * @param Request       $request       request
+     * @param Request $request request
      *
      * @return Response HTTP response
      */
@@ -59,7 +56,8 @@ class TagController extends AbstractController
     /**
      * New action.
      *
-     * @param Request                $request       request
+     * @param Request $request request
+     *
      * @return Response HTTP response
      */
     #[Route(
@@ -75,15 +73,26 @@ class TagController extends AbstractController
         $form = $this->createForm(TagType::class, $tag);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->tagService->save($tag);
+        if ($form->isSubmitted()) {
+            if (!$this->tagService->canBeEmpty($tag)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.input_fields')
+                );
 
-            $this->addFlash(
-                'success',
-                $this->translator->trans('message.created_successfully')
-            );
+                return $this->redirectToRoute('app_tag_new');
+            }
 
-            return $this->redirectToRoute('app_tag_index');
+            if ($form->isValid()) {
+                $this->tagService->save($tag);
+
+                $this->addFlash(
+                    'success',
+                    $this->translator->trans('message.created_successfully')
+                );
+
+                return $this->redirectToRoute('app_tag_index');
+            }
         }
 
         return $this->render(
@@ -115,8 +124,8 @@ class TagController extends AbstractController
     /**
      * Edit action.
      *
-     * @param Request                $request       request
-     * @param Tag                    $tag           Tag
+     * @param Request $request request
+     * @param Tag     $tag     Tag
      *
      * @return Response HTTP response
      */
@@ -140,15 +149,28 @@ class TagController extends AbstractController
         );
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->tagService->save($tag);
+        if ($form->isSubmitted()) {
+            if (!$this->tagService->canBeEmpty($tag)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.input_fields')
+                );
 
-            $this->addFlash(
-                'success',
-                $this->translator->trans('message.updated_successfully')
-            );
+                return $this->redirectToRoute('app_tag_edit', [
+                    'id' => $tag->getId(),
+                ]);
+            }
 
-            return $this->redirectToRoute('app_tag_index');
+            if ($form->isValid()) {
+                $this->tagService->save($tag);
+
+                $this->addFlash(
+                    'success',
+                    $this->translator->trans('message.created_successfully')
+                );
+
+                return $this->redirectToRoute('app_tag_index');
+            }
         }
 
         return $this->render(
