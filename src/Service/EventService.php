@@ -11,23 +11,30 @@ use App\Entity\User;
 use App\Repository\EventRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Knp\Component\Pager\Pagination\PaginationInterface;
-use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Class EventService.
  */
 class EventService implements EventServiceInterface
 {
-    public const PAGINATOR_ITEMS_PER_PAGE = 2;
+    /**
+     * Items per page.
+     *
+     * Use constants to define configuration options that rarely change instead
+     * of specifying them in app/config/config.yml.
+     * See https://symfony.com/doc/current/best_practices.html#configuration
+     *
+     * @constant int
+     */
+    private const PAGINATOR_ITEMS_PER_PAGE = 5;
 
     /**
      * Constructor.
      *
      * @param EventRepository        $eventRepository Event repository
      * @param PaginatorInterface     $paginator       Paginator
-     * @param EntityManagerInterface $entityManager   Entity manager
      */
-    public function __construct(private readonly EventRepository $eventRepository, private readonly PaginatorInterface $paginator, private readonly EntityManagerInterface $entityManager)
+    public function __construct(private readonly EventRepository $eventRepository, private readonly PaginatorInterface $paginator)
     {
     }
 
@@ -57,6 +64,26 @@ class EventService implements EventServiceInterface
     }
 
     /**
+     * Save entity.
+     *
+     * @param Event $event Event entity
+     */
+    public function save(Event $event): void
+    {
+        $this->eventRepository->save($event);
+    }
+
+    /**
+     * Delete entity.
+     *
+     * @param Event $event Event entity
+     */
+    public function delete(Event $event): void
+    {
+        $this->eventRepository->delete($event);
+    }
+
+    /**
      * Create event.
      *
      * @param Event     $event Event
@@ -82,7 +109,7 @@ class EventService implements EventServiceInterface
     }
 
     /**
-     * Export approved current and upcoming events to ICS format.
+     * Export approved events to ICS format.
      *
      * @return string ICS content
      */
@@ -100,29 +127,24 @@ class EventService implements EventServiceInterface
 
         foreach ($events as $event) {
             $lines[] = 'BEGIN:VEVENT';
-
             $lines[] = 'UID:event-'.$event->getId().'@local-events-calendar';
             $lines[] = 'DTSTAMP:'.gmdate('Ymd\THis\Z');
 
             $lines[] = 'DTSTART:'.$this->formatIcsDate($event->getStartDate());
-
             if ($event->getEndDate()) {
                 $lines[] = 'DTEND:'.$this->formatIcsDate($event->getEndDate());
             }
 
             $lines[] = 'SUMMARY:'.$this->escapeIcsText($event->getTitle());
-
             if ($event->getDescription()) {
                 $lines[] = 'DESCRIPTION:'.$this->escapeIcsText($event->getDescription());
             }
-
             if ($event->getLocation()) {
                 $lines[] = 'LOCATION:'.$this->escapeIcsText($event->getLocation());
             }
 
             $lines[] = 'END:VEVENT';
         }
-
         $lines[] = 'END:VCALENDAR';
 
         return implode("\r\n", $lines)."\r\n";
@@ -140,7 +162,6 @@ class EventService implements EventServiceInterface
         if (!$date) {
             return '';
         }
-
         $date = clone $date;
         $date->setTimezone(new \DateTimeZone('UTC'));
 

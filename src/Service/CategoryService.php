@@ -8,7 +8,6 @@ namespace App\Service;
 
 use App\Entity\Category;
 use App\Repository\CategoryRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use App\Repository\EventRepository;
@@ -18,17 +17,25 @@ use App\Repository\EventRepository;
  */
 class CategoryService implements CategoryServiceInterface
 {
-    public const PAGINATOR_ITEMS_PER_PAGE = 5;
+    /**
+     * Items per page.
+     *
+     * Use constants to define configuration options that rarely change instead
+     * of specifying them in app/config/config.yml.
+     * See https://symfony.com/doc/current/best_practices.html#configuration
+     *
+     * @constant int
+     */
+    public const PAGINATOR_ITEMS_PER_PAGE = 3;
 
     /**
      * Constructor.
      *
      * @param CategoryRepository     $categoryRepository Category repository
-     * @param EntityManagerInterface $entityManager      Entity manager
      * @param PaginatorInterface     $paginator          Paginator
      * @param EventRepository        $eventRepository    Event repository
      */
-    public function __construct(private readonly CategoryRepository $categoryRepository, private readonly EntityManagerInterface $entityManager, private readonly PaginatorInterface $paginator, private readonly EventRepository $eventRepository)
+    public function __construct(private readonly CategoryRepository $categoryRepository, private readonly PaginatorInterface $paginator, private readonly EventRepository $eventRepository)
     {
     }
 
@@ -68,7 +75,7 @@ class CategoryService implements CategoryServiceInterface
     }
 
     /**
-     * Delete category.
+     * Delete entity.
      *
      * @param Category $category Category
      */

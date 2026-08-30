@@ -29,6 +29,20 @@ interface EventServiceInterface
     public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): PaginationInterface;
 
     /**
+     * Save entity.
+     *
+     * @param Event $event Event entity
+     */
+    public function save(Event $event): void;
+
+    /**
+     * Delete entity.
+     *
+     * @param Event $event Event entity
+     */
+    public function delete(Event $event): void;
+
+    /**
      * Create event.
      *
      * @param Event     $event Event

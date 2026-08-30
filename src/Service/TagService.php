@@ -6,10 +6,8 @@
 
 namespace App\Service;
 
-use App\Entity\Category;
 use App\Entity\Tag;
 use App\Repository\TagRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 
@@ -34,9 +32,8 @@ class TagService implements TagServiceInterface
      *
      * @param TagRepository          $tagRepository Tag repository
      * @param PaginatorInterface     $paginator     Paginator
-     * @param EntityManagerInterface $entityManager Entity manager
      */
-    public function __construct(private readonly TagRepository $tagRepository, private readonly PaginatorInterface $paginator, private readonly EntityManagerInterface $entityManager)
+    public function __construct(private readonly TagRepository $tagRepository, private readonly PaginatorInterface $paginator)
     {
     }
 

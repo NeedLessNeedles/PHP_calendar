@@ -18,8 +18,6 @@ use Doctrine\ORM\QueryBuilder;
  */
 class EventRepository extends ServiceEntityRepository
 {
-    public const PAGINATOR_ITEMS_PER_PAGE = 5;
-
     /**
      * Constructor.
      *
@@ -76,7 +74,29 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find approved current and upcoming events.
+     * Save entity.
+     *
+     * @param Event $event Event entity
+     */
+    public function save(Event $event): void
+    {
+        $this->getEntityManager()->persist($event);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * Delete entity.
+     *
+     * @param Event $event Event entity
+     */
+    public function delete(Event $event): void
+    {
+        $this->getEntityManager()->remove($event);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * Find approved events for ICS export.
      *
      * @return Event[] Events
      */

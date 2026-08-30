@@ -33,12 +33,17 @@ class EventType extends AbstractType
         $builder
             ->add('title', null, [
                 'label' => 'th.title',
+                'required' => true,
+                'attr' => ['max_length' => 64],
             ])
             ->add('description', null, [
                 'label' => 'th.description',
+                'required' => false,
+                'attr' => ['max_length' => 256],
             ])
             ->add('location', null, [
                 'label' => 'th.location',
+                'attr' => ['max_length' => 64],
             ])
             ->add('startDate', DateTimeType::class, [
                 'label' => 'th.start_date',
@@ -55,6 +60,8 @@ class EventType extends AbstractType
                 'choice_label' => function (Category $category) {
                     return $category->getTitle();
                 },
+                'placeholder' => 'label.none',
+                'required' => true,
             ])
             ->add('tags', EntityType::class, [
                 'label' => 'option.tags',
@@ -79,5 +86,20 @@ class EventType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Event::class,
         ]);
+    }
+
+    /**
+     * Returns the prefix of the template block name for this type.
+     *
+     * The block prefix defaults to the underscored short class name with
+     * the "Type" suffix removed (e.g. "UserProfileType" => "user_profile").
+     *
+     * @return string The prefix of the template block name
+     *
+     * @psalm-return 'task'
+     */
+    public function getBlockPrefix(): string
+    {
+        return 'event';
     }
 }
