@@ -7,6 +7,7 @@
 namespace App\Repository;
 
 use App\Entity\Event;
+use App\Entity\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
@@ -96,6 +97,24 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
+     * Count events by category.
+     *
+     * @param Category $category Category
+     *
+     * @return int Number of tasks in category
+     */
+    public function countByCategory(Category $category): int
+    {
+        $qb = $this->getOrCreateQueryBuilder();
+
+        return $qb->select($qb->expr()->countDistinct('event.id'))
+            ->where('event.category = :category')
+            ->setParameter(':category', $category)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
      * Find approved events for ICS export.
      *
      * @return Event[] Events
@@ -108,5 +127,17 @@ class EventRepository extends ServiceEntityRepository
             ->orderBy('event.startDate', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Get or create new query builder.
+     *
+     * @param QueryBuilder|null $queryBuilder Query builder
+     *
+     * @return QueryBuilder Query builder
+     */
+    private function getOrCreateQueryBuilder(?QueryBuilder $queryBuilder = null): QueryBuilder
+    {
+        return $queryBuilder ?? $this->createQueryBuilder('event');
     }
 }

@@ -172,7 +172,14 @@ class CategoryController extends AbstractController
     )]
     public function delete(Request $request, Category $category): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        if (!$this->categoryService->canBeDeleted($category)) {
+            $this->addFlash(
+                'warning',
+                $this->translator->trans('message.category_contains_events')
+            );
+
+            return $this->redirectToRoute('app_category_index');
+        }
 
         $form = $this->createForm(CategoryType::class, $category, [
             'method' => 'DELETE',

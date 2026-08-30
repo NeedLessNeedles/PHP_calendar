@@ -432,6 +432,10 @@
         <source>message.validation_failed</source>
         <target>Validation failed!</target>
       </trans-unit>
+      <trans-unit id="message.category_contains_events">
+        <source>message.category_contains_events</source>
+        <target>You cannot delete the category that contains events!</target>
+      </trans-unit>
       <trans-unit id="message.blocked_user">
         <source>message.blocked_user</source>
         <target>User blocked successfully!</target>

@@ -8,9 +8,9 @@ namespace App\Service;
 
 use App\Entity\Category;
 use App\Repository\CategoryRepository;
+use App\Repository\EventRepository;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use App\Repository\EventRepository;
 
 /**
  * Class CategoryService.
@@ -90,5 +90,19 @@ class CategoryService implements CategoryServiceInterface
         }
 
         $this->categoryRepository->delete($category);
+    }
+
+    /**
+     * Can Category be deleted?
+     *
+     * @param Category $category Category entity
+     *
+     * @return bool Result
+     */
+    public function canBeDeleted(Category $category): bool
+    {
+        $result = $this->eventRepository->countByCategory($category);
+
+        return !($result > 0);
     }
 }
