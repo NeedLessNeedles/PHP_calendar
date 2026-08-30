@@ -68,6 +68,7 @@ class EventService implements EventServiceInterface
      * Save entity.
      *
      * @param Event $event Event entity
+     * @param User $user User entity
      */
     public function save(Event $event, ?User $user): void
     {
@@ -132,6 +133,30 @@ class EventService implements EventServiceInterface
         }
 
         return true;
+    }
+
+    /**
+     * Check whether event title is unique.
+     *
+     * @param Event $event Event entity
+     *
+     * @return bool Result
+     */
+    public function isTitleUnique(Event $event): bool
+    {
+        $title = $event->getTitle();
+
+        if (null === $title || '' === trim($title)) {
+            return false;
+        }
+        $existingEvent = $this->eventRepository->findOneBy([
+            'title' => $title,
+        ]);
+        if (null === $existingEvent) {
+            return true;
+        }
+
+        return $existingEvent->getId() === $event->getId();
     }
 
     /**

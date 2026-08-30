@@ -83,6 +83,15 @@ class TagController extends AbstractController
                 return $this->redirectToRoute('app_tag_new');
             }
 
+            if (!$this->tagService->isTitleUnique($tag)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.title_already_exists')
+                );
+
+                return $this->redirectToRoute('app_tag_new');
+            }
+
             if ($form->isValid()) {
                 $this->tagService->save($tag);
 
@@ -159,6 +168,18 @@ class TagController extends AbstractController
                 return $this->redirectToRoute('app_tag_edit', [
                     'id' => $tag->getId(),
                 ]);
+            }
+
+            if (!$this->tagService->isTitleUnique($tag)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.title_already_exists')
+                );
+
+                return $this->redirectToRoute(
+                    'app_tag_edit',
+                    ['id' => $tag->getId()]
+                );
             }
 
             if ($form->isValid()) {

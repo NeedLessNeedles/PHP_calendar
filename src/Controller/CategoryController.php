@@ -81,6 +81,15 @@ class CategoryController extends AbstractController
                 return $this->redirectToRoute('app_category_new');
             }
 
+            if (!$this->categoryService->isTitleUnique($category)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.title_already_exists')
+                );
+
+                return $this->redirectToRoute('app_category_new');
+            }
+
             if ($form->isValid()) {
                 $this->categoryService->save($category);
 
@@ -157,6 +166,18 @@ class CategoryController extends AbstractController
                 return $this->redirectToRoute('app_category_edit', [
                     'id' => $category->getId(),
                 ]);
+            }
+
+            if (!$this->categoryService->isTitleUnique($category)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.title_already_exists')
+                );
+
+                return $this->redirectToRoute(
+                    'app_category_edit',
+                    ['id' => $category->getId()]
+                );
             }
 
             if ($form->isValid()) {

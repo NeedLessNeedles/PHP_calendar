@@ -7,6 +7,7 @@
 namespace App\Service;
 
 use App\Entity\Category;
+use App\Entity\Event;
 use App\Repository\CategoryRepository;
 use App\Repository\EventRepository;
 use Knp\Component\Pager\Pagination\PaginationInterface;
@@ -83,13 +84,37 @@ class CategoryService implements CategoryServiceInterface
      */
     public function canBeEmpty(Category $category): bool
     {
-        if (null === $category->getTitle() || '' === trim($category->getTitle())) {
+        if (null === $category->getTitle()) {
             return false;
         }
 
-        $result = $this->eventRepository->countByCategory($category);
+        return '' !== trim($category->getTitle());
+    }
 
-        return !($result > 0);
+    /**
+     * Check whether category title is unique.
+     *
+     * @param Category $category Category entity
+     *
+     * @return bool Result
+     */
+    public function isTitleUnique(Category $category): bool
+    {
+        $title = $category->getTitle();
+
+        if (null === $title || '' === trim($title)) {
+            return false;
+        }
+
+        $existingCategory = $this->categoryRepository->findOneBy([
+            'title' => $title,
+        ]);
+
+        if (null === $existingCategory) {
+            return true;
+        }
+
+        return $existingCategory->getId() === $category->getId();
     }
 
     /**

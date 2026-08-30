@@ -86,6 +86,32 @@ class TagService implements TagServiceInterface
     }
 
     /**
+     * Check whether Tag title is unique.
+     *
+     * @param Tag $tag Tag entity
+     *
+     * @return bool Result
+     */
+    public function isTitleUnique(Tag $tag): bool
+    {
+        $title = $tag->getTitle();
+
+        if (null === $title || '' === trim($title)) {
+            return false;
+        }
+
+        $existingTag = $this->tagRepository->findOneBy([
+            'title' => $title,
+        ]);
+
+        if (null === $existingTag) {
+            return true;
+        }
+
+        return $existingTag->getId() === $tag->getId();
+    }
+
+    /**
      * Delete entity.
      *
      * @param Tag $tag Tag

@@ -32,6 +32,7 @@ interface EventServiceInterface
      * Save entity.
      *
      * @param Event $event Event entity
+     * @param User $user User entity
      */
     public function save(Event $event, ?User $user): void;
 
@@ -65,4 +66,13 @@ interface EventServiceInterface
      * @return bool Result
      */
     public function canBeEmpty(Event $event): bool;
+
+    /**
+     * Check whether event title is unique.
+     *
+     * @param Event $event Event entity
+     *
+     * @return bool Result
+     */
+    public function isTitleUnique(Event $event): bool;
 }

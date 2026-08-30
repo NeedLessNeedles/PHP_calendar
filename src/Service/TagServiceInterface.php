@@ -43,4 +43,13 @@ interface TagServiceInterface
      * @return bool Result
      */
     public function canBeEmpty(Tag $tag): bool;
+
+    /**
+     * Check whether Tag title is unique.
+     *
+     * @param Tag $tag Tag entity
+     *
+     * @return bool Result
+     */
+    public function isTitleUnique(Tag $tag): bool;
 }

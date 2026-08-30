@@ -109,6 +109,15 @@ class EventController extends AbstractController
                 return $this->redirectToRoute('app_event_new');
             }
 
+            if (!$this->eventService->isTitleUnique($event)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.title_already_exists')
+                );
+
+                return $this->redirectToRoute('app_event_new');
+            }
+
             if ($form->isValid()) {
                 $this->eventService->save($event, $this->getUser());
 
@@ -178,15 +187,41 @@ class EventController extends AbstractController
         );
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->eventService->save($event, $this->getUser());
+        if ($form->isSubmitted()) {
+            if (!$this->eventService->canBeEmpty($event)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.empty_title')
+                );
 
-            $this->addFlash(
-                'success',
-                $this->translator->trans('message.updated_successfully')
-            );
+                return $this->redirectToRoute(
+                    'app_event_edit',
+                    ['id' => $event->getId()]
+                );
+            }
 
-            return $this->redirectToRoute('app_event_index');
+            if (!$this->eventService->isTitleUnique($event)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.title_already_exists')
+                );
+
+                return $this->redirectToRoute(
+                    'app_event_edit',
+                    ['id' => $event->getId()]
+                );
+            }
+
+            if ($form->isValid()) {
+                $this->eventService->save($event, $this->getUser());
+
+                $this->addFlash(
+                    'success',
+                    $this->translator->trans('message.created_successfully')
+                );
+
+                return $this->redirectToRoute('app_event_index');
+            }
         }
 
         return $this->render(

@@ -52,4 +52,13 @@ interface CategoryServiceInterface
      * @return bool Result
      */
     public function canBeEmpty(Category $category): bool;
+
+    /**
+     * Check whether category title is unique.
+     *
+     * @param Category $category Category entity
+     *
+     * @return bool Result
+     */
+    public function isTitleUnique(Category $category): bool;
 }

@@ -440,6 +440,10 @@
         <source>message.input_fields</source>
         <target>Input fields cannot be empty!</target>
       </trans-unit>
+      <trans-unit id="message.title_already_exists">
+        <source>message.title_already_exists</source>
+        <target>Item with this title already exists!</target>
+      </trans-unit>
       <trans-unit id="message.empty_title">
         <source>message.empty_title</source>
         <target>'Title' or 'Start date' (with correct date AND hour) fields cannot be empty!</target>
