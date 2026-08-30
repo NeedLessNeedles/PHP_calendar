@@ -56,4 +56,13 @@ interface EventServiceInterface
      * @return string ICS content
      */
     public function exportToIcs(): string;
+
+    /**
+     * Can Title for Event be empty?
+     *
+     * @param Event $event Event entity
+     *
+     * @return bool Result
+     */
+    public function canBeEmpty(Event $event): bool;
 }

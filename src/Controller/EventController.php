@@ -99,15 +99,26 @@ class EventController extends AbstractController
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->eventService->save($event, $this->getUser());
+        if ($form->isSubmitted()) {
+            if (!$this->eventService->canBeEmpty($event)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.empty_title')
+                );
 
-            $this->addFlash(
-                'success',
-                $this->translator->trans('message.created_successfully')
-            );
+                return $this->redirectToRoute('app_event_new');
+            }
 
-            return $this->redirectToRoute('app_event_index');
+            if ($form->isValid()) {
+                $this->eventService->save($event, $this->getUser());
+
+                $this->addFlash(
+                    'success',
+                    $this->translator->trans('message.created_successfully')
+                );
+
+                return $this->redirectToRoute('app_event_index');
+            }
         }
 
         return $this->render(

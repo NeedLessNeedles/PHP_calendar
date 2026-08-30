@@ -11,6 +11,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Event.
@@ -190,11 +191,11 @@ class Event
     /**
      * Setter for start date.
      *
-     * @param \DateTime $startDate Start date
+     * @param \DateTime|null $startDate Start date
      *
      * @return static Start date
      */
-    public function setStartDate(\DateTime $startDate): static
+    public function setStartDate(?\DateTime $startDate): static
     {
         $this->startDate = $startDate;
 

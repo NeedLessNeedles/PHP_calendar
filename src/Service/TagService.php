@@ -82,8 +82,6 @@ class TagService implements TagServiceInterface
             return false;
         }
 
-//        $result = $this->eventRepository->countByCategory($category);
-
         return true;
     }
 

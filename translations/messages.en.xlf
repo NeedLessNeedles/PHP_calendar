@@ -440,6 +440,14 @@
         <source>message.input_fields</source>
         <target>Input fields cannot be empty!</target>
       </trans-unit>
+      <trans-unit id="message.empty_title">
+        <source>message.empty_title</source>
+        <target>'Title' or 'Start date' (with correct date AND hour) fields cannot be empty!</target>
+      </trans-unit>
+      <trans-unit id="message.empty_start_date">
+        <source>message.empty_start_date</source>
+        <target>'Start Date' field cannot be empty nor have an empty starting hour!</target>
+      </trans-unit>
       <trans-unit id="message.blocked_user">
         <source>message.blocked_user</source>
         <target>User blocked successfully!</target>

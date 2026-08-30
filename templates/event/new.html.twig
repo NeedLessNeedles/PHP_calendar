@@ -6,7 +6,7 @@
 <div class="container d-flex justify-content-center align-items-center mt-2" style="max-width: 500px;">
     <div class="auth-card p-3">
         <h1 class="h3 mb-1 font-weight-normal">{{ 'title.create_new_event'|trans }}</h1>
-        {{ form_start(form) }}
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
         {{ form_widget(form) }}
 
         <div class="d-flex flex-row justify-content-center align-items-center gap-2">

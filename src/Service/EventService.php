@@ -6,6 +6,7 @@
 
 namespace App\Service;
 
+use App\Entity\Category;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\EventRepository;
@@ -115,6 +116,22 @@ class EventService implements EventServiceInterface
 
         $this->entityManager->persist($event);
         $this->entityManager->flush();
+    }
+
+    /**
+     * Can Title or Start Date for Event be empty?
+     *
+     * @param Event $event Event entity
+     *
+     * @return bool Result
+     */
+    public function canBeEmpty(Event $event): bool
+    {
+        if (null === $event->getTitle() || '' === trim($event->getTitle()) || null === $event->getStartDate()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
