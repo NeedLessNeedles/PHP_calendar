@@ -7,6 +7,7 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Form\CategoryType;
 use App\Form\EventType;
 use App\Form\EventEditType;
 use App\Repository\EventRepository;
@@ -60,12 +61,7 @@ class EventController extends AbstractController
         $tagId = is_numeric($tagId) ? (int) $tagId : null;
         $title = $request->query->get('title');
 
-        $pagination = $this->eventService->getPaginatedList(
-            $page,
-            $categoryId,
-            $title,
-            $tagId
-        );
+        $pagination = $this->eventService->getPaginatedList($page);
         $createForm = $this->createForm(EventType::class, new Event(), [
             'action' => $this->generateUrl('app_event_new'),
         ]);
@@ -106,20 +102,20 @@ class EventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->eventService->create($event, $this->getUser());
+            $this->eventService->save($event, $this->getUser());
 
             $this->addFlash(
                 'success',
                 $this->translator->trans('message.created_successfully')
             );
 
-            return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_event_index');
         }
 
-        return $this->render('event/new.html.twig', [
-            'event' => $event,
-            'form' => $form,
-        ]);
+        return $this->render(
+            'event/new.html.twig',
+            ['form' => $form->createView()]
+        );
     }
 
     /**
@@ -152,7 +148,6 @@ class EventController extends AbstractController
      *
      * @param Request                $request       request
      * @param Event                  $event         event
-     * @param EntityManagerInterface $entityManager entityManager
      *
      * @return Response HTTP response
      */
@@ -160,20 +155,23 @@ class EventController extends AbstractController
         '/{id}/edit',
         name: 'app_event_edit',
         requirements: ['id' => '[1-9]\d*'],
-        methods: ['GET', 'POST']
+        methods: ['GET', 'PUT'],
     )]
-    public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Event $event): Response
     {
-        $this->denyAccessUnlessGranted(
-            EventVoter::EDIT,
-            $event
+        $form = $this->createForm(
+            EventType::class,
+            $event,
+            [
+                'method' => 'PUT',
+                'action' => $this->generateUrl('app_event_edit', ['id' => $event->getId()]),
+            ]
         );
-
-        $form = $this->createForm(EventEditType::class, $event);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            $this->eventService->save($event, $this->getUser());
+
             $this->addFlash(
                 'success',
                 $this->translator->trans('message.updated_successfully')
@@ -184,7 +182,10 @@ class EventController extends AbstractController
 
         return $this->render(
             'event/edit.html.twig',
-            ['form' => $form->createView()],
+            [
+                'form' => $form->createView(),
+                'event' => $event,
+            ]
         );
     }
 
@@ -193,46 +194,53 @@ class EventController extends AbstractController
      *
      * @param Request                $request       request
      * @param Event                  $event         event
-     * @param EntityManagerInterface $entityManager entityManager
      *
      * @return Response HTTP response
      */
     #[Route(
-        '/{id}',
+        '/{id}/delete',
         name: 'app_event_delete',
         requirements: ['id' => '[1-9]\d*'],
-        methods: ['POST']
+        methods: ['GET', 'DELETE'],
     )]
-    public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Event $event): Response
     {
-        $this->denyAccessUnlessGranted(EventVoter::DELETE, $event);
+        //$this->denyAccessUnlessGranted(EventVoter::DELETE, $event);
 
-        if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($event);
-            $entityManager->flush();
+        $form = $this->createForm(EventType::class, $event, [
+            'method' => 'DELETE',
+            'action' => $this->generateUrl('app_event_delete', ['id' => $event->getId()]),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->eventService->delete($event);
 
             $this->addFlash(
                 'success',
                 $this->translator->trans('message.deleted_successfully')
             );
-        } else {
-            $this->addFlash(
-                'error',
-                $this->translator->trans('message.validation_failed')
-            );
+
+            return $this->redirectToRoute('app_event_index');
         }
 
-        return $this->redirectToRoute('app_event_index');
+        return $this->render(
+            'event/delete.html.twig',
+            [
+                'form' => $form->createView(),
+                'event' => $event,
+            ]
+        );
     }
 
     /**
-     * Export events to ICS.
+     * Export events list to ICS format.
      *
      * @return Response HTTP response
      */
     #[Route(
-        '/export/ics',
-        name: 'app_event_export_ics',
+        '/export',
+        name: 'app_event_export',
         methods: ['GET']
     )]
     public function exportIcs(): Response

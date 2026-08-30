@@ -97,6 +97,10 @@
         <source>option.requests</source>
         <target>Requests</target>
       </trans-unit>
+      <trans-unit id="title.event_requests">
+        <source>title.event_requests</source>
+        <target>Event requests</target>
+      </trans-unit>
       <trans-unit id="option.categories">
         <source>option.categories</source>
         <target>Categories</target>
@@ -348,6 +352,10 @@
         <source>alert.delete_category</source>
         <target>Delete category</target>
       </trans-unit>
+      <trans-unit id="alert.delete_event">
+        <source>alert.delete_event</source>
+        <target>Delete event</target>
+      </trans-unit>
       <trans-unit id="alert.delete_tag">
         <source>alert.delete_tag</source>
         <target>Delete tag</target>
@@ -355,6 +363,10 @@
       <trans-unit id="alert.delete_item">
         <source>alert.delete_category_content</source>
         <target>Are you sure you want to delete this item?</target>
+      </trans-unit>
+      <trans-unit id="label.none">
+        <source>label.none</source>
+        <target>Select item from the list</target>
       </trans-unit>
 
       <!-- /admin/requests -->

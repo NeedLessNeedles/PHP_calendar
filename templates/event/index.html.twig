@@ -70,12 +70,9 @@
                     <a href="{{ path('app_event_index') }}" class="btn btn-secondary">
                         {{ 'button.reset'|trans }}
                     </a>
-
                 </form>
             </div>
-
         </div>
-
 
         <table class="table">
             <colgroup>
@@ -134,21 +131,7 @@
                     {% if app.user %}
                         <td>
                             <a class="btn btn-primary btn-sm edit-event-btn" href="{{ path('app_event_edit', {'id': event.id}) }}">{{ 'button.edit'|trans }}</a>
-                            <form
-                                method="post"
-                                action="{{ path('app_event_delete', {'id': event.id}) }}"
-                                style="display:inline;"
-                                onsubmit="return confirm('Delete event?');"
-                            >
-                                <input
-                                    type="hidden"
-                                    name="_token"
-                                    value="{{ csrf_token('delete' ~ event.id) }}"
-                                >
-                                <button type="submit" class="btn btn-danger btn-sm">
-                                    {{ 'button.delete'|trans }}
-                                </button>
-                            </form>
+                            <a class="btn btn-danger btn-sm" href="{{ path('app_event_delete', {'id': event.id}) }}">{{ 'button.delete'|trans }}</a>
                         </td>
                     {% else %}
                         <td>-</td>
@@ -172,20 +155,11 @@
     {% endif %}
 
     <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#eventModal">
-            {{ 'button.create_new'|trans }}
-        </button>
+        <a class="btn btn-success" href="{{ path('app_event_new') }}">{{ 'button.create_new'|trans }}</a>
         {% if app.user %}
-            <a href="{{ path('app_event_export_ics') }}" class="btn btn-primary">
+            <a href="{{ path('app_event_export') }}" class="btn btn-primary">
                 {{ 'button.export'|trans }}
             </a>
         {% endif %}
     </div>
-
-    {{ include('event/_modal_form.html.twig', { form: createForm }) }}
-    {{ include('event/_modal_edit.html.twig', { form: editForm }) }}
-{% endblock %}
-{% block javascripts %}
-    {{ parent() }}
-    <script src="{{ asset('js/edit_event.js') }}"></script>
 {% endblock %}

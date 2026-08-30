@@ -68,9 +68,18 @@ class EventService implements EventServiceInterface
      *
      * @param Event $event Event entity
      */
-    public function save(Event $event): void
+    public function save(Event $event, ?User $user): void
     {
+        if ($user && in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            $event->setStatus('approved');
+        } elseif ($user) {
+            $event->setStatus('approved');
+        } else {
+            $event->setStatus('pending');
+        }
+
         $this->eventRepository->save($event);
+        $event->setOwner($user);
     }
 
     /**
