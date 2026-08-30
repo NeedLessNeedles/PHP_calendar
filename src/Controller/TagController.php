@@ -7,6 +7,8 @@
 namespace App\Controller;
 
 use App\Entity\Tag;
+use App\Form\CategoryType;
+use App\Form\TagType;
 use App\Repository\TagRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,21 +38,19 @@ class TagController extends AbstractController
      * Index action.
      *
      * @param Request       $request       request
-     * @param TagRepository $tagRepository Tag repository
      *
      * @return Response HTTP response
      */
     #[Route(
         name: 'app_tag_index',
-        methods: ['GET', 'POST']
+        methods: ['GET']
     )]
-    public function index(Request $request, TagRepository $tagRepository): Response
+    public function index(Request $request): Response
     {
         $page = $request->query->getInt('page', 1);
         $pagination = $this->tagService->getPaginatedList($page);
 
         return $this->render('tag/index.html.twig', [
-            'tags' => $tagRepository->findAll(),
             'pagination' => $pagination,
             'tag' => new Tag(),
         ]);
@@ -60,8 +60,6 @@ class TagController extends AbstractController
      * New action.
      *
      * @param Request                $request       request
-     * @param EntityManagerInterface $entityManager entityManager
-     *
      * @return Response HTTP response
      */
     #[Route(
@@ -69,25 +67,29 @@ class TagController extends AbstractController
         name: 'app_tag_new',
         methods: ['GET', 'POST']
     )]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         $tag = new Tag();
+        $form = $this->createForm(TagType::class, $tag);
+        $form->handleRequest($request);
 
-        $tag->setTitle($request->request->get('title'));
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->tagService->save($tag);
 
-        if ($tag->getTitle()) {
-            $entityManager->persist($tag);
-            $entityManager->flush();
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.created_successfully')
+            );
+
+            return $this->redirectToRoute('app_tag_index');
         }
 
-        $this->addFlash(
-            'success',
-            $this->translator->trans('message.created_successfully')
+        return $this->render(
+            'tag/create.html.twig',
+            ['form' => $form->createView()]
         );
-
-        return $this->redirectToRoute('app_tag_index');
     }
 
     /**
@@ -115,7 +117,6 @@ class TagController extends AbstractController
      *
      * @param Request                $request       request
      * @param Tag                    $tag           Tag
-     * @param EntityManagerInterface $entityManager entityManager
      *
      * @return Response HTTP response
      */
@@ -123,27 +124,40 @@ class TagController extends AbstractController
         '/{id}/edit',
         name: 'app_tag_edit',
         requirements: ['id' => '[1-9]\d*'],
-        methods: ['POST']
+        methods: ['GET', 'PUT'],
     )]
-    public function edit(Request $request, Tag $tag, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Tag $tag): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        if (!$this->isCsrfTokenValid('tag_edit', $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF');
+        $form = $this->createForm(
+            TagType::class,
+            $tag,
+            [
+                'method' => 'PUT',
+                'action' => $this->generateUrl('app_tag_edit', ['id' => $tag->getId()]),
+            ]
+        );
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->tagService->save($tag);
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.updated_successfully')
+            );
+
+            return $this->redirectToRoute('app_tag_index');
         }
 
-        $title = $request->request->get('title');
-        $this->tagService->edit($tag, $title);
-
-        $entityManager->flush();
-
-        $this->addFlash(
-            'success',
-            $this->translator->trans('message.updated_successfully')
+        return $this->render(
+            'tag/edit.html.twig',
+            [
+                'form' => $form->createView(),
+                'tag' => $tag,
+            ]
         );
-
-        return $this->redirectToRoute('app_tag_index');
     }
 
     /**
@@ -155,25 +169,38 @@ class TagController extends AbstractController
      * @return Response HTTP response
      */
     #[Route(
-        '/{id}',
+        '/{id}/delete',
         name: 'app_tag_delete',
         requirements: ['id' => '[1-9]\d*'],
-        methods: ['POST']
+        methods: ['GET', 'DELETE'],
     )]
     public function delete(Request $request, Tag $tag): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        if (!$this->isCsrfTokenValid('delete'.$tag->getId(), $request->request->get('_token'))) {
+        $form = $this->createForm(TagType::class, $tag, [
+            'method' => 'DELETE',
+            'action' => $this->generateUrl('app_tag_delete', ['id' => $tag->getId()]),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->tagService->delete($tag);
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.deleted_successfully')
+            );
+
             return $this->redirectToRoute('app_tag_index');
         }
-        $this->tagService->delete($tag);
 
-        $this->addFlash(
-            'success',
-            $this->translator->trans('message.deleted_successfully')
+        return $this->render(
+            'tag/delete.html.twig',
+            [
+                'form' => $form->createView(),
+                'category' => $tag,
+            ]
         );
-
-        return $this->redirectToRoute('app_tag_index');
     }
 }

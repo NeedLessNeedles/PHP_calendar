@@ -8,8 +8,6 @@ namespace App\Controller;
 
 use App\Entity\Category;
 use App\Form\CategoryType;
-use App\Repository\CategoryRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,24 +35,20 @@ class CategoryController extends AbstractController
      * Index action.
      *
      * @param Request            $request            request
-     * @param CategoryRepository $categoryRepository Category repository
      *
      * @return Response HTTP response
      */
     #[Route(
         name: 'app_category_index',
-        methods: ['GET', 'POST']
+        methods: ['GET']
     )]
-    public function index(Request $request, CategoryRepository $categoryRepository): Response
+    public function index(Request $request): Response
     {
         $page = $request->query->getInt('page', 1);
         $pagination = $this->categoryService->getPaginatedList($page);
-        $form = $this->createForm(CategoryType::class, new Category());
 
         return $this->render('category/index.html.twig', [
-            'categories' => $categoryRepository->findAll(),
             'pagination' => $pagination,
-            'form' => $form->createView(),
         ]);
     }
 
@@ -72,8 +66,8 @@ class CategoryController extends AbstractController
     )]
     public function new(Request $request): Response
     {
-        $category = new Category();
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $category = new Category();
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
 
@@ -174,7 +168,7 @@ class CategoryController extends AbstractController
         '/{id}/delete',
         name: 'app_category_delete',
         requirements: ['id' => '[1-9]\d*'],
-        methods: ['GET', 'DELETE']
+        methods: ['GET', 'DELETE'],
     )]
     public function delete(Request $request, Category $category): Response
     {

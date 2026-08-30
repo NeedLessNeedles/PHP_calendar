@@ -67,6 +67,20 @@ class CategoryService implements CategoryServiceInterface
     }
 
     /**
+     * Save entity.
+     *
+     * @param Category $category Category entity
+     */
+    public function save(Category $category): void
+    {
+        $category->setUpdatedAt(new \DateTimeImmutable());
+        if (null === $category->getId()) {
+            $category->setCreatedAt(new \DateTimeImmutable());
+        }
+        $this->categoryRepository->save($category);
+    }
+
+    /**
      * Delete category.
      *
      * @param Category $category Category
@@ -81,23 +95,6 @@ class CategoryService implements CategoryServiceInterface
             throw new \DomainException('Cannot delete category used by events.');
         }
 
-//        $this->entityManager->remove($category);
-//        $this->entityManager->flush();
-
         $this->categoryRepository->delete($category);
-    }
-
-    /**
-     * Save entity.
-     *
-     * @param Category $category Category entity
-     */
-    public function save(Category $category): void
-    {
-        $category->setUpdatedAt(new \DateTimeImmutable());
-        if (null === $category->getId()) {
-            $category->setCreatedAt(new \DateTimeImmutable());
-        }
-        $this->categoryRepository->save($category);
     }
 }

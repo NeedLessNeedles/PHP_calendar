@@ -348,6 +348,10 @@
         <source>alert.delete_category</source>
         <target>Delete category</target>
       </trans-unit>
+      <trans-unit id="alert.delete_tag">
+        <source>alert.delete_tag</source>
+        <target>Delete tag</target>
+      </trans-unit>
       <trans-unit id="alert.delete_item">
         <source>alert.delete_category_content</source>
         <target>Are you sure you want to delete this item?</target>

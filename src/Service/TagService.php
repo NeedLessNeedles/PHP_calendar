@@ -6,6 +6,7 @@
 
 namespace App\Service;
 
+use App\Entity\Category;
 use App\Entity\Tag;
 use App\Repository\TagRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,7 +18,16 @@ use Knp\Component\Pager\PaginatorInterface;
  */
 class TagService implements TagServiceInterface
 {
-    public const PAGINATOR_ITEMS_PER_PAGE = 5;
+    /**
+     * Items per page.
+     *
+     * Use constants to define configuration options that rarely change instead
+     * of specifying them in app/config/config.yml.
+     * See https://symfony.com/doc/current/best_practices.html#configuration
+     *
+     * @constant int
+     */
+    private const PAGINATOR_ITEMS_PER_PAGE = 5;
 
     /**
      * Constructor.
@@ -63,13 +73,22 @@ class TagService implements TagServiceInterface
     }
 
     /**
-     * Delete tag.
+     * Save entity.
+     *
+     * @param Tag $tag Tag entity
+     */
+    public function save(Tag $tag): void
+    {
+        $this->tagRepository->save($tag);
+    }
+
+    /**
+     * Delete entity.
      *
      * @param Tag $tag Tag
      */
     public function delete(Tag $tag): void
     {
-        $this->entityManager->remove($tag);
-        $this->entityManager->flush();
+        $this->tagRepository->delete($tag);
     }
 }

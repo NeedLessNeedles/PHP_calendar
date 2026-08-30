@@ -30,6 +30,13 @@ interface TagServiceInterface
     public function edit(Tag $tag, string $title): void;
 
     /**
+     * Save entity.
+     *
+     * @param Tag $tag Tag entity
+     */
+    public function save(Tag $tag): void;
+
+    /**
      * Delete tag.
      *
      * @param Tag $tag Tag
