@@ -15,12 +15,7 @@ class CategoryControllerTest extends WebTestCase
     private const CATEGORY_ROUTE = '/category';
 
     /**
-     * Test getUser()
-     *
-     * @param User $user
-     * @param $email
-     *
-     * @return User
+     * Test getUser().
      */
     private function getUser($client, string $email): ?User
     {
@@ -40,7 +35,6 @@ class CategoryControllerTest extends WebTestCase
 
     /**
      * Test index route.
-     *
      */
     public function testIndex(): void
     {
@@ -57,7 +51,6 @@ class CategoryControllerTest extends WebTestCase
 
     /**
      * Test show category.
-     *
      */
     public function testShowCategory(): void
     {
@@ -80,7 +73,6 @@ class CategoryControllerTest extends WebTestCase
 
     /**
      * Tests if new category can be created only by admin.
-     *
      */
     public function testNewRequiresAdmin(): void
     {
@@ -96,7 +88,6 @@ class CategoryControllerTest extends WebTestCase
 
     /**
      * Tests for regular user case.
-     *
      */
     public function testNewRequiresAdminForRegularUser(): void
     {
@@ -173,7 +164,6 @@ class CategoryControllerTest extends WebTestCase
 
     /**
      * Test for invalid token.
-     *
      */
     public function testEditCategoryWithInvalidCsrfToken(): void
     {
@@ -208,7 +198,6 @@ class CategoryControllerTest extends WebTestCase
 
     /**
      * Test for category removal.
-     *
      */
     public function testDeleteCategoryWithInvalidCsrfToken(): void
     {

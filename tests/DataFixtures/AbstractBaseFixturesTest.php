@@ -15,37 +15,42 @@ use PHPUnit\Framework\TestCase;
  */
 class AbstractBaseFixturesTest extends TestCase
 {
+    /**
+     * Test for crating many throws, whatever that means.
+     */
     public function testCreateManyThrows(): void
     {
-        $fixture = new class () extends AbstractBaseFixtures {
+        $fixture = new class extends AbstractBaseFixtures
+        {
             protected function loadData(): void
             {
             }
         };
-        $manager = $this->createMock(ObjectManager::class);
+        $manager = $this->createStub(ObjectManager::class);
 
         $fixture->load($manager);
         $this->expectException(\LogicException::class);
         $ref = new \ReflectionMethod($fixture, 'createMany');
-        $ref->setAccessible(true);
 
         $ref->invoke($fixture, 1, 'test', fn () => null);
     }
 
+    /**
+     * Test get random reference throws.
+     */
     public function testGetRandomReferenceThrows(): void
     {
-        $fixture = new class () extends AbstractBaseFixtures {
+        $fixture = new class extends AbstractBaseFixtures
+        {
             protected function loadData(): void
             {
             }
         };
-
-        $manager = $this->createMock(ObjectManager::class);
+        $manager = $this->createStub(ObjectManager::class);
         $fixture->load($manager);
         $this->expectException(\InvalidArgumentException::class);
 
         $ref = new \ReflectionMethod($fixture, 'getRandomReference');
-        // $ref->setAccessible(true);
 
         $ref->invoke($fixture, 'nonexistent', \stdClass::class);
     }

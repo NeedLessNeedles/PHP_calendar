@@ -32,10 +32,10 @@
         <include>
             <directory>src</directory>
         </include>
-<!--        <exclude>-->
-<!--            <directory>tests/Form</directory>-->
+        <exclude>
+            <directory>tests/DataFixtures</directory>
 <!--            <directory>tests/Repository</directory>-->
-<!--        </exclude>-->
+        </exclude>
 
         <deprecationTrigger>
             <method>Doctrine\Deprecations\Deprecation::trigger</method>

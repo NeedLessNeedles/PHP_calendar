@@ -14,7 +14,6 @@ use PHPUnit\Framework\TestCase;
  */
 class UserTest extends TestCase
 {
-
     /**
      * Tests if ID column can be null.
      */
