@@ -480,6 +480,10 @@
         <source>message.user_registered</source>
         <target>User registered successfully!</target>
       </trans-unit>
+      <trans-unit id="message.cant_block_yourself">
+        <source>message.cant_block_yourself</source>
+        <target>You cant block yourself!</target>
+      </trans-unit>
 
       <trans-unit id="message.agree_terms">
         <source>message.agree_terms</source>

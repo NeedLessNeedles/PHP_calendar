@@ -296,7 +296,6 @@ class AdminController extends AbstractController
      * Block action.
      *
      * @param User                   $user          user
-     * @param EntityManagerInterface $entityManager entityManager
      *
      * @return Response HTTP response
      */
@@ -306,10 +305,17 @@ class AdminController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['POST']
     )]
-    public function block(User $user, EntityManagerInterface $entityManager): Response
+    public function block(User $user): Response
     {
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User) {
+            $this->addFlash(
+                'warning',
+                $this->translator->trans('message.cant_block_yourself')
+            );
+        }
+
         $this->adminService->toggleBlock($user, $this->getUser());
-        $entityManager->flush();
 
         $this->addFlash(
             'success',

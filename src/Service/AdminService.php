@@ -66,6 +66,7 @@ class AdminService implements AdminServiceInterface
         }
 
         $targetUser->setIsBlocked(!$targetUser->isBlocked());
+        $this->userRepository->save($targetUser);
     }
 
     /**

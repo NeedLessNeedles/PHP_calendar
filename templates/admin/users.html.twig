@@ -45,7 +45,6 @@
                                     <form method="post"
                                           action="{{ path('app_admin_users_block', {'id': user.id}) }}"
                                           style="display:inline">
-
                                         <button class="btn btn-warning btn-sm">
                                             {{ user.isBlocked ? 'button.unblock'|trans : 'button.block'|trans }}
                                         </button>
