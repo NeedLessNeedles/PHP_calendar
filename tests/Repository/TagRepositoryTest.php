@@ -69,25 +69,15 @@ class TagRepositoryTest extends KernelTestCase
      */
     public function testSave(): void
     {
+        $title = 'Repository test tag '.uniqid();
         $tag = new Tag();
-        $tag->setTitle(
-            'Repository test tag'
-        );
-
+        $tag->setTitle($title);
         $this->tagRepository->save($tag);
         $this->assertNotNull($tag->getId());
-        $savedTag = $this->tagRepository->find(
-            $tag->getId()
-        );
+        $savedTag = $this->tagRepository->find($tag->getId());
 
-        $this->assertInstanceOf(
-            Tag::class,
-            $savedTag
-        );
-        $this->assertSame(
-            'Repository test tag',
-            $savedTag->getTitle()
-        );
+        $this->assertInstanceOf(Tag::class, $savedTag);
+        $this->assertSame($title, $savedTag->getTitle());
     }
 
     /**

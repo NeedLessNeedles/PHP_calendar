@@ -69,26 +69,15 @@ class CategoryRepositoryTest extends KernelTestCase
      */
     public function testSave(): void
     {
+        $title = 'Repository test category '.uniqid();
         $category = new Category();
-        $category->setTitle(
-            'Repository test category'
-        );
-
+        $category->setTitle($title);
         $this->categoryRepository->save($category);
         $this->assertNotNull($category->getId());
-        $savedCategory = $this->categoryRepository->find(
-            $category->getId()
-        );
+        $savedCategory = $this->categoryRepository->find($category->getId());
 
-        $this->assertInstanceOf(
-            Category::class,
-            $savedCategory
-        );
-
-        $this->assertSame(
-            'Repository test category',
-            $savedCategory->getTitle()
-        );
+        $this->assertInstanceOf(Category::class, $savedCategory);
+        $this->assertSame($title, $savedCategory->getTitle());
     }
 
     /**
