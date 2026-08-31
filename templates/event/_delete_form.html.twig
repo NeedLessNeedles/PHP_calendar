@@ -1,7 +1,0 @@
-<form method="post"
-      id="delete-form-{{ event.id }}"
-      action="{{ path('app_event_delete', {'id': event.id}) }}"
-      class="d-inline-flex"
-      onsubmit="return confirm('Are you sure you want to delete this item?');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
-</form>
