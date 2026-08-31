@@ -8,16 +8,12 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Event;
-use App\Repository\UserRepository;
-use App\Form\ProfileType;
 use App\Form\ChangeEmailType;
 use App\Form\AdminChangePasswordType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\EventRepository;
 use App\Service\EventServiceInterface;
 use App\Service\AdminServiceInterface;
 use App\Service\ProfileServiceInterface;
@@ -64,7 +60,6 @@ class AdminController extends AbstractController
      * Show action.
      *
      * @param Request        $request        Request
-     * @param UserRepository $userRepository User repository
      *
      * @return Response HTTP response
      */
@@ -73,13 +68,12 @@ class AdminController extends AbstractController
         name: 'app_admin_users',
         methods: ['GET']
     )]
-    public function show(Request $request, UserRepository $userRepository): Response
+    public function show(Request $request): Response
     {
         $page = $request->query->getInt('page', 1);
         $pagination = $this->profileService->getPaginatedList($page);
 
         return $this->render('admin/users.html.twig', [
-            'users' => $userRepository->findAll(),
             'pagination' => $pagination,
         ]);
     }
@@ -88,8 +82,6 @@ class AdminController extends AbstractController
      * Edit action.
      *
      * @param User                   $user          user
-     * @param Request                $request       request
-     * @param EntityManagerInterface $entityManager entityManager
      *
      * @return Response HTTP response
      */
@@ -99,37 +91,10 @@ class AdminController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['GET', 'POST']
     )]
-    public function edit(User $user, Request $request, EntityManagerInterface $entityManager): Response
+    public function edit(User $user): Response
     {
-        // FORM: email
-        $emailForm = $this->createForm(ProfileType::class, $user);
-        $emailForm->handleRequest($request);
-
-        // FORM: password
-        $passwordForm = $this->createForm(AdminChangePasswordType::class);
-        $passwordForm->handleRequest($request);
-
-        // email update
-        if ($emailForm->isSubmitted() && $emailForm->isValid()) {
-            $entityManager->flush();
-        }
-
-        // password update
-        if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
-            $data = $passwordForm->getData();
-
-            $this->adminService->changePassword(
-                $user,
-                $data['newPassword']
-            );
-
-            $entityManager->flush();
-        }
-
         return $this->render('admin/edit.html.twig', [
             'user' => $user,
-            'emailForm' => $emailForm,
-            'passwordForm' => $passwordForm,
         ]);
     }
 
