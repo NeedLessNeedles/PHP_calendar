@@ -329,7 +329,6 @@ class AdminController extends AbstractController
      * Requests action.
      *
      * @param Request         $request         request
-     * @param EventRepository $eventRepository Event Repository
      *
      * @return Response HTTP response
      */
@@ -338,19 +337,16 @@ class AdminController extends AbstractController
         name: 'app_admin_requests',
         methods: ['GET']
     )]
-    public function requests(Request $request, EventRepository $eventRepository): Response
+    public function requests(Request $request): Response
     {
         $page = $request->query->getInt('page', 1);
+
         $pagination = $this->eventService->getPaginatedList(
             $page,
             status: 'pending'
         );
-        $events = $eventRepository->findBy([
-            'status' => 'pending',
-        ]);
 
         return $this->render('admin/requests.html.twig', [
-            'events' => $events,
             'pagination' => $pagination,
         ]);
     }

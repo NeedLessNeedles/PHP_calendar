@@ -74,7 +74,7 @@ class EventFixtures extends AbstractBaseFixtures implements DependentFixtureInte
 
         for ($i = 0; $i < 5; ++$i) {
             $event = new Event();
-            $event->setTitle($this->faker->sentence);
+            $event->setTitle($this->faker->word);
             $event->setDescription($this->faker->sentence);
             $event->setLocation($this->faker->city());
             $event->setStartDate(
