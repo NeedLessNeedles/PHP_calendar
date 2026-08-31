@@ -58,7 +58,12 @@ class EventController extends AbstractController
         $tagId = is_numeric($tagId) ? (int) $tagId : null;
         $title = $request->query->get('title');
 
-        $pagination = $this->eventService->getPaginatedList($page);
+        $pagination = $this->eventService->getPaginatedList(
+            $page,
+            $categoryId,
+            $title,
+            $tagId
+        );
 
         return $this->render('event/index.html.twig', [
             'pagination' => $pagination,

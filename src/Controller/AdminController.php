@@ -10,7 +10,6 @@ use App\Entity\User;
 use App\Entity\Event;
 use App\Repository\UserRepository;
 use App\Form\ProfileType;
-use App\Form\ChangePasswordType;
 use App\Form\ChangeEmailType;
 use App\Form\AdminChangePasswordType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
