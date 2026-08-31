@@ -6,6 +6,10 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\User;
+use App\Service\ProfileServiceInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -13,101 +17,371 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class ProfileControllerTest extends WebTestCase
 {
-    /**
-     * Test index() method.
-     */
-    public function testIndex(): void
+    private function getEntityManager($client): EntityManagerInterface
     {
-        // given
-        $client = static::createClient();
-
-        // when
-        $client->request('GET', '/profile');
-
-        // then
-        self::assertResponseIsSuccessful();
+        return $client->getContainer()->get(EntityManagerInterface::class);
     }
 
-    private function loginUser(): User
+    private function getUser($client): User
     {
-        $container = static::getContainer();
-        $em = $container->get(EntityManagerInterface::class);
+        $user = $this->getEntityManager($client)
+            ->getRepository(User::class)
+            ->findOneBy([
+                'email' => 'user.first@gmail.com',
+            ]);
 
-        $user = $em->getRepository(User::class)->findOneBy([
-            'email' => 'user.first@gmail.com',
-        ]);
-
-        $client = static::createClient();
-        $client->loginUser($user);
+        $this->assertInstanceOf(User::class, $user);
 
         return $user;
     }
 
-    public function testProfileIndexGet(): void
+    private function mockProfileService($client): ProfileServiceInterface&MockObject
+    {
+        $service = $this->createMock(ProfileServiceInterface::class);
+
+        $client->getContainer()->set(
+            ProfileServiceInterface::class,
+            $service
+        );
+
+        return $service;
+    }
+
+    /**
+     * Logged user can view profile.
+     */
+    public function testIndex(): void
     {
         $client = static::createClient();
-        $this->loginUser();
+
+        $user = $this->getUser($client);
+        $client->loginUser($user);
 
         $client->request('GET', '/profile');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('form');
     }
 
-    public function testProfileEmailUpdate(): void
+    /**
+     * Change password page can be displayed.
+     */
+    public function testChangePasswordGet(): void
     {
         $client = static::createClient();
-        $user = $this->loginUser();
 
-        $crawler = $client->request('GET', '/profile');
+        $user = $this->getUser($client);
+        $client->loginUser($user);
 
-        $form = $crawler->selectButton('Zapisz')->form([
-            'profile_email[email]' => 'newmail@example.com',
-        ]);
+        $client->request(
+            'GET',
+            '/profile/change_password'
+        );
 
-        $client->submit($form);
-
-        $this->assertResponseRedirects();
-
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-        $updated = $em->getRepository(User::class)->find($user->getId());
-
-        $this->assertSame('newmail@example.com', $updated->getEmail());
+        $this->assertResponseIsSuccessful();
     }
 
-    public function testProfilePasswordChange(): void
+    public function testChangePasswordRequiresLogin(): void
     {
         $client = static::createClient();
-        $user = $this->loginUser();
 
-        $crawler = $client->request('GET', '/profile');
+        $client->request(
+            'GET',
+            '/profile/change_password'
+        );
 
-        $form = $crawler->selectButton('Zapisz')->form([
-            'change_password[newPassword]' => 'newpassword123',
-        ]);
+        $this->assertResponseStatusCodeSame(403);
+    }
 
-        $client->submit($form);
+    public function testChangeEmailRequiresLogin(): void
+    {
+        $client = static::createClient();
 
-        $this->assertResponseRedirects();
+        $client->request(
+            'GET',
+            '/profile/change_email'
+        );
 
-        $passwordHasher = static::getContainer()->get(UserPasswordHasherInterface::class);
+        $this->assertResponseStatusCodeSame(403);
+    }
 
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-        $updated = $em->getRepository(User::class)->find($user->getId());
 
-        $this->assertTrue(
-            $passwordHasher->isPasswordValid($updated, 'newpassword123')
+
+    /**
+     * Empty password is rejected.
+     */
+    public function testChangePasswordRejectsEmptyPassword(): void
+    {
+        $client = static::createClient();
+
+        $profileService = $this->mockProfileService($client);
+
+        $profileService
+            ->expects($this->once())
+            ->method('canPasswordBeEmpty')
+            ->with('')
+            ->willReturn(false);
+
+        $profileService
+            ->expects($this->never())
+            ->method('isPasswordLongEnough');
+
+        $profileService
+            ->expects($this->never())
+            ->method('savePassword');
+
+        $user = $this->getUser($client);
+        $client->loginUser($user);
+
+        $client->request(
+            'POST',
+            '/profile/change_password',
+            [
+                'change_password' => [
+                    'currentPassword' => 'anything',
+                    'newPassword' => '',
+                ],
+            ]
+        );
+
+        $this->assertResponseRedirects(
+            '/profile/change_password'
         );
     }
 
-    public function testProfileEditPage(): void
+    /**
+     * Too short password is rejected.
+     */
+    public function testChangePasswordRejectsShortPassword(): void
     {
         $client = static::createClient();
-        $this->loginUser();
 
-        $client->request('GET', '/profile/edit');
+        $profileService = $this->mockProfileService($client);
+
+        $password = 'short';
+
+        $profileService
+            ->expects($this->once())
+            ->method('canPasswordBeEmpty')
+            ->with($password)
+            ->willReturn(true);
+
+        $profileService
+            ->expects($this->once())
+            ->method('isPasswordLongEnough')
+            ->with($password)
+            ->willReturn(false);
+
+        $profileService
+            ->expects($this->never())
+            ->method('savePassword');
+
+        $user = $this->getUser($client);
+        $client->loginUser($user);
+
+        $client->request(
+            'POST',
+            '/profile/change_password',
+            [
+                'change_password' => [
+                    'currentPassword' => 'anything',
+                    'newPassword' => $password,
+                ],
+            ]
+        );
+
+        $this->assertResponseRedirects(
+            '/profile/change_password'
+        );
+    }
+
+    /**
+     * Valid password is saved.
+     */
+    public function testChangePasswordSavesValidPassword(): void
+    {
+        $client = static::createClient();
+
+        $profileService = $this->mockProfileService($client);
+
+        $user = $this->getUser($client);
+        $client->loginUser($user);
+
+        $profileService
+            ->method('canPasswordBeEmpty')
+            ->willReturn(true);
+
+        $profileService
+            ->method('isPasswordLongEnough')
+            ->willReturn(true);
+
+        $profileService
+            ->expects($this->once())
+            ->method('savePassword')
+            ->with(
+                $this->identicalTo($user),
+                'new-valid-password'
+            );
+
+        $client->request(
+            'POST',
+            '/profile/change_password',
+            [
+                'change_password' => [
+                    'currentPassword' => 'current-password',
+                    'newPassword' => 'new-valid-password',
+                ],
+            ]
+        );
+
+        $this->assertResponseRedirects('/profile');
+    }
+
+    /**
+     * Change email page can be displayed.
+     */
+    public function testChangeEmailGet(): void
+    {
+        $client = static::createClient();
+
+        $user = $this->getUser($client);
+        $client->loginUser($user);
+
+        $client->request(
+            'GET',
+            '/profile/change_email'
+        );
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('body', 'profile');
+    }
+
+    /**
+     * Empty email is rejected.
+     */
+    public function testChangeEmailRejectsEmptyEmail(): void
+    {
+        $client = static::createClient();
+
+        $profileService = $this->mockProfileService($client);
+
+        $profileService
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->with('')
+            ->willReturn(false);
+
+        $profileService
+            ->expects($this->never())
+            ->method('isEmailUnique');
+
+        $profileService
+            ->expects($this->never())
+            ->method('saveEmail');
+
+        $user = $this->getUser($client);
+        $client->loginUser($user);
+
+        $client->request(
+            'POST',
+            '/profile/change_email',
+            [
+                'change_email' => [
+                    'email' => '',
+                ],
+            ]
+        );
+
+        $this->assertResponseRedirects(
+            '/profile/change_email'
+        );
+    }
+
+    /**
+     * Duplicate email is rejected.
+     */
+    public function testChangeEmailRejectsDuplicateEmail(): void
+    {
+        $client = static::createClient();
+
+        $profileService = $this->mockProfileService($client);
+
+        $user = $this->getUser($client);
+        $email = 'duplicate@example.com';
+
+        $profileService
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->with($email)
+            ->willReturn(true);
+
+        $profileService
+            ->expects($this->once())
+            ->method('isEmailUnique')
+            ->with(
+                $this->identicalTo($user),
+                $email
+            )
+            ->willReturn(false);
+
+        $profileService
+            ->expects($this->never())
+            ->method('saveEmail');
+
+        $client->loginUser($user);
+
+        $client->request(
+            'POST',
+            '/profile/change_email',
+            [
+                'change_email' => [
+                    'email' => $email,
+                ],
+            ]
+        );
+
+        $this->assertResponseRedirects(
+            '/profile/change_email'
+        );
+    }
+
+    /**
+     * Valid email is saved.
+     */
+    public function testChangeEmailSavesValidEmail(): void
+    {
+        $client = static::createClient();
+
+        $profileService = $this->mockProfileService($client);
+
+        $user = $this->getUser($client);
+
+        $profileService
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $profileService
+            ->method('isEmailUnique')
+            ->willReturn(true);
+
+        $profileService
+            ->expects($this->once())
+            ->method('saveEmail')
+            ->with(
+                $this->identicalTo($user),
+                'new-profile-email@example.com'
+            );
+
+        $client->loginUser($user);
+
+        $client->request(
+            'POST',
+            '/profile/change_email',
+            [
+                'change_email' => [
+                    'email' => 'new-profile-email@example.com',
+                ],
+            ]
+        );
+
+        $this->assertResponseRedirects('/profile');
     }
 }

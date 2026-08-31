@@ -51,21 +51,6 @@ class ProfileController extends AbstractController
     }
 
     /**
-     * Edit action.
-     *
-     * @return Response HTTP response
-     */
-    #[Route(
-        '/edit',
-        name: 'app_profile_edit',
-        methods: ['GET', 'POST']
-    )]
-    public function edit(): Response
-    {
-        return $this->render('profile/edit.html.twig', []);
-    }
-
-    /**
      * Change password action.
      *
      * @param Request $request request
