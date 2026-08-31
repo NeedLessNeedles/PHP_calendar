@@ -6,6 +6,7 @@
 
 namespace App\Tests\Repository;
 
+use App\Entity\Category;
 use App\Repository\CategoryRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -61,5 +62,54 @@ class CategoryRepositoryTest extends KernelTestCase
             'FROM App\Entity\Category',
             $qb->getDQL()
         );
+    }
+
+    /**
+     * Test saving category.
+     */
+    public function testSave(): void
+    {
+        $category = new Category();
+        $category->setTitle(
+            'Repository test category'
+        );
+
+        $this->categoryRepository->save($category);
+        $this->assertNotNull($category->getId());
+        $savedCategory = $this->categoryRepository->find(
+            $category->getId()
+        );
+
+        $this->assertInstanceOf(
+            Category::class,
+            $savedCategory
+        );
+
+        $this->assertSame(
+            'Repository test category',
+            $savedCategory->getTitle()
+        );
+    }
+
+    /**
+     * Test deleting category.
+     */
+    public function testDelete(): void
+    {
+        $category = new Category();
+        $category->setTitle(
+            'Repository category to delete'
+        );
+
+        $this->categoryRepository->save($category);
+        $categoryId = $category->getId();
+        $this->assertNotNull($categoryId);
+        $this->categoryRepository->delete($category);
+
+        $deletedCategory = $this->categoryRepository->find(
+            $categoryId
+        );
+
+        $this->assertNull($deletedCategory);
     }
 }

@@ -6,6 +6,7 @@
 
 namespace App\Tests\Repository;
 
+use App\Entity\Tag;
 use App\Repository\TagRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -61,5 +62,53 @@ class TagRepositoryTest extends KernelTestCase
             'FROM App\Entity\Tag',
             $qb->getDQL()
         );
+    }
+
+    /**
+     * Test saving tag.
+     */
+    public function testSave(): void
+    {
+        $tag = new Tag();
+        $tag->setTitle(
+            'Repository test tag'
+        );
+
+        $this->tagRepository->save($tag);
+        $this->assertNotNull($tag->getId());
+        $savedTag = $this->tagRepository->find(
+            $tag->getId()
+        );
+
+        $this->assertInstanceOf(
+            Tag::class,
+            $savedTag
+        );
+        $this->assertSame(
+            'Repository test tag',
+            $savedTag->getTitle()
+        );
+    }
+
+    /**
+     * Test deleting tag.
+     */
+    public function testDelete(): void
+    {
+        $tag = new Tag();
+        $tag->setTitle(
+            'Repository tag to delete'
+        );
+
+        $this->tagRepository->save($tag);
+        $tagId = $tag->getId();
+        $this->assertNotNull($tagId);
+        $this->tagRepository->delete($tag);
+
+        $deletedTag = $this->tagRepository->find(
+            $tagId
+        );
+
+        $this->assertNull($deletedTag);
     }
 }
