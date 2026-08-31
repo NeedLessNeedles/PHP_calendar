@@ -115,8 +115,7 @@ class EventService implements EventServiceInterface
         }
         $event->setOwner($user);
 
-        $this->entityManager->persist($event);
-        $this->entityManager->flush();
+        $this->eventRepository->save($event);
     }
 
     /**

@@ -8,7 +8,6 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Form\EventType;
-use App\Repository\EventRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\TagRepository;
 use App\Service\EventServiceInterface;
@@ -17,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Security\Voter\EventVoter;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -294,84 +292,5 @@ class EventController extends AbstractController
                 'Content-Disposition' => 'attachment; filename="events.ics"',
             ]
         );
-    }
-
-    /**
-     * EventsJson action.
-     *
-     * @param EventRepository $eventRepository event repository
-     *
-     * @return JsonResponse JSON response
-     */
-    #[Route(
-        '/json',
-        name: 'app_event_json',
-        methods: ['GET']
-    )]
-    public function eventsJson(EventRepository $eventRepository): JsonResponse
-    {
-        $events = $eventRepository->findAll();
-
-        $data = [];
-        foreach ($events as $event) {
-            $data[] = [
-                'id' => $event->getId(),
-                'title' => $event->getTitle(),
-                'start' => $event->getStartDate()->format('Y-m-d\TH:i:s'),
-                'end' => $event->getEndDate()?->format('Y-m-d\TH:i:s'),
-                'status' => $event->getStatus(),
-            ];
-        }
-
-        return $this->json($data);
-    }
-
-    /**
-     * editEventJson action.
-     *
-     * @param Event $event event
-     *
-     * @return JsonResponse JSON response
-     */
-    #[Route(
-        '/{id}/json',
-        name: 'app_event_json_edit',
-        requirements: ['id' => '[1-9]\d*'],
-        methods: ['GET']
-    )]
-    public function editEventJson(Event $event): JsonResponse
-    {
-        return $this->json([
-            'id' => $event->getId(),
-            'title' => $event->getTitle(),
-            'description' => $event->getDescription(),
-            'location' => $event->getLocation(),
-            'startDate' => $event->getStartDate()?->format('Y-m-d\TH:i'),
-            'endDate' => $event->getEndDate()?->format('Y-m-d\TH:i'),
-            'category' => $event->getCategory()?->getId(),
-        ]);
-    }
-
-    /**
-     * Calendar action.
-     *
-     * @return Response HTTP response
-     */
-    #[Route(
-        '/calendar',
-        name: 'app_event_calendar',
-        methods: ['GET', 'POST']
-    )]
-    public function calendar(): Response
-    {
-        $event = new Event();
-        $event->setOwner($this->getUser());
-        $createForm = $this->createForm(EventType::class, new Event(), [
-            'action' => $this->generateUrl('app_event_new'),
-        ]);
-
-        return $this->render('event/calendar.html.twig', [
-            'createForm' => $createForm->createView(),
-        ]);
     }
 }

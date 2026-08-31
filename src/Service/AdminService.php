@@ -20,9 +20,9 @@ class AdminService implements AdminServiceInterface
     /**
      * Constructor.
      *
-     * @param UserPasswordHasherInterface $passwordHasher Password hasher
-     * @param UserRepository              $userRepository User repository
-     * @param EventRepository              $eventRepository event repository
+     * @param UserPasswordHasherInterface $passwordHasher  Password hasher
+     * @param UserRepository              $userRepository  User repository
+     * @param EventRepository             $eventRepository event repository
      */
     public function __construct(private readonly UserPasswordHasherInterface $passwordHasher, private readonly UserRepository $userRepository, private readonly EventRepository $eventRepository)
     {
@@ -115,9 +115,7 @@ class AdminService implements AdminServiceInterface
             $adminCount = $this->userRepository->countAdministrators();
 
             if ($adminCount <= 1) {
-                throw new \LogicException(
-                    'Cannot remove administrator role from the last administrator.'
-                );
+                throw new \LogicException('Cannot remove administrator role from the last administrator.');
             }
 
             $roles = array_filter(

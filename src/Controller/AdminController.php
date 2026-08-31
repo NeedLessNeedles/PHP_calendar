@@ -59,7 +59,7 @@ class AdminController extends AbstractController
     /**
      * Show action.
      *
-     * @param Request        $request        Request
+     * @param Request $request Request
      *
      * @return Response HTTP response
      */
@@ -81,7 +81,7 @@ class AdminController extends AbstractController
     /**
      * Edit action.
      *
-     * @param User                   $user          user
+     * @param User $user user
      *
      * @return Response HTTP response
      */
@@ -260,7 +260,7 @@ class AdminController extends AbstractController
     /**
      * Block action.
      *
-     * @param User                   $user          user
+     * @param User $user user
      *
      * @return Response HTTP response
      */
@@ -293,7 +293,7 @@ class AdminController extends AbstractController
     /**
      * Requests action.
      *
-     * @param Request         $request         request
+     * @param Request $request request
      *
      * @return Response HTTP response
      */
@@ -319,7 +319,7 @@ class AdminController extends AbstractController
     /**
      * Approve action.
      *
-     * @param Event                  $event         event
+     * @param Event $event event
      *
      * @return Response HTTP response
      */
@@ -345,7 +345,7 @@ class AdminController extends AbstractController
     /**
      * Reject action.
      *
-     * @param Event                  $event         event
+     * @param Event $event event
      *
      * @return Response HTTP response
      */
@@ -371,7 +371,7 @@ class AdminController extends AbstractController
     /**
      * Toggle administrator role.
      *
-     * @param User                   $user          User
+     * @param User $user User
      *
      * @return Response HTTP response
      */
