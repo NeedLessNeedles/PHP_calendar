@@ -55,4 +55,22 @@ interface ProfileServiceInterface
      * @return bool Result
      */
     public function isEmailUnique(User $user, ?string $email): bool;
+
+    /**
+     * Check User's password be empty?.
+     *
+     * @param string|null $password Password
+     *
+     * @return bool Result
+     */
+    public function canPasswordBeEmpty(?string $password): bool;
+
+    /**
+     * Check if password has at least 8 characters.
+     *
+     * @param string|null $password Password
+     *
+     * @return bool Result
+     */
+    public function isPasswordLongEnough(?string $password): bool;
 }

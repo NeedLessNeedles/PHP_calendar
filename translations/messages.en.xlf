@@ -479,7 +479,7 @@
       </trans-unit>
       <trans-unit id="message.but_at_least">
         <source>message.but_at_least</source>
-        <target>Your password should be at least 8 characters</target>
+        <target>Your password should be at least 8 characters!</target>
       </trans-unit>
 
       <trans-unit id="label.new_password">

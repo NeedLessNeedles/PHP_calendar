@@ -80,35 +80,29 @@ class ProfileController extends AbstractController
     public function changePassword(Request $request): Response
     {
         $user = $this->getUser();
-
         if (!$user instanceof User) {
             throw $this->createAccessDeniedException();
         }
-
-        $form = $this->createForm(
-            ChangePasswordType::class,
-            null,
-            [
-                'method' => 'POST',
-                'action' => $this->generateUrl('app_profile_change_password'),
-            ]
-        );
+        $form = $this->createForm(ChangePasswordType::class, null, ['method' => 'POST', 'action' => $this->generateUrl('app_profile_change_password')]);
         $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $newPassword = $form->get('newPassword')->getData();
+            if (!$this->profileService->canPasswordBeEmpty($newPassword)) {
+                $this->addFlash('warning', $this->translator->trans('message.input_fields'));
 
-            $this->profileService->savePassword(
-                $user,
-                $newPassword
-            );
+                return $this->redirectToRoute('app_profile_change_password');
+            }
+            if (!$this->profileService->isPasswordLongEnough($newPassword)) {
+                $this->addFlash('warning', $this->translator->trans('message.but_at_least'));
 
-            $this->addFlash(
-                'success',
-                $this->translator->trans('message.updated_successfully')
-            );
+                return $this->redirectToRoute('app_profile_change_password');
+            }
+            if ($form->isValid()) {
+                $this->profileService->savePassword($user, $newPassword);
+                $this->addFlash('success', $this->translator->trans('message.updated_successfully'));
 
-            return $this->redirectToRoute('app_profile_index');
+                return $this->redirectToRoute('app_profile_index');
+            }
         }
 
         return $this->render(

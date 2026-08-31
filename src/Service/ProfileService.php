@@ -87,11 +87,6 @@ class ProfileService implements ProfileServiceInterface
      */
     public function canBeEmpty(?string $email): bool
     {
-        //        if (null === $user->getEmail() || '' === trim($user->getEmail())) {
-        //            return false;
-        //        }
-        //
-        //        return true;
         return null !== $email && '' !== trim($email);
     }
 
@@ -105,8 +100,6 @@ class ProfileService implements ProfileServiceInterface
      */
     public function isEmailUnique(User $user, ?string $email): bool
     {
-        // $email = $user->getEmail();
-
         if (null === $email || '' === trim($email)) {
             return false;
         }
@@ -120,5 +113,29 @@ class ProfileService implements ProfileServiceInterface
         }
 
         return $existingUser->getId() === $user->getId();
+    }
+
+    /**
+     * Check User's password be empty?.
+     *
+     * @param string|null $password Password
+     *
+     * @return bool Result
+     */
+    public function canPasswordBeEmpty(?string $password): bool
+    {
+        return null !== $password && '' !== trim($password);
+    }
+
+    /**
+     * Check if password has at least 8 characters.
+     *
+     * @param string|null $password Password
+     *
+     * @return bool Result
+     */
+    public function isPasswordLongEnough(?string $password): bool
+    {
+        return null !== $password && mb_strlen($password) >= 8;
     }
 }
