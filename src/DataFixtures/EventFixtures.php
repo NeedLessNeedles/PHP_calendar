@@ -72,6 +72,25 @@ class EventFixtures extends AbstractBaseFixtures implements DependentFixtureInte
             $this->manager->persist($event);
         }
 
+        for ($i = 0; $i < 5; ++$i) {
+            $event = new Event();
+            $event->setTitle($this->faker->sentence);
+            $event->setDescription($this->faker->sentence);
+            $event->setLocation($this->faker->city());
+            $event->setStartDate(
+                $this->faker->dateTimeBetween('-10 days', '+1 days')
+            );
+            $event->setStatus('pending');
+            $event->setCategory(
+                $this->faker->randomElement($categories)
+            );
+            $randomTags = $this->faker->randomElements($tags, rand(1, 2));
+            foreach ($randomTags as $tag) {
+                $event->addTag($tag);
+            }
+            $this->manager->persist($event);
+        }
+
         $this->manager->flush();
     }
 }

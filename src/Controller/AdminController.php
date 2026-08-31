@@ -359,7 +359,6 @@ class AdminController extends AbstractController
      * Approve action.
      *
      * @param Event                  $event         event
-     * @param EntityManagerInterface $entityManager Entity Manager
      *
      * @return Response HTTP response
      */
@@ -369,11 +368,10 @@ class AdminController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['POST']
     )]
-    public function approve(Event $event, EntityManagerInterface $entityManager): Response
+    public function approve(Event $event): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $this->adminService->approveEvent($event);
-        $entityManager->flush();
 
         $this->addFlash(
             'success',
@@ -387,7 +385,6 @@ class AdminController extends AbstractController
      * Reject action.
      *
      * @param Event                  $event         event
-     * @param EntityManagerInterface $entityManager Entity Manager
      *
      * @return Response HTTP response
      */
@@ -397,11 +394,10 @@ class AdminController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['POST']
     )]
-    public function reject(Event $event, EntityManagerInterface $entityManager): Response
+    public function reject(Event $event): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $entityManager->remove($event);
-        $entityManager->flush();
+        $this->adminService->rejectEvent($event);
 
         $this->addFlash(
             'success',
@@ -415,7 +411,6 @@ class AdminController extends AbstractController
      * Toggle administrator role.
      *
      * @param User                   $user          User
-     * @param EntityManagerInterface $entityManager Entity manager
      *
      * @return Response HTTP response
      */
@@ -425,11 +420,10 @@ class AdminController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['POST']
     )]
-    public function toggleAdminRole(User $user, EntityManagerInterface $entityManager,): Response {
+    public function toggleAdminRole(User $user): Response
+    {
         try {
             $this->adminService->toggleAdminRole($user);
-
-            $entityManager->flush();
 
             $this->addFlash(
                 'success',
@@ -438,7 +432,7 @@ class AdminController extends AbstractController
         } catch (\LogicException $exception) {
             $this->addFlash(
                 'warning',
-                $exception->getMessage()
+                $this->translator->trans('message.validation_failed')
             );
         }
 
