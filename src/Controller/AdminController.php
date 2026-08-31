@@ -8,7 +8,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Event;
-use App\Form\ProfileEmailType;
+use App\Form\ProfileType;
 use App\Form\AdminChangePasswordType;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -101,7 +101,7 @@ class AdminController extends AbstractController
     public function edit(User $user, Request $request, EntityManagerInterface $entityManager): Response
     {
         // FORM: email
-        $emailForm = $this->createForm(ProfileEmailType::class, $user);
+        $emailForm = $this->createForm(ProfileType::class, $user);
         $emailForm->handleRequest($request);
 
         // FORM: password

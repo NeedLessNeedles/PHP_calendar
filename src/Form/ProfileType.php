@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ProfileEmail type.
+ * Profile type.
  */
 
 namespace App\Form;
@@ -13,9 +13,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class ProfileEmailType.
+ * Class ProfileType.
  */
-class ProfileEmailType extends AbstractType
+class ProfileType extends AbstractType
 {
     /**
      * Builds the form.
@@ -42,5 +42,20 @@ class ProfileEmailType extends AbstractType
         $resolver->setDefaults([
             'data_class' => User::class,
         ]);
+    }
+
+    /**
+     * Returns the prefix of the template block name for this type.
+     *
+     * The block prefix defaults to the underscored short class name with
+     * the "Type" suffix removed (e.g. "UserProfileType" => "user_profile").
+     *
+     * @return string The prefix of the template block name
+     *
+     * @psalm-return 'user'
+     */
+    public function getBlockPrefix(): string
+    {
+        return 'user';
     }
 }

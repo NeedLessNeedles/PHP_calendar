@@ -8,7 +8,6 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Form\EventType;
-use App\Form\EventEditType;
 use App\Repository\EventRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\TagRepository;
@@ -60,13 +59,6 @@ class EventController extends AbstractController
         $title = $request->query->get('title');
 
         $pagination = $this->eventService->getPaginatedList($page);
-        $createForm = $this->createForm(EventType::class, new Event(), [
-            'action' => $this->generateUrl('app_event_new'),
-        ]);
-
-        $editForm = $this->createForm(EventEditType::class, null, [
-            'action' => '#',
-        ]);
 
         return $this->render('event/index.html.twig', [
             'pagination' => $pagination,
@@ -74,8 +66,6 @@ class EventController extends AbstractController
             'currentCategory' => $categoryId ?: null,
             'tags' => $tagRepository->findAll(),
             'currentTag' => $tagId,
-            'createForm' => $createForm->createView(),
-            'editForm' => $editForm->createView(),
             'title' => $title,
         ]);
     }
@@ -374,13 +364,9 @@ class EventController extends AbstractController
         $createForm = $this->createForm(EventType::class, new Event(), [
             'action' => $this->generateUrl('app_event_new'),
         ]);
-        $editForm = $this->createForm(EventEditType::class, null, [
-            'action' => '#',
-        ]);
 
         return $this->render('event/calendar.html.twig', [
             'createForm' => $createForm->createView(),
-            'editForm' => $editForm->createView(),
         ]);
     }
 }

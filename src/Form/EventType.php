@@ -95,7 +95,7 @@ class EventType extends AbstractType
      *
      * @return string The prefix of the template block name
      *
-     * @psalm-return 'task'
+     * @psalm-return 'event'
      */
     public function getBlockPrefix(): string
     {

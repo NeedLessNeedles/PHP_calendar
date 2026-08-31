@@ -52,15 +52,29 @@ class ProfileService implements ProfileServiceInterface
     }
 
     /**
-     * Change password.
+     * Save password.
      *
      * @param User   $user     User
      * @param string $password Password
      */
-    public function changePassword(User $user, string $password): void
+    public function savePassword(User $user, string $password): void
     {
         $user->setPassword(
             $this->passwordHasher->hashPassword($user, $password)
         );
+        $this->userRepository->save($user);
+    }
+
+    /**
+     * Save email.
+     *
+     * @param User   $user     User
+     * @param string $email Email
+     */
+    public function saveEmail(User $user, string $email): void
+    {
+        $user->setEmail($email);
+
+        $this->userRepository->save($user);
     }
 }

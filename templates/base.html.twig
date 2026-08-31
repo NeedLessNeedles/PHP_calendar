@@ -65,7 +65,7 @@
             <a class="nav-link" href="{{ path('app_event_index') }}">{{ 'title.events'|trans }}</a>
             <a class="nav-link" href="{{ path('app_event_calendar') }}">{{ 'title.calendar'|trans }}</a>
             {% if app.user %}
-                <a class="nav-link" href="{{ path('app_profile') }}">{{ 'title.profile'|trans }}</a>
+                <a class="nav-link" href="{{ path('app_profile_index') }}">{{ 'title.profile'|trans }}</a>
             {% endif %}
             {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
                 <div class="dropdown">
