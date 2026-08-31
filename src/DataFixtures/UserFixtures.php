@@ -60,7 +60,7 @@ class UserFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
             $user->setRoles(['ROLE_ADMIN']);
             $hashedPassword = $this->passwordHasher->hashPassword(
                 $user,
-                'admin1234'
+                'admin123'
             );
             $user->setPassword($hashedPassword);
             $user->setIsBlocked(false);

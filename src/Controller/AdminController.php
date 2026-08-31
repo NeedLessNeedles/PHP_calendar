@@ -404,4 +404,38 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute('app_admin_requests');
     }
+
+    /**
+     * Toggle administrator role.
+     *
+     * @param User                   $user          User
+     * @param EntityManagerInterface $entityManager Entity manager
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/users/{id}/toggle-admin',
+        name: 'app_admin_users_toggle_admin',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['POST']
+    )]
+    public function toggleAdminRole(User $user, EntityManagerInterface $entityManager,): Response {
+        try {
+            $this->adminService->toggleAdminRole($user);
+
+            $entityManager->flush();
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.updated_successfully')
+            );
+        } catch (\LogicException $exception) {
+            $this->addFlash(
+                'warning',
+                $exception->getMessage()
+            );
+        }
+
+        return $this->redirectToRoute('app_admin_users');
+    }
 }

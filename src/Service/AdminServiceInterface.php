@@ -36,4 +36,18 @@ interface AdminServiceInterface
      * @param User $currentUser Current user
      */
     public function toggleBlock(User $targetUser, User $currentUser): void;
+
+    /**
+     * Count administrators.
+     *
+     * @return int Number of administrators
+     */
+    public function countAdmins(): int;
+
+    /**
+     * Toggle administrator role.
+     *
+     * @param User $targetUser Target user
+     */
+    public function toggleAdminRole(User $targetUser): void;
 }

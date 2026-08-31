@@ -9,6 +9,7 @@ namespace App\Service;
 use App\Entity\User;
 use App\Entity\Event;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Repository\UserRepository;
 
 /**
  * Class AdminService.
@@ -19,8 +20,9 @@ class AdminService implements AdminServiceInterface
      * Constructor.
      *
      * @param UserPasswordHasherInterface $passwordHasher Password hasher
+     * @param UserRepository              $userRepository User repository
      */
-    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher, private readonly UserRepository $userRepository)
     {
     }
 
@@ -64,5 +66,52 @@ class AdminService implements AdminServiceInterface
         }
 
         $targetUser->setIsBlocked(!$targetUser->isBlocked());
+    }
+
+    /**
+     * Count administrators.
+     *
+     * @return int Number of administrators
+     */
+    public function countAdmins(): int
+    {
+        $users = $this->userRepository->findAll();
+
+        $adminsCount = 0;
+
+        foreach ($users as $user) {
+            if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+                ++$adminsCount;
+            }
+        }
+
+        return $adminsCount;
+    }
+
+    /**
+     * Toggle administrator role.
+     *
+     * @param User $targetUser Target user
+     */
+    public function toggleAdminRole(User $targetUser): void
+    {
+        $roles = $targetUser->getRoles();
+
+        if (in_array('ROLE_ADMIN', $roles, true)) {
+            if ($this->countAdmins() <= 1) {
+                throw new \LogicException('Cannot remove administrator role from the last administrator.');
+            }
+
+            $roles = array_filter(
+                $roles,
+                static fn (string $role): bool => 'ROLE_ADMIN' !== $role
+            );
+        } else {
+            $roles[] = 'ROLE_ADMIN';
+        }
+
+        $targetUser->setRoles(
+            array_values(array_unique($roles))
+        );
     }
 }

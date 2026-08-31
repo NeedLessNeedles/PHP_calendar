@@ -183,6 +183,14 @@
         <source>button.export</source>
         <target>Export to ICS</target>
       </trans-unit>
+      <trans-unit id="button.promote">
+        <source>button.promote</source>
+        <target>Promote</target>
+      </trans-unit>
+      <trans-unit id="button.degrade">
+        <source>button.degrade</source>
+        <target>Degrade</target>
+      </trans-unit>
 
       <!-- /home -->
       <trans-unit id="text.welcome_home">

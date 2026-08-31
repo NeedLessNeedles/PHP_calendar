@@ -36,7 +36,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Email.
      */
-    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
     #[Assert\Email]
     private ?string $email = null;
 
@@ -116,7 +116,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
