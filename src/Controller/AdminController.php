@@ -8,9 +8,11 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Event;
-use App\Form\ProfileType;
-use App\Form\AdminChangePasswordType;
 use App\Repository\UserRepository;
+use App\Form\ProfileType;
+use App\Form\ChangePasswordType;
+use App\Form\ChangeEmailType;
+use App\Form\AdminChangePasswordType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -111,16 +113,6 @@ class AdminController extends AbstractController
         // email update
         if ($emailForm->isSubmitted() && $emailForm->isValid()) {
             $entityManager->flush();
-
-            $this->addFlash(
-                'success',
-                $this->translator->trans('message.updated_successfully')
-            );
-        } else {
-            $this->addFlash(
-                'error',
-                $this->translator->trans('message.validation_failed')
-            );
         }
 
         // password update
@@ -131,23 +123,173 @@ class AdminController extends AbstractController
                 $user,
                 $data['newPassword']
             );
-            $entityManager->flush();
 
-            $this->addFlash(
-                'success',
-                $this->translator->trans('message.updated_successfully')
-            );
-        } else {
-            $this->addFlash(
-                'error',
-                $this->translator->trans('message.validation_failed')
-            );
+            $entityManager->flush();
         }
 
         return $this->render('admin/edit.html.twig', [
             'user' => $user,
             'emailForm' => $emailForm,
             'passwordForm' => $passwordForm,
+        ]);
+    }
+
+    /**
+     * Change user email action.
+     *
+     * @param Request $request Request
+     * @param User    $user    User
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/users/{id}/change_email',
+        name: 'app_admin_users_change_email',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['GET', 'POST']
+    )]
+    public function changeEmail(Request $request, User $user): Response
+    {
+        $form = $this->createForm(
+            ChangeEmailType::class,
+            null,
+            [
+                'method' => 'POST',
+                'action' => $this->generateUrl(
+                    'app_admin_users_change_email',
+                    ['id' => $user->getId()]
+                ),
+            ]
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $email = $form->get('email')->getData();
+
+            if (!$this->profileService->canBeEmpty($email)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.input_fields')
+                );
+
+                return $this->redirectToRoute(
+                    'app_admin_users_change_email',
+                    ['id' => $user->getId()]
+                );
+            }
+
+            if (!$this->profileService->isEmailUnique($user, $email)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.email_already_exists')
+                );
+
+                return $this->redirectToRoute(
+                    'app_admin_users_change_email',
+                    ['id' => $user->getId()]
+                );
+            }
+
+            if ($form->isValid()) {
+                $this->profileService->saveEmail($user, $email);
+
+                $this->addFlash(
+                    'success',
+                    $this->translator->trans('message.updated_successfully')
+                );
+
+                return $this->redirectToRoute(
+                    'app_admin_users_edit',
+                    ['id' => $user->getId()]
+                );
+            }
+        }
+
+        return $this->render('admin/change_email.html.twig', [
+            'form' => $form->createView(),
+            'user' => $user,
+        ]);
+    }
+
+    /**
+     * Change user password action.
+     *
+     * @param Request $request Request
+     * @param User    $user    User
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/users/{id}/change_password',
+        name: 'app_admin_users_change_password',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['GET', 'POST']
+    )]
+    public function changePassword(Request $request, User $user): Response
+    {
+        $form = $this->createForm(
+            AdminChangePasswordType::class,
+            null,
+            [
+                'method' => 'POST',
+                'action' => $this->generateUrl(
+                    'app_admin_users_change_password',
+                    ['id' => $user->getId()]
+                ),
+            ]
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $newPassword = $form->get('newPassword')->getData();
+
+            if (!$this->profileService->canPasswordBeEmpty($newPassword)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.input_fields')
+                );
+
+                return $this->redirectToRoute(
+                    'app_admin_users_change_password',
+                    ['id' => $user->getId()]
+                );
+            }
+
+            if (!$this->profileService->isPasswordLongEnough($newPassword)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.but_at_least')
+                );
+
+                return $this->redirectToRoute(
+                    'app_admin_users_change_password',
+                    ['id' => $user->getId()]
+                );
+            }
+
+            if ($form->isValid()) {
+                $this->profileService->savePassword(
+                    $user,
+                    $newPassword
+                );
+
+                $this->addFlash(
+                    'success',
+                    $this->translator->trans('message.updated_successfully')
+                );
+
+                return $this->redirectToRoute(
+                    'app_admin_users_edit',
+                    ['id' => $user->getId()]
+                );
+            }
+        }
+
+        return $this->render('admin/change_password.html.twig', [
+            'form' => $form->createView(),
+            'user' => $user,
         ]);
     }
 

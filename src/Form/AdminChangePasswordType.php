@@ -29,18 +29,13 @@ class AdminChangePasswordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('newPassword', RepeatedType::class, [
-                'type' => PasswordType::class,
-                'constraints' => [
-                    new NotBlank(),
-                ],
-                'first_options' => [
-                    'label' => 'New password',
-                ],
-                'second_options' => [
-                    'label' => 'Repeat password',
-                ],
-            ]);
+            ->add(
+                'newPassword',
+                PasswordType::class,
+                [
+                    'mapped' => false,
+                ]
+            );
     }
 
     /**
