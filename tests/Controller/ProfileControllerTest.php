@@ -17,11 +17,26 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class ProfileControllerTest extends WebTestCase
 {
+
+    /**
+     * Helper.
+     *
+     * @param User $client client
+     *
+     * @return EntityManagerInterface Entity manager interface
+     */
     private function getEntityManager($client): EntityManagerInterface
     {
         return $client->getContainer()->get(EntityManagerInterface::class);
     }
 
+    /**
+     * Helper.
+     *
+     * @param User $client client
+     *
+     * @return User user
+     */
     private function getUser($client): User
     {
         $user = $this->getEntityManager($client)
@@ -35,6 +50,26 @@ class ProfileControllerTest extends WebTestCase
         return $user;
     }
 
+    /**
+     * Helper.
+     */
+    private function getCsrfToken($client, string $url, string $selector): string
+    {
+        $client->request('GET', $url);
+
+        $token = $client->getCrawler()
+            ->filter($selector)
+            ->attr('value');
+
+        $this->assertNotNull($token);
+
+        return $token;
+
+    }
+
+    /**
+     * Helper.
+     */
     private function mockProfileService($client): ProfileServiceInterface&MockObject
     {
         $service = $this->createMock(ProfileServiceInterface::class);
@@ -80,6 +115,9 @@ class ProfileControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    /**
+     * Test for changing password.
+     */
     public function testChangePasswordRequiresLogin(): void
     {
         $client = static::createClient();
@@ -92,6 +130,9 @@ class ProfileControllerTest extends WebTestCase
         $this->assertResponseStatusCodeSame(403);
     }
 
+    /**
+     * Test for changing email.
+     */
     public function testChangeEmailRequiresLogin(): void
     {
         $client = static::createClient();
@@ -104,7 +145,90 @@ class ProfileControllerTest extends WebTestCase
         $this->assertResponseStatusCodeSame(403);
     }
 
+    /**
+     * Test for changing password.
+     */
+    public function testChangePasswordInvalidForm(): void
+    {
+        $client = static::createClient();
 
+        $profileService = $this->mockProfileService($client);
+
+        $password = 'valid-password';
+
+        $profileService
+            ->expects($this->once())
+            ->method('canPasswordBeEmpty')
+            ->with($password)
+            ->willReturn(true);
+
+        $profileService
+            ->expects($this->once())
+            ->method('isPasswordLongEnough')
+            ->with($password)
+            ->willReturn(true);
+
+        $profileService
+            ->expects($this->never())
+            ->method('savePassword');
+
+        $user = $this->getUser($client);
+        $client->loginUser($user);
+
+        $client->request(
+            'POST',
+            '/profile/change_password',
+            [
+                'change_password' => [
+                    'newPassword' => $password,
+                ],
+            ]
+        );
+
+        $this->assertResponseStatusCodeSame(200);
+    }
+
+    /**
+     * Test for changing email.
+     */
+    public function testChangeEmailInvalidForm(): void
+    {
+        $client = static::createClient();
+
+        $profileService = $this->mockProfileService($client);
+
+        $email = 'not-an-email';
+
+        $profileService
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->with($email)
+            ->willReturn(true);
+
+        $profileService
+            ->expects($this->once())
+            ->method('isEmailUnique')
+            ->willReturn(true);
+
+        $profileService
+            ->expects($this->never())
+            ->method('saveEmail');
+
+        $user = $this->getUser($client);
+        $client->loginUser($user);
+
+        $client->request(
+            'POST',
+            '/profile/change_email',
+            [
+                'change_email' => [
+                    'email' => $email,
+                ],
+            ]
+        );
+
+        $this->assertResponseStatusCodeSame(200);
+    }
 
     /**
      * Empty password is rejected.
@@ -204,14 +328,18 @@ class ProfileControllerTest extends WebTestCase
         $profileService = $this->mockProfileService($client);
 
         $user = $this->getUser($client);
-        $client->loginUser($user);
+        $password = 'new-valid-password';
 
         $profileService
+            ->expects($this->once())
             ->method('canPasswordBeEmpty')
+            ->with($password)
             ->willReturn(true);
 
         $profileService
+            ->expects($this->once())
             ->method('isPasswordLongEnough')
+            ->with($password)
             ->willReturn(true);
 
         $profileService
@@ -219,16 +347,25 @@ class ProfileControllerTest extends WebTestCase
             ->method('savePassword')
             ->with(
                 $this->identicalTo($user),
-                'new-valid-password'
+                $password
             );
+
+        $client->loginUser($user);
+
+        $token = $this->getCsrfToken(
+            $client,
+            '/profile/change_password',
+            'input[name="change_password[_token]"]'
+        );
 
         $client->request(
             'POST',
             '/profile/change_password',
             [
                 'change_password' => [
-                    'currentPassword' => 'current-password',
-                    'newPassword' => 'new-valid-password',
+                    'currentPassword' => 'anything',
+                    'newPassword' => $password,
+                    '_token' => $token,
                 ],
             ]
         );
@@ -353,13 +490,21 @@ class ProfileControllerTest extends WebTestCase
         $profileService = $this->mockProfileService($client);
 
         $user = $this->getUser($client);
+        $email = 'new-profile-email@example.com';
 
         $profileService
+            ->expects($this->once())
             ->method('canBeEmpty')
+            ->with($email)
             ->willReturn(true);
 
         $profileService
+            ->expects($this->once())
             ->method('isEmailUnique')
+            ->with(
+                $this->identicalTo($user),
+                $email
+            )
             ->willReturn(true);
 
         $profileService
@@ -367,17 +512,24 @@ class ProfileControllerTest extends WebTestCase
             ->method('saveEmail')
             ->with(
                 $this->identicalTo($user),
-                'new-profile-email@example.com'
+                $email
             );
 
         $client->loginUser($user);
+
+        $token = $this->getCsrfToken(
+            $client,
+            '/profile/change_email',
+            'input[name="change_email[_token]"]'
+        );
 
         $client->request(
             'POST',
             '/profile/change_email',
             [
                 'change_email' => [
-                    'email' => 'new-profile-email@example.com',
+                    'email' => $email,
+                    '_token' => $token,
                 ],
             ]
         );
