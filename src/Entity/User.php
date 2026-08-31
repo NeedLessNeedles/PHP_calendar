@@ -35,8 +35,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Email.
-     *
-     * @var string|null
      */
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     #[Assert\Email]
@@ -52,16 +50,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Hashed password.
-     *
-     * @var string|null
      */
     #[ORM\Column]
     private ?string $password = null;
 
     /**
-     * Block status
-     *
-     * @var bool
+     * Block status.
      */
     #[ORM\Column(type: 'boolean')]
     private bool $isBlocked = false;

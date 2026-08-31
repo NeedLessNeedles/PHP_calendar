@@ -68,7 +68,7 @@ class ProfileService implements ProfileServiceInterface
     /**
      * Save email.
      *
-     * @param User   $user     User
+     * @param User   $user  User
      * @param string $email Email
      */
     public function saveEmail(User $user, string $email): void
@@ -76,5 +76,49 @@ class ProfileService implements ProfileServiceInterface
         $user->setEmail($email);
 
         $this->userRepository->save($user);
+    }
+
+    /**
+     * Can User's email be empty?
+     *
+     * @param string|null $email Email
+     *
+     * @return bool Result
+     */
+    public function canBeEmpty(?string $email): bool
+    {
+        //        if (null === $user->getEmail() || '' === trim($user->getEmail())) {
+        //            return false;
+        //        }
+        //
+        //        return true;
+        return null !== $email && '' !== trim($email);
+    }
+
+    /**
+     * Check whether User's email is unique.
+     *
+     * @param User        $user  User entity
+     * @param string|null $email Email
+     *
+     * @return bool Result
+     */
+    public function isEmailUnique(User $user, ?string $email): bool
+    {
+        // $email = $user->getEmail();
+
+        if (null === $email || '' === trim($email)) {
+            return false;
+        }
+
+        $existingUser = $this->userRepository->findOneBy([
+            'email' => $email,
+        ]);
+
+        if (null === $existingUser) {
+            return true;
+        }
+
+        return $existingUser->getId() === $user->getId();
     }
 }

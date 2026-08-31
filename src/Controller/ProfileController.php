@@ -11,9 +11,7 @@ use App\Form\ChangeEmailType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use App\Form\ProfileType;
 use App\Form\ChangePasswordType;
 use App\Service\ProfileServiceInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -36,9 +34,6 @@ class ProfileController extends AbstractController
 
     /**
      * Index action.
-     *
-     * @param Request                $request       request
-     * @param EntityManagerInterface $entityManager entityManager
      *
      * @return Response HTTP response
      */
@@ -156,20 +151,22 @@ class ProfileController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $email = $form->get('email')->getData();
+            if (!$this->profileService->canBeEmpty($email)) {
+                $this->addFlash('warning', $this->translator->trans('message.input_fields'));
 
-            $this->profileService->saveEmail(
-                $user,
-                $email
-            );
+                return $this->redirectToRoute('app_profile_change_email');
+            } if (!$this->profileService->isEmailUnique($user, $email)) {
+                $this->addFlash('warning', $this->translator->trans('message.title_already_exists'));
 
-            $this->addFlash(
-                'success',
-                $this->translator->trans('message.updated_successfully')
-            );
+                return $this->redirectToRoute('app_profile_change_email');
+            } if ($form->isValid()) {
+                $this->profileService->saveEmail($user, $email);
+                $this->addFlash('success', $this->translator->trans('message.updated_successfully'));
 
-            return $this->redirectToRoute('app_profile_index');
+                return $this->redirectToRoute('app_profile_index');
+            }
         }
 
         return $this->render(

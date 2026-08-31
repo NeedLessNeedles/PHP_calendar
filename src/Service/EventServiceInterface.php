@@ -32,7 +32,7 @@ interface EventServiceInterface
      * Save entity.
      *
      * @param Event $event Event entity
-     * @param User $user User entity
+     * @param User  $user  User entity
      */
     public function save(Event $event, ?User $user): void;
 

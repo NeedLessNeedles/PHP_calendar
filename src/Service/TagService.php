@@ -6,7 +6,6 @@
 
 namespace App\Service;
 
-use App\Entity\Category;
 use App\Entity\Tag;
 use App\Repository\TagRepository;
 use Knp\Component\Pager\Pagination\PaginationInterface;
