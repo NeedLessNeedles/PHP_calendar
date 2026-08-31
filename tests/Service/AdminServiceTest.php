@@ -8,36 +8,45 @@ namespace App\Tests\Service;
 
 use App\Entity\Event;
 use App\Entity\User;
-use App\Service\AdminService;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use App\Service\AdminService;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * Class AdminServiceTest.
  */
-class AdminServiceTest extends KernelTestCase
+class AdminServiceTest extends TestCase
 {
-    private AdminService $adminService;
+    private UserRepository $userRepository;
 
-    /**
-     * Constructor test.
-     */
-    public function testServiceCanBeCreated(): void
-    {
-        self::bootKernel();
-        $service = self::getContainer()->get(AdminService::class);
+    private EventRepository $eventRepository;
 
-        $this->assertInstanceOf(AdminService::class, $service);
-    }
+    private UserPasswordHasherInterface $passwordHasher;
+
+    private AdminService $service;
 
     /**
      * Test setup.
      */
     protected function setUp(): void
     {
-        self::bootKernel();
-        $this->adminService = self::getContainer()->get(AdminService::class);
+        $this->userRepository = $this->createStub(
+            UserRepository::class
+        );
+        $this->eventRepository = $this->createStub(
+            EventRepository::class
+        );
+        $this->passwordHasher = $this->createStub(
+            UserPasswordHasherInterface::class
+        );
+
+        $this->service = new AdminService(
+            $this->passwordHasher,
+            $this->userRepository,
+            $this->eventRepository
+        );
     }
 
     /**
@@ -46,81 +55,417 @@ class AdminServiceTest extends KernelTestCase
     public function testChangePassword(): void
     {
         $user = new User();
-        $user->setEmail('test@test.com');
 
-        $this->adminService->changePassword($user, 'plain-password');
-        $this->assertNotEmpty($user->getPassword());
-        $this->assertNotSame('plain-password', $user->getPassword());
+        $passwordHasher = $this->createMock(
+            UserPasswordHasherInterface::class
+        );
+
+        $passwordHasher
+            ->expects($this->once())
+            ->method('hashPassword')
+            ->with($user, 'plain-password')
+            ->willReturn('hashed-password');
+
+        $this->service = new AdminService(
+            $passwordHasher,
+            $this->userRepository,
+            $this->eventRepository
+        );
+
+        $this->service->changePassword(
+            $user,
+            'plain-password'
+        );
+
+        $this->assertSame(
+            'hashed-password',
+            $user->getPassword()
+        );
     }
 
-    /** * Test for approving the pending event. */
+    /**
+     * Test for approving event.
+     */
     public function testApproveEvent(): void
     {
         $event = new Event();
-
         $event->setStatus('pending');
-        $event->setTitle('Test event');
-        $eventRepository = $this->createMock(EventRepository::class);
-        $eventRepository->expects($this->once())->method('save')->with($this->identicalTo($event));
-        $adminService = new AdminService(self::getContainer()->get(\Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface::class), self::getContainer()->get(UserRepository::class), $eventRepository);
-        $adminService->approveEvent($event);
-        $this->assertSame('approved', $event->getStatus());
+
+        $eventRepository = $this->createMock(
+            EventRepository::class
+        );
+
+        $eventRepository
+            ->expects($this->once())
+            ->method('save')
+            ->with($event);
+
+        $this->service = new AdminService(
+            $this->passwordHasher,
+            $this->userRepository,
+            $eventRepository
+        );
+
+        $this->service->approveEvent($event);
+
+        $this->assertSame(
+            'approved',
+            $event->getStatus()
+        );
     }
 
     /**
-     * Test for blocking the user.
+     * Test for rejecting event.
      */
-    public function testToggleBlock(): void
+    public function testRejectEvent(): void
     {
-        $admin = new User();
-        $admin->setEmail('admin@test.com');
-        $user = new User();
-        $user->setEmail('user@test.com');
-        $reflection = new \ReflectionClass($admin);
-        $prop = $reflection->getProperty('roles');
-        $prop->setValue($admin, ['ROLE_ADMIN']);
+        $event = new Event();
 
-        $this->expectException(\LogicException::class);
-        $this->adminService->toggleBlock($user, $admin);
+        $eventRepository = $this->createMock(
+            EventRepository::class
+        );
+
+        $eventRepository
+            ->expects($this->once())
+            ->method('delete')
+            ->with($event);
+
+        $this->service = new AdminService(
+            $this->passwordHasher,
+            $this->userRepository,
+            $eventRepository
+        );
+
+        $this->service->rejectEvent($event);
     }
 
     /**
-     * Tests if admin can block himself.
+     * Test that user cannot block himself.
      */
-    public function testToggleBlockSelf(): void
+    public function testToggleBlockThrowsWhenBlockingSelf(): void
     {
         $user = new User();
-        $user->setEmail('test@test.com');
 
+        $this->setUserId($user, 1);
+
+        $this->expectException(
+            \LogicException::class
+        );
+
+        $this->expectExceptionMessage(
+            'You cannot block yourself.'
+        );
+
+        $this->service->toggleBlock(
+            $user,
+            $user
+        );
+    }
+
+    /**
+     * Test that user cannot block another admin.
+     */
+    public function testToggleBlockThrowsWhenTargetIsAdmin(): void
+    {
+        $targetUser = new User();
+        $targetUser->setRoles(['ROLE_ADMIN']);
+
+        $currentUser = new User();
+
+        $this->setUserId($targetUser, 1);
+        $this->setUserId($currentUser, 2);
+
+        $this->expectException(
+            \LogicException::class
+        );
+
+        $this->expectExceptionMessage(
+            'You cannot block another admin.'
+        );
+
+        $this->service->toggleBlock(
+            $targetUser,
+            $currentUser
+        );
+    }
+
+    /**
+     * Test for blocking user.
+     */
+    public function testToggleBlockBlocksUser(): void
+    {
+        $targetUser = new User();
+        $targetUser->setIsBlocked(false);
+
+        $currentUser = new User();
+
+        $this->setUserId($targetUser, 1);
+        $this->setUserId($currentUser, 2);
+
+        $userRepository = $this->createMock(
+            UserRepository::class
+        );
+
+        $userRepository
+            ->expects($this->once())
+            ->method('save')
+            ->with($targetUser);
+
+        $this->service = new AdminService(
+            $this->passwordHasher,
+            $userRepository,
+            $this->eventRepository
+        );
+
+        $this->service->toggleBlock(
+            $targetUser,
+            $currentUser
+        );
+
+        $this->assertTrue(
+            $targetUser->isBlocked()
+        );
+    }
+
+    /**
+     * Test for unblocking user.
+     */
+    public function testToggleBlockUnblocksUser(): void
+    {
+        $targetUser = new User();
+        $targetUser->setIsBlocked(true);
+
+        $currentUser = new User();
+
+        $this->setUserId($targetUser, 1);
+        $this->setUserId($currentUser, 2);
+
+        $userRepository = $this->createMock(
+            UserRepository::class
+        );
+
+        $userRepository
+            ->expects($this->once())
+            ->method('save')
+            ->with($targetUser);
+
+        $this->service = new AdminService(
+            $this->passwordHasher,
+            $userRepository,
+            $this->eventRepository
+        );
+
+        $this->service->toggleBlock(
+            $targetUser,
+            $currentUser
+        );
+
+        $this->assertFalse(
+            $targetUser->isBlocked()
+        );
+    }
+
+    /**
+     * Test counting administrators.
+     */
+    public function testCountAdmins(): void
+    {
+        $adminOne = new User();
+        $adminOne->setRoles([
+            'ROLE_USER',
+            'ROLE_ADMIN',
+        ]);
+
+        $user = new User();
+        $user->setRoles([
+            'ROLE_USER',
+        ]);
+
+        $adminTwo = new User();
+        $adminTwo->setRoles([
+            'ROLE_ADMIN',
+        ]);
+
+        $userRepository = $this->createMock(
+            UserRepository::class
+        );
+
+        $userRepository
+            ->expects($this->once())
+            ->method('findAll')
+            ->willReturn([
+                $adminOne,
+                $user,
+                $adminTwo,
+            ]);
+
+        $this->service = new AdminService(
+            $this->passwordHasher,
+            $userRepository,
+            $this->eventRepository
+        );
+
+        $this->assertSame(
+            2,
+            $this->service->countAdmins()
+        );
+    }
+
+    /**
+     * Test counting administrators when there are none.
+     */
+    public function testCountAdminsReturnsZero(): void
+    {
+        $userOne = new User();
+        $userOne->setRoles(['ROLE_USER']);
+
+        $userTwo = new User();
+        $userTwo->setRoles(['ROLE_USER']);
+
+        $userRepository = $this->createMock(
+            UserRepository::class
+        );
+
+        $userRepository
+            ->expects($this->once())
+            ->method('findAll')
+            ->willReturn([
+                $userOne,
+                $userTwo,
+            ]);
+
+        $this->service = new AdminService(
+            $this->passwordHasher,
+            $userRepository,
+            $this->eventRepository
+        );
+
+        $this->assertSame(
+            0,
+            $this->service->countAdmins()
+        );
+    }
+
+    /**
+     * Test adding administrator role.
+     */
+    public function testToggleAdminRoleAddsAdminRole(): void
+    {
+        $user = new User();
+        $user->setRoles(['ROLE_USER']);
+
+        $userRepository = $this->createMock(
+            UserRepository::class
+        );
+
+        $userRepository
+            ->expects($this->once())
+            ->method('save')
+            ->with($user);
+
+        $this->service = new AdminService(
+            $this->passwordHasher,
+            $userRepository,
+            $this->eventRepository
+        );
+
+        $this->service->toggleAdminRole($user);
+
+        $this->assertContains(
+            'ROLE_ADMIN',
+            $user->getRoles()
+        );
+    }
+
+    /**
+     * Test removing administrator role.
+     */
+    public function testToggleAdminRoleRemovesAdminRole(): void
+    {
+        $user = new User();
+        $user->setRoles([
+            'ROLE_USER',
+            'ROLE_ADMIN',
+        ]);
+
+        $userRepository = $this->createMock(
+            UserRepository::class
+        );
+
+        $userRepository
+            ->expects($this->once())
+            ->method('countAdministrators')
+            ->willReturn(2);
+
+        $userRepository
+            ->expects($this->once())
+            ->method('save')
+            ->with($user);
+
+        $this->service = new AdminService(
+            $this->passwordHasher,
+            $userRepository,
+            $this->eventRepository
+        );
+
+        $this->service->toggleAdminRole($user);
+
+        $this->assertNotContains(
+            'ROLE_ADMIN',
+            $user->getRoles()
+        );
+
+        $this->assertSame(
+            ['ROLE_USER'],
+            $user->getRoles()
+        );
+    }
+
+    /**
+     * Test if the last administrator cannot lose admin role.
+     */
+    public function testToggleAdminRoleThrowsForLastAdmin(): void
+    {
+        $user = new User();
+        $user->setRoles([
+            'ROLE_ADMIN',
+        ]);
+        $userRepository = $this->createMock(
+            UserRepository::class
+        );
+        $userRepository
+            ->expects($this->once())
+            ->method('countAdministrators')
+            ->willReturn(1);
+        $userRepository
+            ->expects($this->never())
+            ->method('save');
+        $this->service = new AdminService(
+            $this->passwordHasher,
+            $userRepository,
+            $this->eventRepository
+        );
+        $this->expectException(
+            \LogicException::class
+        );
+        $this->expectExceptionMessage(
+            'Cannot remove administrator role from the last administrator.'
+        );
+
+        $this->service->toggleAdminRole($user);
+    }
+
+    /**
+     * Set user ID for tests.
+     *
+     * @param User $user User
+     * @param int  $id   ID
+     */
+    private function setUserId(User $user, int $id): void
+    {
         $reflection = new \ReflectionClass($user);
-        $prop = $reflection->getProperty('id');
-        $prop->setValue($user, 1);
+        $property = $reflection->getProperty('id');
 
-        $this->expectException(\LogicException::class);
-
-        $this->adminService->toggleBlock($user, $user);
-    }
-
-    /**
-     * Test for blocking.
-     */
-    public function testToggleBlockSuccess(): void
-    {
-        $target = new User();
-
-        $target->setEmail('target@test.com');
-        $current = new User();
-        $current->setEmail('admin@test.com');
-        $reflection = new \ReflectionClass(User::class);
-        $targetId = $reflection->getProperty('id');
-        $targetId->setValue($target, 1);
-        $currentId = $reflection->getProperty('id');
-        $currentId->setValue($current, 2);
-        $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->expects($this->once())->method('save')->with($this->identicalTo($target));
-        $adminService = new AdminService(self::getContainer()->get(\Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface::class), $userRepository, self::getContainer()->get(EventRepository::class));
-        $this->assertFalse($target->isBlocked());
-        $adminService->toggleBlock($target, $current);
-        $this->assertTrue($target->isBlocked());
+        $property->setValue($user, $id);
     }
 }

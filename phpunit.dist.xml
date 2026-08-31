@@ -33,8 +33,8 @@
             <directory>src</directory>
         </include>
         <exclude>
-            <directory>tests/DataFixtures</directory>
-<!--            <directory>tests/Repository</directory>-->
+            <directory>src/DataFixtures</directory>
+            <directory>src/Security</directory>
         </exclude>
 
         <deprecationTrigger>
