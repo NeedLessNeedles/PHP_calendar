@@ -8,6 +8,8 @@ namespace App\Service;
 
 use App\Entity\Event;
 use App\Entity\User;
+use App\Entity\Category;
+use App\Entity\Tag;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 
 /**
@@ -27,6 +29,20 @@ interface EventServiceInterface
      * @return PaginationInterface Paginated list
      */
     public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): PaginationInterface;
+
+    /**
+     * Get all categories.
+     *
+     * @return Category[] Categories
+     */
+    public function getCategories(): array;
+
+    /**
+     * Get all tags.
+     *
+     * @return Tag[] Tags
+     */
+    public function getTags(): array;
 
     /**
      * Save entity.

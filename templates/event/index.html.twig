@@ -15,12 +15,20 @@
                     class="form-select"
                     onchange="location = this.value"
                 >
-                    <option value="{{ path('app_event_index') }}"
+                    <option value="{{ path('app_event_index', {
+                        tagId: currentTag,
+                        title: title
+                    }) }}"
                             {% if currentCategory is null %}selected{% endif %}>
                         {{ 'option.all'|trans }}
                     </option>
+
                     {% for category in categories %}
-                        <option value="{{ path('app_event_index', {categoryId: category.id}) }}"
+                        <option value="{{ path('app_event_index', {
+                            categoryId: category.id,
+                            tagId: currentTag,
+                            title: title
+                        }) }}"
                                 {% if currentCategory == category.id %}selected{% endif %}>
                             {{ category.title }}
                         </option>

@@ -145,6 +145,103 @@ class EventRepositoryTest extends KernelTestCase
     }
 
     /**
+     * Test saving event.
+     */
+    public function testSave(): void
+    {
+        $category = $this->entityManager
+            ->getRepository(Category::class)
+            ->findOneBy([]);
+
+        $this->assertInstanceOf(Category::class, $category);
+
+        $event = new Event();
+        $event->setTitle('Repository test event');
+        $event->setStartDate(new \DateTime('2026-01-01'));
+        $event->setCategory($category);
+        $event->setStatus('approved');
+
+        $this->eventRepository->save($event);
+        $this->assertNotNull($event->getId());
+
+        $savedEvent = $this->eventRepository->find(
+            $event->getId()
+        );
+
+        $this->assertInstanceOf(Event::class, $savedEvent);
+        $this->assertSame(
+            'Repository test event',
+            $savedEvent->getTitle()
+        );
+    }
+
+    /**
+     * Test deleting event.
+     */
+    public function testDelete(): void
+    {
+        $category = $this->entityManager
+            ->getRepository(Category::class)
+            ->findOneBy([]);
+
+        $this->assertInstanceOf(Category::class, $category);
+
+        $event = new Event();
+        $event->setTitle('Event to delete');
+        $event->setStartDate(new \DateTime('2026-01-02'));
+        $event->setCategory($category);
+        $event->setStatus('approved');
+
+        $this->eventRepository->save($event);
+
+        $eventId = $event->getId();
+        $this->assertNotNull($eventId);
+        $this->eventRepository->delete($event);
+        $deletedEvent = $this->eventRepository->find($eventId);
+        $this->assertNull($deletedEvent);
+    }
+
+    /**
+     * Test counting events by category.
+     */
+    public function testCountByCategory(): void
+    {
+        $category = $this->entityManager
+            ->getRepository(Category::class)
+            ->findOneBy([]);
+
+        $this->assertInstanceOf(Category::class, $category);
+
+        $initialCount = $this->eventRepository->countByCategory(
+            $category
+        );
+
+        $event1 = new Event();
+        $event1->setTitle('Count test event 1');
+        $event1->setStartDate(new \DateTime('2026-02-01'));
+        $event1->setCategory($category);
+        $event1->setStatus('approved');
+
+        $event2 = new Event();
+        $event2->setTitle('Count test event 2');
+        $event2->setStartDate(new \DateTime('2026-02-02'));
+        $event2->setCategory($category);
+        $event2->setStatus('approved');
+
+        $this->eventRepository->save($event1);
+        $this->eventRepository->save($event2);
+
+        $count = $this->eventRepository->countByCategory(
+            $category
+        );
+
+        $this->assertSame(
+            $initialCount + 2,
+            $count
+        );
+    }
+
+    /**
      * Test status filtering.
      */
     public function testQueryAllWithStatusFilter(): void
@@ -165,15 +262,46 @@ class EventRepositoryTest extends KernelTestCase
     }
 
     /**
-     * Test finding events for ICS export.
+     * Test finding approved events for ICS export.
      */
     public function testFindEventsForIcsExport(): void
     {
         $events = $this->eventRepository->findEventsForIcsExport();
 
-        dump($events);
-        dump(count($events));
-
         $this->assertIsArray($events);
+
+        foreach ($events as $event) {
+            $this->assertInstanceOf(Event::class, $event);
+
+            $this->assertSame(
+                'approved',
+                $event->getStatus()
+            );
+        }
+    }
+
+    /**
+     * Test events for ICS export are sorted by start date.
+     */
+    public function testEventsForIcsExportSortedByStartDate(): void
+    {
+        $events = $this->eventRepository->findEventsForIcsExport();
+
+        $previousDate = null;
+
+        foreach ($events as $event) {
+            $currentDate = $event->getStartDate();
+
+            $this->assertNotNull($currentDate);
+
+            if (null !== $previousDate) {
+                $this->assertGreaterThanOrEqual(
+                    $previousDate,
+                    $currentDate
+                );
+            }
+
+            $previousDate = $currentDate;
+        }
     }
 }

@@ -7,9 +7,12 @@
 namespace App\Service;
 
 use App\Entity\Category;
+use App\Entity\Tag;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\EventRepository;
+use App\Repository\CategoryRepository;
+use App\Repository\TagRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 
@@ -33,9 +36,11 @@ class EventService implements EventServiceInterface
      * Constructor.
      *
      * @param EventRepository    $eventRepository Event repository
+     * @param CategoryRepository $categoryRepository Category repository
+     * @param TagRepository $tagRepository Tag repository
      * @param PaginatorInterface $paginator       Paginator
      */
-    public function __construct(private readonly EventRepository $eventRepository, private readonly PaginatorInterface $paginator)
+    public function __construct(private readonly EventRepository $eventRepository, private readonly CategoryRepository $categoryRepository, private readonly TagRepository $tagRepository, private readonly PaginatorInterface $paginator)
     {
     }
 
@@ -62,6 +67,26 @@ class EventService implements EventServiceInterface
                 'defaultSortDirection' => 'desc',
             ]
         );
+    }
+
+    /**
+     * Get all categories.
+     *
+     * @return Category[] Categories
+     */
+    public function getCategories(): array
+    {
+        return $this->categoryRepository->findAll();
+    }
+
+    /**
+     * Get all tags.
+     *
+     * @return Tag[] Tags
+     */
+    public function getTags(): array
+    {
+        return $this->tagRepository->findAll();
     }
 
     /**

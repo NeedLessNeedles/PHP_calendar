@@ -8,8 +8,6 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Form\EventType;
-use App\Repository\CategoryRepository;
-use App\Repository\TagRepository;
 use App\Service\EventServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,9 +35,7 @@ class EventController extends AbstractController
     /**
      * Index action.
      *
-     * @param Request            $request            request
-     * @param CategoryRepository $categoryRepository Category repository
-     * @param TagRepository      $tagRepository      Tag repository
+     * @param Request $request Request
      *
      * @return Response HTTP response
      */
@@ -47,13 +43,16 @@ class EventController extends AbstractController
         name: 'app_event_index',
         methods: ['GET']
     )]
-    public function index(Request $request, CategoryRepository $categoryRepository, TagRepository $tagRepository): Response
+    public function index(Request $request): Response
     {
         $page = $request->query->getInt('page', 1);
+
         $categoryId = $request->query->get('categoryId');
         $categoryId = is_numeric($categoryId) ? (int) $categoryId : null;
+
         $tagId = $request->query->get('tagId');
         $tagId = is_numeric($tagId) ? (int) $tagId : null;
+
         $title = $request->query->get('title');
 
         $pagination = $this->eventService->getPaginatedList(
@@ -65,9 +64,9 @@ class EventController extends AbstractController
 
         return $this->render('event/index.html.twig', [
             'pagination' => $pagination,
-            'categories' => $categoryRepository->findAll(),
-            'currentCategory' => $categoryId ?: null,
-            'tags' => $tagRepository->findAll(),
+            'categories' => $this->eventService->getCategories(),
+            'currentCategory' => $categoryId,
+            'tags' => $this->eventService->getTags(),
             'currentTag' => $tagId,
             'title' => $title,
         ]);
@@ -242,8 +241,6 @@ class EventController extends AbstractController
     )]
     public function delete(Request $request, Event $event): Response
     {
-        // $this->denyAccessUnlessGranted(EventVoter::DELETE, $event);
-
         $form = $this->createForm(EventType::class, $event, [
             'method' => 'DELETE',
             'action' => $this->generateUrl('app_event_delete', ['id' => $event->getId()]),

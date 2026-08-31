@@ -53,6 +53,8 @@ class CategoryType extends AbstractType
      * the "Type" suffix removed (e.g. "UserProfileType" => "user_profile").
      *
      * @return string The prefix of the template block name
+     *
+     * @psalm-return 'category'
      */
     public function getBlockPrefix(): string
     {
