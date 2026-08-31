@@ -8,13 +8,25 @@ namespace App\Tests\Form;
 
 use App\Entity\Category;
 use App\Form\CategoryType;
-use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * Class CategoryTypeTest.
  */
-class CategoryTypeTest extends TypeTestCase
+class CategoryTypeTest extends KernelTestCase
 {
+    private FormFactoryInterface $formFactory;
+
+    /**
+     * Test setup.
+     */
+    protected function setUp(): void
+    {
+        self::bootKernel();
+        $this->formFactory = self::getContainer()->get(FormFactoryInterface::class);
+    }
+
     /**
      * Data validation test.
      */
@@ -22,17 +34,14 @@ class CategoryTypeTest extends TypeTestCase
     {
         $formData = ['title' => 'Music'];
         $model = new Category();
-        $form = $this->factory->create(CategoryType::class, $model);
+        $form = $this->formFactory->create(CategoryType::class, $model);
         $expected = new Category();
         $expected->setTitle('Music');
         $form->submit($formData);
-
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals($expected->getTitle(), $model->getTitle());
-
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($expected->getTitle(), $model->getTitle());
         $view = $form->createView();
         $children = $view->children;
-
-        $this->assertArrayHasKey('title', $children);
+        self::assertArrayHasKey('title', $children);
     }
 }

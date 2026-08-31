@@ -15,7 +15,6 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class EventTypeTest.
