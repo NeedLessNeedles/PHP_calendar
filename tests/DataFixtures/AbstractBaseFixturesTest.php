@@ -20,8 +20,7 @@ class AbstractBaseFixturesTest extends TestCase
      */
     public function testCreateManyThrows(): void
     {
-        $fixture = new class extends AbstractBaseFixtures
-        {
+        $fixture = new class () extends AbstractBaseFixtures {
             protected function loadData(): void
             {
             }
@@ -40,8 +39,7 @@ class AbstractBaseFixturesTest extends TestCase
      */
     public function testGetRandomReferenceThrows(): void
     {
-        $fixture = new class extends AbstractBaseFixtures
-        {
+        $fixture = new class () extends AbstractBaseFixtures {
             protected function loadData(): void
             {
             }
