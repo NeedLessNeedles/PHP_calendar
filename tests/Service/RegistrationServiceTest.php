@@ -17,6 +17,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 class RegistrationServiceTest extends TestCase
 {
+    /**
+     * Test if user can be registered.
+     */
     public function testRegisterUser(): void
     {
         $user = new User();

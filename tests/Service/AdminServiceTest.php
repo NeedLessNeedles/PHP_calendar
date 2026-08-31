@@ -9,6 +9,8 @@ namespace App\Tests\Service;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Service\AdminService;
+use App\Repository\EventRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
@@ -51,15 +53,17 @@ class AdminServiceTest extends KernelTestCase
         $this->assertNotSame('plain-password', $user->getPassword());
     }
 
-    /**
-     * Test for approving the pending event.
-     */
+    /** * Test for approving the pending event. */
     public function testApproveEvent(): void
     {
         $event = new Event();
-        $event->setStatus('pending');
 
-        $this->adminService->approveEvent($event);
+        $event->setStatus('pending');
+        $event->setTitle('Test event');
+        $eventRepository = $this->createMock(EventRepository::class);
+        $eventRepository->expects($this->once())->method('save')->with($this->identicalTo($event));
+        $adminService = new AdminService(self::getContainer()->get(\Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface::class), self::getContainer()->get(UserRepository::class), $eventRepository);
+        $adminService->approveEvent($event);
         $this->assertSame('approved', $event->getStatus());
     }
 
@@ -74,7 +78,6 @@ class AdminServiceTest extends KernelTestCase
         $user->setEmail('user@test.com');
         $reflection = new \ReflectionClass($admin);
         $prop = $reflection->getProperty('roles');
-        // $prop->setAccessible(true);
         $prop->setValue($admin, ['ROLE_ADMIN']);
 
         $this->expectException(\LogicException::class);
@@ -91,7 +94,6 @@ class AdminServiceTest extends KernelTestCase
 
         $reflection = new \ReflectionClass($user);
         $prop = $reflection->getProperty('id');
-        // $prop->setAccessible(true);
         $prop->setValue($user, 1);
 
         $this->expectException(\LogicException::class);
@@ -105,11 +107,20 @@ class AdminServiceTest extends KernelTestCase
     public function testToggleBlockSuccess(): void
     {
         $target = new User();
+
         $target->setEmail('target@test.com');
         $current = new User();
         $current->setEmail('admin@test.com');
-
-        $this->adminService->toggleBlock($target, $current);
-        $this->assertTrue($target->isBlocked() || false === $target->isBlocked());
+        $reflection = new \ReflectionClass(User::class);
+        $targetId = $reflection->getProperty('id');
+        $targetId->setValue($target, 1);
+        $currentId = $reflection->getProperty('id');
+        $currentId->setValue($current, 2);
+        $userRepository = $this->createMock(UserRepository::class);
+        $userRepository->expects($this->once())->method('save')->with($this->identicalTo($target));
+        $adminService = new AdminService(self::getContainer()->get(\Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface::class), $userRepository, self::getContainer()->get(EventRepository::class));
+        $this->assertFalse($target->isBlocked());
+        $adminService->toggleBlock($target, $current);
+        $this->assertTrue($target->isBlocked());
     }
 }
