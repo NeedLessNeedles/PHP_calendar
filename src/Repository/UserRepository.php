@@ -12,6 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Class UserRepository.
@@ -31,6 +32,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
+     * Query all records.
+     *
+     * @return QueryBuilder Query builder
+     */
+    public function queryAll(): QueryBuilder
+    {
+        return $this->createQueryBuilder('user');
+    }
+
+    /**
      * Used to upgrade (rehash) the user's password automatically over time.
      *
      * @param PasswordAuthenticatedUserInterface $user              User authentication
@@ -43,7 +54,46 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         }
 
         $user->setPassword($newHashedPassword);
+
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
+    }
+
+    /**
+     * Save entity.
+     *
+     * @param User $user User entity
+     */
+    public function save(User $user): void
+    {
+        $entityManager = $this->getEntityManager();
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+    }
+
+    /**
+     * Find all users.
+     *
+     * @return User[] Users
+     */
+    public function findAllUsers(): array
+    {
+        return $this->findAll();
+    }
+
+    /**
+     * Count administrators.
+     *
+     * @return int Number of administrators
+     */
+    public function countAdministrators(): int
+    {
+        return (int) $this->createQueryBuilder('user')
+            ->select('COUNT(user.id)')
+            ->where('user.roles LIKE :role')
+            ->setParameter('role', '%ROLE_ADMIN%')
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

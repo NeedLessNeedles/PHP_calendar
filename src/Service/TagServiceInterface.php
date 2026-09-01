@@ -7,6 +7,7 @@
 namespace App\Service;
 
 use App\Entity\Tag;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 
 /**
  * Interface TagServiceInterface.
@@ -14,12 +15,18 @@ use App\Entity\Tag;
 interface TagServiceInterface
 {
     /**
-     * Edit tag.
+     * Get paginated list.
      *
-     * @param Tag    $tag   Tag
-     * @param string $title Title
+     * @param int $page Page number
      */
-    public function edit(Tag $tag, string $title): void;
+    public function getPaginatedList(int $page): PaginationInterface;
+
+    /**
+     * Save entity.
+     *
+     * @param Tag $tag Tag entity
+     */
+    public function save(Tag $tag): void;
 
     /**
      * Delete tag.
@@ -27,4 +34,22 @@ interface TagServiceInterface
      * @param Tag $tag Tag
      */
     public function delete(Tag $tag): void;
+
+    /**
+     * Can Title for Tag be empty?
+     *
+     * @param Tag $tag Tag entity
+     *
+     * @return bool Result
+     */
+    public function canBeEmpty(Tag $tag): bool;
+
+    /**
+     * Check whether Tag title is unique.
+     *
+     * @param Tag $tag Tag entity
+     *
+     * @return bool Result
+     */
+    public function isTitleUnique(Tag $tag): bool;
 }

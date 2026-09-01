@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class User.
@@ -35,23 +36,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Email.
      */
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    #[Assert\Email]
     private ?string $email = null;
 
     /**
-     * @var list<string> The user roles
+     * Roles.
+     *
+     * @var list<string>
      */
     #[ORM\Column]
     private array $roles = [];
 
     /**
-     * @var string|null The hashed password
+     * Hashed password.
      */
     #[ORM\Column]
     private ?string $password = null;
 
     /**
-     * @var bool Block status
+     * Block status.
      */
     #[ORM\Column(type: 'boolean')]
     private bool $isBlocked = false;
@@ -112,7 +116,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);

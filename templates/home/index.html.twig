@@ -6,15 +6,15 @@
     <div class="container d-flex justify-content-center align-items-center mt-4">
         <div class="auth-card d-flex flex-column gap-2" style="max-width: 500px;">
             <p class="lead mb-4">
-                Welcome to the local events calendar application.
+                {{ 'text.welcome_home'|trans }}
             </p>
 
             <div class="d-flex justify-content-center gap-2">
                 <a href="{{ path('app_login') }}" class="btn btn-success">
-                    Login
+                    {{ 'button.login'|trans }}
                 </a>
                 <a href="{{ path('app_register') }}" class="btn btn-outline-primary">
-                    Register
+                    {{ 'button.register'|trans }}
                 </a>
             </div>
         </div>

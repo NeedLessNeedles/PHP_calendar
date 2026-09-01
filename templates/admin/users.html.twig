@@ -1,43 +1,43 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Admin panel{% endblock %}
+{% block title %}{{ 'option.users'|trans }}{% endblock %}
 
 {% block body %}
     <div class="container d-flex justify-content-center align-items-center mt-3">
         <div class="auth-card d-flex flex-column gap-1" style="max-width: 850px;">
-            <div class="h3 mb-2 font-weight-normal">Users</div>
+            <div class="h3 mb-2 font-weight-normal">{{ 'option.users'|trans }}</div>
 
             <table class="table">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>{{ 'th.id'|trans }}</th>
+                    <th>{{ knp_pagination_sortable(pagination, 'th.name'|trans, 'user.email') }}</th>
+                    <th>{{ 'label.role'|trans }}</th>
+                    <th>{{ 'th.status'|trans }}</th>
+                    <th>{{ 'th.actions'|trans }}</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for user in users %}
+                {% for user in pagination.items %}
                     <tr>
                         <td>{{ user.id }}</td>
                         <td>{{ user.email }}</td>
                         <td>
                             {% if 'ROLE_ADMIN' in user.roles %}
-                                admin
+                                {{ 'label.role_admin'|trans }}
                             {% else %}
-                                user
+                                {{ 'label.role_user'|trans }}
                             {% endif %}
                         </td>
                         <td>
                             {% if user.isBlocked %}
-                                <span class="badge bg-danger">Blocked</span>
+                                <span class="badge bg-danger">{{ 'status.blocked'|trans }}</span>
                             {% else %}
-                                <span class="badge bg-success">Active</span>
+                                <span class="badge bg-success">{{ 'status.active'|trans }}</span>
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{{ path('app_admin_users_edit', {'id': user.id}) }}" class="btn btn-primary btn-sm">Edit</a>
+                            <a href="{{ path('app_admin_users_edit', {'id': user.id}) }}" class="btn btn-primary btn-sm">{{ 'button.edit'|trans }}</a>
                             <form method="post"
                                   action="{{ path('app_admin_users_block', {'id': user.id}) }}"
                                   style="display:inline">
@@ -45,14 +45,24 @@
                                     <form method="post"
                                           action="{{ path('app_admin_users_block', {'id': user.id}) }}"
                                           style="display:inline">
-
                                         <button class="btn btn-warning btn-sm">
-                                            {{ user.isBlocked ? 'Unblock' : 'Block' }}
+                                            {{ user.isBlocked ? 'button.unblock'|trans : 'button.block'|trans }}
                                         </button>
 
                                     </form>
                                 {% endif %}
 
+                            </form>
+                            <form
+                                method="post"
+                                action="{{ path('app_admin_users_toggle_admin', {'id': user.id}) }}"
+                                style="display:inline"
+                            >
+                                    {% if 'ROLE_ADMIN' in user.roles %}
+                                        <button class="btn btn-danger btn-sm">{{ 'button.degrade'|trans }}</button>
+                                    {% else %}
+                                        <button class="btn btn-success btn-sm">{{ 'button.promote'|trans }}</button>
+                                    {% endif %}
                             </form>
                         </td>
                     </tr>
@@ -63,6 +73,9 @@
                 {% endfor %}
                 </tbody>
             </table>
+            <div class="d-flex justify-content-center navigation mt-1">
+                {{ knp_pagination_render(pagination) }}
+            </div>
         </div>
     </div>
 {% endblock %}

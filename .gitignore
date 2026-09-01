@@ -32,3 +32,6 @@
 ###> phpstan/phpstan ###
 phpstan.neon
 ###< phpstan/phpstan ###
+
+check_code_ztp2.sh
+check_code.result.cache

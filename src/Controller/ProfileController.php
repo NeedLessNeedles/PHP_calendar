@@ -6,14 +6,15 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Form\ChangeEmailType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use App\Form\ProfileEmailType;
 use App\Form\ChangePasswordType;
 use App\Service\ProfileServiceInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class ProfileController.
@@ -25,70 +26,134 @@ class ProfileController extends AbstractController
      * Constructor.
      *
      * @param ProfileServiceInterface $profileService Profile service
+     * @param TranslatorInterface     $translator     Translator
      */
-    public function __construct(private readonly ProfileServiceInterface $profileService)
+    public function __construct(private readonly ProfileServiceInterface $profileService, private readonly TranslatorInterface $translator)
     {
     }
 
     /**
      * Index action.
      *
-     * @param Request                $request       request
-     * @param EntityManagerInterface $entityManager entityManager
-     *
      * @return Response HTTP response
      */
     #[Route(
-        name: 'app_profile',
+        name: 'app_profile_index',
         methods: ['GET', 'POST']
     )]
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
+    public function index(): Response
     {
         $user = $this->getUser();
 
-        // FORM: email
-        $emailForm = $this->createForm(ProfileEmailType::class, $user);
-        $emailForm->handleRequest($request);
-
-        // FORM: password
-        $passwordForm = $this->createForm(ChangePasswordType::class);
-        $passwordForm->handleRequest($request);
-
-        // email update
-        if ($emailForm->isSubmitted() && $emailForm->isValid()) {
-            $entityManager->flush();
-        }
-
-        // password update
-        if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
-            $data = $passwordForm->getData();
-
-            $this->profileService->changePassword(
-                $user,
-                $data['newPassword']
-            );
-
-            $entityManager->flush();
-        }
-
-        return $this->render('profile/index.html.twig', [
-            'emailForm' => $emailForm,
-            'passwordForm' => $passwordForm,
+        return $this->render('profile/show.html.twig', [
+            'user' => $user,
         ]);
     }
 
     /**
-     * Edit action.
+     * Change password action.
+     *
+     * @param Request $request request
      *
      * @return Response HTTP response
      */
     #[Route(
-        '/edit',
-        name: 'app_profile_edit',
+        '/change_password',
+        name: 'app_profile_change_password',
         methods: ['GET', 'POST']
     )]
-    public function edit(): Response
+    public function changePassword(Request $request): Response
     {
-        return $this->render('profile/edit.html.twig', []);
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+        $form = $this->createForm(ChangePasswordType::class, null, ['method' => 'POST', 'action' => $this->generateUrl('app_profile_change_password')]);
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $newPassword = $form->get('newPassword')->getData();
+            if (!$this->profileService->canPasswordBeEmpty($newPassword)) {
+                $this->addFlash('warning', $this->translator->trans('message.input_fields'));
+
+                return $this->redirectToRoute('app_profile_change_password');
+            }
+            if (!$this->profileService->isPasswordLongEnough($newPassword)) {
+                $this->addFlash('warning', $this->translator->trans('message.but_at_least'));
+
+                return $this->redirectToRoute('app_profile_change_password');
+            }
+            if ($form->isValid()) {
+                $this->profileService->savePassword($user, $newPassword);
+                $this->addFlash('success', $this->translator->trans('message.updated_successfully'));
+
+                return $this->redirectToRoute('app_profile_index');
+            }
+        }
+
+        return $this->render(
+            'profile/change_password.html.twig',
+            [
+                'form' => $form->createView(),
+                'user' => $user,
+            ]
+        );
+    }
+
+    /**
+     * Change email action.
+     *
+     * @param Request $request request
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/change_email',
+        name: 'app_profile_change_email',
+        methods: ['GET', 'POST']
+    )]
+    public function changeEmail(Request $request): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $form = $this->createForm(
+            ChangeEmailType::class,
+            null,
+            [
+                'method' => 'POST',
+                'action' => $this->generateUrl('app_profile_change_email'),
+            ]
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $email = $form->get('email')->getData();
+            if (!$this->profileService->canBeEmpty($email)) {
+                $this->addFlash('warning', $this->translator->trans('message.input_fields'));
+
+                return $this->redirectToRoute('app_profile_change_email');
+            } if (!$this->profileService->isEmailUnique($user, $email)) {
+                $this->addFlash('warning', $this->translator->trans('message.title_already_exists'));
+
+                return $this->redirectToRoute('app_profile_change_email');
+            } if ($form->isValid()) {
+                $this->profileService->saveEmail($user, $email);
+                $this->addFlash('success', $this->translator->trans('message.updated_successfully'));
+
+                return $this->redirectToRoute('app_profile_index');
+            }
+        }
+
+        return $this->render(
+            'profile/change_email.html.twig',
+            [
+                'form' => $form->createView(),
+                'user' => $user,
+            ]
+        );
     }
 }

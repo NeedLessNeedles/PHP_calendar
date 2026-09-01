@@ -9,7 +9,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use App\Service\SecurityServiceInterface;
 
 /**
  * Class SecurityController.
@@ -17,22 +17,31 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class SecurityController extends AbstractController
 {
     /**
-     * Login action.
+     * Constructor.
      *
-     * @param AuthenticationUtils $authenticationUtils auth utils
+     * @param SecurityServiceInterface $securityService Security service
+     */
+    public function __construct(private readonly SecurityServiceInterface $securityService)
+    {
+    }
+
+    /**
+     * Login action.
      *
      * @return Response HTTP response
      */
     #[Route(
         '/login',
-        name: 'app_login'
+        name: 'app_login',
+        methods: ['GET', 'POST'],
     )]
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    public function login(): Response
     {
-        $error = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
+        return $this->render(
+            'security/login.html.twig',
+            $this->securityService->getLoginData(),
+        );
     }
 
     /**
@@ -42,7 +51,8 @@ class SecurityController extends AbstractController
      */
     #[Route(
         '/logout',
-        name: 'app_logout'
+        name: 'app_logout',
+        methods: ['GET']
     )]
     public function logout(): void
     {

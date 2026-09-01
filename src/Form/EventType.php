@@ -31,23 +31,39 @@ class EventType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title')
-            ->add('description')
-            ->add('location')
+            ->add('title', null, [
+                'label' => 'th.title',
+                'required' => true,
+                'attr' => ['max_length' => 64],
+            ])
+            ->add('description', null, [
+                'label' => 'th.description',
+                'required' => false,
+                'attr' => ['max_length' => 256],
+            ])
+            ->add('location', null, [
+                'label' => 'th.location',
+                'attr' => ['max_length' => 64],
+            ])
             ->add('startDate', DateTimeType::class, [
+                'label' => 'th.start_date',
                 'widget' => 'single_text',
             ])
             ->add('endDate', DateTimeType::class, [
+                'label' => 'th.end_date',
                 'widget' => 'single_text',
                 'required' => false,
             ])
             ->add('category', EntityType::class, [
+                'label' => 'th.category',
                 'class' => Category::class,
                 'choice_label' => function (Category $category) {
                     return $category->getTitle();
                 },
+                'required' => true,
             ])
             ->add('tags', EntityType::class, [
+                'label' => 'option.tags',
                 'class' => Tag::class,
                 'choice_label' => function (Tag $tag) {
                     return '#'.$tag->getTitle();
@@ -69,5 +85,20 @@ class EventType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Event::class,
         ]);
+    }
+
+    /**
+     * Returns the prefix of the template block name for this type.
+     *
+     * The block prefix defaults to the underscored short class name with
+     * the "Type" suffix removed (e.g. "UserProfileType" => "user_profile").
+     *
+     * @return string The prefix of the template block name
+     *
+     * @psalm-return 'event'
+     */
+    public function getBlockPrefix(): string
+    {
+        return 'event';
     }
 }

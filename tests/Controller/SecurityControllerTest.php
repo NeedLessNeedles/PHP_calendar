@@ -6,6 +6,10 @@
 
 namespace App\Tests\Controller;
 
+use App\Controller\SecurityController;
+use App\Service\SecurityServiceInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -14,46 +18,108 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class SecurityControllerTest extends WebTestCase
 {
     /**
-     * Test '/login' route.
+     * Browser client.
      */
-    public function testIndex(): void
-    {
-        //given
-        $client = static::createClient();
+    private KernelBrowser $client;
 
-        //when
-        $client->request('GET', '/login');
-
-        //then
-        self::assertResponseIsSuccessful();
-    }
-
+    /**
+     * Login page can be displayed.
+     */
     public function testLoginPageLoads(): void
     {
-        $client = static::createClient();
+        $service = $this->mockSecurityService();
 
-        $client->request('GET', '/login');
+        $service
+            ->expects($this->once())
+            ->method('getLoginData')
+            ->willReturn([
+                'last_username' => '',
+                'error' => null,
+            ]);
 
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('form');
+        $this->client->request(
+            'GET',
+            '/login'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        self::assertSelectorExists('form');
     }
 
-    public function testLoginPageShowsLastUsername(): void
+    /**
+     * Login action renders data returned by security service.
+     */
+    public function testLoginUsesSecurityService(): void
     {
-        $client = static::createClient();
+        $service = $this->mockSecurityService();
 
-        $client->request('GET', '/login?last_username=test@example.com');
+        $service
+            ->expects($this->once())
+            ->method('getLoginData')
+            ->willReturn([
+                'last_username' => 'test@example.com',
+                'error' => null,
+            ]);
 
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('body');
+        $this->client->request(
+            'GET',
+            '/login'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        self::assertSelectorExists('input');
     }
 
-    public function testLogoutRouteExists(): void
+    /**
+     * Logout action throws logic exception when called directly.
+     */
+    public function testLogoutThrowsLogicException(): void
     {
-        $client = static::createClient();
+        $service = $this->createMock(
+            SecurityServiceInterface::class
+        );
 
-        $client->request('GET', '/logout');
+        $controller = new SecurityController($service);
 
-        $this->assertTrue(true);
+        $this->expectException(
+            \LogicException::class
+        );
+
+        $this->expectExceptionMessage(
+            'This method can be blank'
+        );
+
+        $controller->logout();
+    }
+
+    /**
+     * Create browser client.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->client = static::createClient();
+    }
+
+    /**
+     * Get security service mock.
+     *
+     * @return SecurityServiceInterface&MockObject Security service interface and Mock object
+     */
+    private function mockSecurityService(): SecurityServiceInterface&MockObject
+    {
+        $service = $this->createMock(
+            SecurityServiceInterface::class
+        );
+
+        static::getContainer()->set(
+            SecurityServiceInterface::class,
+            $service
+        );
+
+        return $service;
     }
 }

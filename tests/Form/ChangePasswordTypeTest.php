@@ -7,67 +7,76 @@
 namespace App\Tests\Form;
 
 use App\Form\ChangePasswordType;
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * Class ChangePasswordTypeTest.
  */
-class ChangePasswordTypeTest extends TypeTestCase
+class ChangePasswordTypeTest extends KernelTestCase
 {
+    private FormFactoryInterface $formFactory;
+
+    /**
+     * Test setup.
+     */
+    protected function setUp(): void
+    {
+        self::bootKernel();
+        $this->formFactory = self::getContainer()->get(FormFactoryInterface::class);
+    }
+
     /**
      * Data validation test.
      */
     public function testFormSubmitValidData(): void
     {
-        $form = $this->factory->create(ChangePasswordType::class);
-        $formData = [
-            'currentPassword' => 'oldpass123',
-            'newPassword' => [
-                'first' => 'newpass123',
-                'second' => 'newpass123',
-            ],
-        ];
-        $form->submit($formData);
-
-        $this->assertTrue($form->isSynchronized());
+        $form = $this->formFactory->create(ChangePasswordType::class);
+        $form->submit(['currentPassword' => 'oldpass123', 'newPassword' => 'newpass123']);
+        self::assertTrue($form->isSynchronized());
+        self::assertSame('oldpass123', $form->get('currentPassword')->getData());
+        self::assertSame('newpass123', $form->get('newPassword')->getData());
     }
 
+    /**
+     * Test form fields.
+     */
     public function testFormHasExpectedFields(): void
     {
-        $form = $this->factory->create(ChangePasswordType::class);
-
-        $this->assertTrue($form->has('currentPassword'));
-        $this->assertTrue($form->has('newPassword'));
+        $form = $this->formFactory->create(ChangePasswordType::class);
+        self::assertTrue($form->has('currentPassword'));
+        self::assertTrue($form->has('newPassword'));
     }
 
+    /**
+     * Test current password field type.
+     */
     public function testCurrentPasswordFieldType(): void
     {
-        $form = $this->factory->create(ChangePasswordType::class);
+        $form = $this->formFactory->create(ChangePasswordType::class);
         $config = $form->get('currentPassword')->getConfig();
-
-        $this->assertEquals('Symfony\Component\Form\Extension\Core\Type\PasswordType', get_class($config->getType()->getInnerType()));
+        self::assertSame(PasswordType::class, $config->getType()->getInnerType()::class);
+        self::assertFalse($config->getOption('mapped'));
     }
 
+    /**
+     * Test new password field configuration.
+     */
     public function testNewPasswordFieldConfiguration(): void
     {
-        $form = $this->factory->create(ChangePasswordType::class);
+        $form = $this->formFactory->create(ChangePasswordType::class);
         $config = $form->get('newPassword')->getConfig();
-
-        $this->assertEquals('Symfony\Component\Form\Extension\Core\Type\RepeatedType', get_class($config->getType()->getInnerType()));
-        $this->assertEquals('Symfony\Component\Form\Extension\Core\Type\PasswordType', $config->getOption('type'));
-
-        $constraints = $config->getOption('constraints');
-
-        $this->assertNotEmpty($constraints);
-        $this->assertInstanceOf(NotBlank::class, $constraints[0]);
+        self::assertSame(PasswordType::class, $config->getType()->getInnerType()::class);
+        self::assertFalse($config->getOption('mapped'));
     }
 
+    /**
+     * Test for no data class.
+     */
     public function testFormHasNoDataClass(): void
     {
-        $form = $this->factory->create(ChangePasswordType::class);
-
-        $this->assertNull($form->getConfig()->getDataClass());
+        $form = $this->formFactory->create(ChangePasswordType::class);
+        self::assertNull($form->getConfig()->getDataClass());
     }
-
 }

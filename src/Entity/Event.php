@@ -190,11 +190,11 @@ class Event
     /**
      * Setter for start date.
      *
-     * @param \DateTime $startDate Start date
+     * @param \DateTime|null $startDate Start date
      *
      * @return static Start date
      */
-    public function setStartDate(\DateTime $startDate): static
+    public function setStartDate(?\DateTime $startDate): static
     {
         $this->startDate = $startDate;
 

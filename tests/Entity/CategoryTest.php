@@ -14,6 +14,9 @@ use PHPUnit\Framework\TestCase;
  */
 class CategoryTest extends TestCase
 {
+    /**
+     * Test constructor.
+     */
     public function testConstructor(): void
     {
         $category = new Category();
@@ -22,6 +25,19 @@ class CategoryTest extends TestCase
         $this->assertInstanceOf(\DateTimeImmutable::class, $category->getUpdatedAt());
     }
 
+    /**
+     * Test default ID value.
+     */
+    public function testIdIsNull(): void
+    {
+        $category = new Category();
+
+        $this->assertNull($category->getId());
+    }
+
+    /**
+     * Test get() and set() for Title column.
+     */
     public function testTitle(): void
     {
         $category = new Category();
@@ -30,6 +46,9 @@ class CategoryTest extends TestCase
         $this->assertEquals('Technology', $category->getTitle());
     }
 
+    /**
+     * Test get() and set() for Created at column.
+     */
     public function testSetCreatedAt(): void
     {
         $category = new Category();
@@ -39,6 +58,9 @@ class CategoryTest extends TestCase
         $this->assertEquals($date, $category->getCreatedAt());
     }
 
+    /**
+     * Test get() and set() for Updated at column.
+     */
     public function testSetUpdatedAt(): void
     {
         $category = new Category();
@@ -48,6 +70,9 @@ class CategoryTest extends TestCase
         $this->assertEquals($date, $category->getUpdatedAt());
     }
 
+    /**
+     * Test for string conversion.
+     */
     public function testToString(): void
     {
         $category = new Category();
@@ -55,5 +80,4 @@ class CategoryTest extends TestCase
 
         $this->assertEquals('Music', (string) $category);
     }
-
 }

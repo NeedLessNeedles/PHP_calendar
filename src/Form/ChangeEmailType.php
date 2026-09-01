@@ -1,43 +1,49 @@
 <?php
 
 /**
- * ProfileEmail type.
+ * Change email type.
  */
 
 namespace App\Form;
 
-use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class ProfileEmailType.
+ * Class ChangeEmailType.
  */
-class ProfileEmailType extends AbstractType
+class ChangeEmailType extends AbstractType
 {
     /**
      * Builds the form.
      *
      * @param FormBuilderInterface $builder Builder
      * @param array<string, mixed> $options Options
-     *
-     * @see FormTypeExtensionInterface::buildForm()
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('email');
+        $builder
+            ->add(
+                'email',
+                EmailType::class,
+                [
+                    'label' => 'label.email',
+                    'mapped' => false,
+                ]
+            );
     }
 
     /**
-     * Configures the options for this type.
+     * Configures options.
      *
-     * @param OptionsResolver $resolver The resolver for the options
+     * @param OptionsResolver $resolver Resolver
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => User::class,
+            'data_class' => null,
         ]);
     }
 }

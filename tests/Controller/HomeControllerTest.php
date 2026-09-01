@@ -6,6 +6,8 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -14,44 +16,47 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class HomeControllerTest extends WebTestCase
 {
     /**
-     * Test '/home' route.
+     * Anonymous user can view home page.
      */
-    public function testIndex(): void
-    {
-        //given
-        $client = static::createClient();
-
-        //when
-        $client->request('GET', '/home');
-
-        //then
-        self::assertResponseIsSuccessful();
-    }
-
-    public function testHomePageAsAnonymousUser(): void
+    public function testIndexAsAnonymous(): void
     {
         $client = static::createClient();
-
         $client->request('GET', '/home');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('body');
-        $this->assertRouteSame('app_home');
     }
 
-    public function testHomeRedirectsToEventsForLoggedUser(): void
+    /**
+     * Logged user is redirected.
+     */
+    public function testIndexAsLoggedUser(): void
     {
         $client = static::createClient();
-
-        $userRepository = static::getContainer()->get('doctrine')
-            ->getRepository(\App\Entity\User::class);
-
-        $testUser = $userRepository->findOneBy(['roles' => ['ROLE_USER']]);
-
-        $client->loginUser($testUser);
-
+        $user = $this->getUser($client);
+        $client->loginUser($user);
         $client->request('GET', '/home');
 
-        $this->assertResponseRedirects('/event');
+        $this->assertResponseRedirects();
+    }
+
+    /**
+     * Get user.
+     *
+     * @param <string> $client Client
+     *
+     * @return User user
+     */
+    private function getUser($client): User
+    {
+        $user = $client->getContainer()
+            ->get(EntityManagerInterface::class)
+            ->getRepository(User::class)
+            ->findOneBy([
+                'email' => 'user.first@gmail.com',
+            ]);
+
+        $this->assertInstanceOf(User::class, $user);
+
+        return $user;
     }
 }

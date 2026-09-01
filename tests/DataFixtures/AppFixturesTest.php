@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
  */
 class AppFixturesTest extends TestCase
 {
+    /**
+     * Load data.
+     */
     public function testLoadDoesNotCrash(): void
     {
         $fixtures = new AppFixtures();

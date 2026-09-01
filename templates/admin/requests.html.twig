@@ -1,39 +1,39 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Requests{% endblock %}
+{% block title %}{{ 'option.requests'|trans }}{% endblock %}
 
 {% block body %}
     <div class="container d-flex justify-content-center align-items-center mt-3">
         <div class="auth-card d-flex flex-column gap-1" style="max-width: 800px;">
             <div class="container mt-3">
-                <h2>Pending events</h2>
+                <h2>{{ 'title.event_requests'|trans }}</h2>
 
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Start</th>
-                        <th>Owner</th>
-                        <th>Actions</th>
+                        <th>{{ 'th.id'|trans }}</th>
+                        <th>{{ 'th.title'|trans }}</th>
+                        <th>{{ knp_pagination_sortable(pagination, 'th.start_date'|trans, 'event.startDate') }}</th>
+                        <th>{{ 'th.owner'|trans }}</th>
+                        <th>{{ 'th.actions'|trans }}</th>
                     </tr>
                     </thead>
 
                     <tbody>
-                    {% for event in events %}
+                    {% for event in pagination.items %}
                         <tr>
                             <td>{{ event.id }}</td>
                             <td>{{ event.title }}</td>
-                            <td>{{ event.startDate|date('Y-m-d H:i') }}</td>
+                            <td>{{ event.startDate|format_date('medium') }}</td>
                             <td>{{ event.owner ? event.owner.email : 'guest' }}</td>
                             <td class="d-flex gap-2">
 
                                 <form method="post" action="{{ path('app_admin_requests_approve', {'id': event.id}) }}">
-                                    <button class="btn btn-success btn-sm">Approve</button>
+                                    <button class="btn btn-success btn-sm">{{ 'button.approve'|trans }}</button>
                                 </form>
 
                                 <form method="post" action="{{ path('app_admin_requests_reject', {'id': event.id}) }}">
-                                    <button class="btn btn-danger btn-sm">Reject</button>
+                                    <button class="btn btn-danger btn-sm">{{ 'button.reject'|trans }}</button>
                                 </form>
 
                             </td>
@@ -41,10 +41,10 @@
                     {% endfor %}
                     </tbody>
                 </table>
+                <div class="d-flex justify-content-center navigation mt-1">
+                    {{ knp_pagination_render(pagination) }}
+                </div>
             </div>
-{#            <div class="d-flex justify-content-center gap-2 mt-2 mb-2">#}
-{#                <a href="{{ path('app_admin') }}" class="btn btn-primary"> << Back</a>#}
-{#            </div>#}
         </div>
     </div>
 {% endblock %}

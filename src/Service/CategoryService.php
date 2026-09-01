@@ -7,8 +7,11 @@
 namespace App\Service;
 
 use App\Entity\Category;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Event;
+use App\Repository\CategoryRepository;
 use App\Repository\EventRepository;
+use Knp\Component\Pager\Pagination\PaginationInterface;
+use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * Class CategoryService.
@@ -16,29 +19,106 @@ use App\Repository\EventRepository;
 class CategoryService implements CategoryServiceInterface
 {
     /**
+     * Items per page.
+     *
+     * Use constants to define configuration options that rarely change instead
+     * of specifying them in app/config/config.yml.
+     * See https://symfony.com/doc/current/best_practices.html#configuration
+     *
+     * @varant int
+     */
+    public const PAGINATOR_ITEMS_PER_PAGE = 3;
+
+    /**
      * Constructor.
      *
-     * @param EntityManagerInterface $entityManager Entity manager
-     * @param EventRepository $eventRepository Event repository
+     * @param CategoryRepository $categoryRepository Category repository
+     * @param PaginatorInterface $paginator          Paginator
+     * @param EventRepository    $eventRepository    Event repository
      */
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly EventRepository $eventRepository)
+    public function __construct(private readonly CategoryRepository $categoryRepository, private readonly PaginatorInterface $paginator, private readonly EventRepository $eventRepository)
     {
     }
 
     /**
-     * Edit category.
+     * Get paginated list.
      *
-     * @param Category $category Category
-     * @param string   $title    Title
+     * @param int $page Page number
+     *
+     * @return PaginationInterface Paginated list
      */
-    public function edit(Category $category, string $title): void
+    public function getPaginatedList(int $page): PaginationInterface
     {
-        $category->setTitle($title);
-        $category->setUpdatedAt(new \DateTimeImmutable());
+        return $this->paginator->paginate(
+            $this->categoryRepository->queryAll(),
+            $page,
+            self::PAGINATOR_ITEMS_PER_PAGE,
+            [
+                'sortFieldAllowList' => ['category.createdAt', 'category.updatedAt'],
+                'defaultSortFieldName' => 'category.createdAt',
+                'defaultSortDirection' => 'desc',
+            ]
+        );
     }
 
     /**
-     * Delete category.
+     * Save entity.
+     *
+     * @param Category $category Category entity
+     */
+    public function save(Category $category): void
+    {
+        $category->setUpdatedAt(new \DateTimeImmutable());
+        if (null === $category->getId()) {
+            $category->setCreatedAt(new \DateTimeImmutable());
+        }
+        $this->categoryRepository->save($category);
+    }
+
+    /**
+     * Can Title for Category be empty?
+     *
+     * @param Category $category Category entity
+     *
+     * @return bool Result
+     */
+    public function canBeEmpty(Category $category): bool
+    {
+        if (null === $category->getTitle()) {
+            return false;
+        }
+
+        return '' !== trim($category->getTitle());
+    }
+
+    /**
+     * Check whether category title is unique.
+     *
+     * @param Category $category Category entity
+     *
+     * @return bool Result
+     */
+    public function isTitleUnique(Category $category): bool
+    {
+        $title = $category->getTitle();
+
+        if (null === $title || '' === trim($title)) {
+            return false;
+        }
+
+        $existingCategory = $this->categoryRepository->findOneBy([
+            'title' => $title,
+        ]);
+
+        if (null === $existingCategory) {
+            return true;
+        }
+
+        return $existingCategory->getId() === $category->getId();
+    }
+
+    /**
+     * Delete entity.
      *
      * @param Category $category Category
      */
@@ -52,7 +132,20 @@ class CategoryService implements CategoryServiceInterface
             throw new \DomainException('Cannot delete category used by events.');
         }
 
-        $this->entityManager->remove($category);
-        $this->entityManager->flush();
+        $this->categoryRepository->delete($category);
+    }
+
+    /**
+     * Can Category be deleted?
+     *
+     * @param Category $category Category entity
+     *
+     * @return bool Result
+     */
+    public function canBeDeleted(Category $category): bool
+    {
+        $result = $this->eventRepository->countByCategory($category);
+
+        return !($result > 0);
     }
 }

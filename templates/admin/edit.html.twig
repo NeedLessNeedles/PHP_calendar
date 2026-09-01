@@ -1,72 +1,32 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit user{% endblock %}
+{% block title %}{{ 'title.profile'|trans }}{% endblock %}
 
 {% block body %}
     <div class="container d-flex justify-content-center align-items-center mt-3">
         <div class="auth-card d-flex flex-column gap-1">
-            <h1 class="h3 mb-2 font-weight-normal">User info</h1>
+            <h1 class="h3 mb-2 font-weight-normal">{{ 'title.user_info'|trans }}</h1>
             <div>
-                <label>Email:</label>
+                <label>{{ 'label.email'|trans }}:</label>
                 <strong>{{ user.email }}</strong>
             </div>
             {% set roles = user.roles %}
             <div>
-                <label>Role:</label>
+                <label>{{ 'label.role'|trans }}</label>
                 {% if 'ROLE_ADMIN' in roles %}
-                    <strong>admin</strong>
+                    <strong>{{ 'label.role_admin'|trans }}</strong>
                 {% elseif 'ROLE_USER' in roles %}
-                    <strong>user</strong>
+                    <strong>{{ 'label.role_user'|trans }}</strong>
                 {% else %}
-                    <strong>unknown</strong>
+                    <strong>{{ 'label.role_unknown'|trans }}</strong>
                 {% endif %}
             </div>
 
             <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
-                <button
-                    class="btn btn-outline-primary"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#editProfileCollapse"
-                >
-                    Change email
-                </button>
-                <button
-                    class="btn btn-outline-primary"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#changePasswordCollapse"
-                >
-                    Change password
-                </button>
-            </div>
 
-            <div id="profileCollapseGroup">
-                <div class="collapse" id="editProfileCollapse" data-bs-parent="#profileCollapseGroup">
-                    <div class="card card-body mb-3">
-                        {{ form_start(emailForm) }}
-                        {{ form_row(emailForm.email) }}
-                        <div class="d-flex justify-content-center gap-2 mt-2">
-                            <button class="btn btn-success" type="submit">
-                                Save
-                            </button>
-                        </div>
-                        {{ form_end(emailForm) }}
-                    </div>
-                </div>
-
-                <div class="collapse" id="changePasswordCollapse" data-bs-parent="#profileCollapseGroup">
-                    <div class="card card-body py-2">
-                        {{ form_start(passwordForm) }}
-                        {{ form_row(passwordForm.newPassword) }}
-                        <div class="d-flex justify-content-center gap-2 mt-1">
-                            <button class="btn btn-success" type="submit">
-                                Save
-                            </button>
-                        </div>
-                        {{ form_end(passwordForm) }}
-                    </div>
-                </div>
+                <a href="{{ path('app_admin_users') }}" class="btn btn-primary"><< {{ 'button.back'|trans }}</a>
+                <a class="btn btn-outline-primary" href="{{ path('app_admin_users_change_email', {'id': user.id}) }}">{{ 'button.change_email'|trans }}</a>
+                <a class="btn btn-outline-primary" href="{{ path('app_admin_users_change_password', {'id': user.id}) }}">{{ 'button.change_password'|trans }}</a>
             </div>
         </div>
     </div>

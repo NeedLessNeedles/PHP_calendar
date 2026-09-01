@@ -8,6 +8,8 @@ namespace App\Service;
 
 use App\Entity\Event;
 use App\Entity\User;
+use App\Entity\Category;
+use App\Entity\Tag;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 
 /**
@@ -22,10 +24,40 @@ interface EventServiceInterface
      * @param int|null    $categoryId Category ID
      * @param string|null $title      Title
      * @param int|null    $tagId      Tag ID
+     * @param string|null $status     Status
      *
      * @return PaginationInterface Paginated list
      */
-    public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null): PaginationInterface;
+    public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): PaginationInterface;
+
+    /**
+     * Get all categories.
+     *
+     * @return Category[] Categories
+     */
+    public function getCategories(): array;
+
+    /**
+     * Get all tags.
+     *
+     * @return Tag[] Tags
+     */
+    public function getTags(): array;
+
+    /**
+     * Save entity.
+     *
+     * @param Event $event Event entity
+     * @param User  $user  User entity
+     */
+    public function save(Event $event, ?User $user): void;
+
+    /**
+     * Delete entity.
+     *
+     * @param Event $event Event entity
+     */
+    public function delete(Event $event): void;
 
     /**
      * Create event.
@@ -34,4 +66,29 @@ interface EventServiceInterface
      * @param User|null $user  User
      */
     public function create(Event $event, ?User $user): void;
+
+    /**
+     * Export approved current and upcoming events to ICS format.
+     *
+     * @return string ICS content
+     */
+    public function exportToIcs(): string;
+
+    /**
+     * Can Title for Event be empty?
+     *
+     * @param Event $event Event entity
+     *
+     * @return bool Result
+     */
+    public function canBeEmpty(Event $event): bool;
+
+    /**
+     * Check whether event title is unique.
+     *
+     * @param Event $event Event entity
+     *
+     * @return bool Result
+     */
+    public function isTitleUnique(Event $event): bool;
 }

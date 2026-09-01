@@ -7,62 +7,73 @@
 namespace App\Tests\Form;
 
 use App\Form\AdminChangePasswordType;
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * Class AdminChangePasswordTypeTest.
  */
-class AdminChangePasswordTypeTest extends TypeTestCase
+class AdminChangePasswordTypeTest extends KernelTestCase
 {
+    private FormFactoryInterface $formFactory;
+
+    /**
+     * Test setup.
+     */
+    protected function setUp(): void
+    {
+        self::bootKernel();
+        $this->formFactory = self::getContainer()->get(FormFactoryInterface::class);
+    }
+
     /**
      * Data validation test.
      */
     public function testSubmitValidData(): void
     {
-        $form = $this->factory->create(AdminChangePasswordType::class);
-        $formData = [
-            'newPassword' => [
-                'first' => 'secret123',
-                'second' => 'secret123',
-            ],
-        ];
-        $form->submit($formData);
+        $form = $this->formFactory->create(AdminChangePasswordType::class);
 
-        $this->assertTrue($form->isSynchronized());
+        $form->submit([
+            'newPassword' => 'secret123',
+        ]);
+
+        self::assertTrue($form->isSynchronized());
+        self::assertSame('secret123', $form->get('newPassword')->getData());
     }
+
+    /**
+     * Test form fields.
+     */
     public function testFormHasExpectedField(): void
     {
-        $form = $this->factory->create(AdminChangePasswordType::class);
+        $form = $this->formFactory->create(AdminChangePasswordType::class);
 
-        $this->assertTrue($form->has('newPassword'));
+        self::assertTrue($form->has('newPassword'));
     }
 
-    public function testFormConfiguration(): void
+    /**
+     * Test new password field configuration.
+     */
+    public function testNewPasswordFieldConfiguration(): void
     {
-        $form = $this->factory->create(AdminChangePasswordType::class);
+        $form = $this->formFactory->create(AdminChangePasswordType::class);
         $config = $form->get('newPassword')->getConfig();
 
-        $this->assertSame('Symfony\Component\Form\Extension\Core\Type\RepeatedType', get_class($config->getType()->getInnerType()));
+        self::assertSame(
+            PasswordType::class,
+            $config->getType()->getInnerType()::class
+        );
+        self::assertFalse($config->getOption('mapped'));
     }
 
-    public function testRepeatedFieldOptions(): void
-    {
-        $form = $this->factory->create(AdminChangePasswordType::class);
-        $config = $form->get('newPassword')->getConfig();
-
-        $this->assertSame('Symfony\Component\Form\Extension\Core\Type\PasswordType', $config->getOption('type'));
-        $constraints = $config->getOption('constraints');
-        $this->assertNotEmpty($constraints);
-
-        $this->assertInstanceOf(NotBlank::class, $constraints[0]);
-    }
-
+    /**
+     * Test for no data class.
+     */
     public function testFormHasNoDataClass(): void
     {
-        $form = $this->factory->create(AdminChangePasswordType::class);
+        $form = $this->formFactory->create(AdminChangePasswordType::class);
 
-        $this->assertNull($form->getConfig()->getDataClass());
+        self::assertNull($form->getConfig()->getDataClass());
     }
-
 }

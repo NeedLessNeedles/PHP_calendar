@@ -7,7 +7,6 @@
 namespace App\Tests\Entity;
 
 use App\Entity\User;
-use App\Entity\Event;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,6 +14,16 @@ use PHPUnit\Framework\TestCase;
  */
 class UserTest extends TestCase
 {
+    /**
+     * Tests if ID column can be null.
+     */
+    public function testId(): void
+    {
+        $user = new User();
+
+        $this->assertNull($user->getId());
+    }
+
     /**
      * Test set() and get() for Email column.
      */
@@ -100,5 +109,17 @@ class UserTest extends TestCase
             "\0App\Entity\User\0password",
             $data
         );
+    }
+
+    /**
+     * Test for erasing credentials function.
+     */
+    public function testEraseCredentials(): void
+    {
+        $user = new User();
+
+        $user->eraseCredentials();
+
+        $this->assertTrue(true);
     }
 }

@@ -2,7 +2,7 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Welcome!{% endblock %}</title>
+    <title>{% block title %}{{ 'title.browser_label'|trans }}{% endblock %}</title>
     {% block stylesheets %}
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
               rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
@@ -22,7 +22,7 @@
             {# CENTER #}
             <div class="position-absolute top-50 start-50 translate-middle text-center">
                 <h1 class="mb-0">
-                    Local Events Calendar
+                    {{ 'title.app_header_title'|trans }}
                 </h1>
             </div>
             {# RIGHT #}
@@ -30,29 +30,29 @@
                 {% if app.user %}
                     <div class="d-flex flex-column text-end">
                         <div>
-                            <span class="text-muted">User:</span>
+                            <span class="text-muted">{{ 'label.user'|trans }}</span>
                             <strong>{{ app.user.userIdentifier }}</strong>
                         </div>
                         {% set roles = app.user.roles %}
                         <div>
-                            <span class="text-muted">Role:</span>
+                            <span class="text-muted">{{ 'label.role'|trans }}</span>
                             {% if 'ROLE_ADMIN' in roles %}
-                                <strong>admin</strong>
+                                <strong>{{ 'label.role_admin'|trans }}</strong>
                             {% elseif 'ROLE_USER' in roles %}
-                                <strong>user</strong>
+                                <strong>{{ 'label.role_user'|trans }}</strong>
                             {% else %}
-                                <span class="text-muted">unknown</span>
+                                <span class="text-muted">{{ 'label.role_unknown'|trans }}</span>
                             {% endif %}
                         </div>
                     </div>
-                    <a href="{{ path('app_logout') }}" class="btn btn-danger">Logout</a>
+                    <a href="{{ path('app_logout') }}" class="btn btn-danger">{{ 'button.logout'|trans }}</a>
                 {% else %}
                     <div class="d-flex flex-column text-end">
                         <div class="text-muted">
-                            Not logged in
+                            {{ 'label.not_logged_in'|trans }}
                         </div>
                     </div>
-                    <a href="{{ path('app_login') }}" class="btn btn-success">Login</a>
+                    <a href="{{ path('app_login') }}" class="btn btn-success">{{ 'button.login'|trans }}</a>
                 {% endif %}
             </div>
         </div>
@@ -62,36 +62,36 @@
         <nav class="main-nav navbar navbar-expand-md bg-dark d-flex justify-content-center align-items-center gap-4 rounded px-4"
              style="width: 650px; height: 50px;"
         >
-            <a class="nav-link" href="{{ path('app_event_index') }}">List</a>
-            <a class="nav-link" href="{{ path('app_event_calendar') }}">Calendar</a>
+            <a class="nav-link" href="{{ path('app_event_index') }}">{{ 'title.events'|trans }}</a>
+{#            <a class="nav-link" href="{{ path('app_event_calendar') }}">{{ 'title.calendar'|trans }}</a>#}
             {% if app.user %}
-                <a class="nav-link" href="{{ path('app_profile') }}">Profile</a>
+                <a class="nav-link" href="{{ path('app_profile_index') }}">{{ 'title.profile'|trans }}</a>
             {% endif %}
             {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
                 <div class="dropdown">
                     <a class="nav-link" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Admin
+                        {{ 'title.admin_panel'|trans }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark">
                         <li>
                             <a class="dropdown-item" href="{{ path('app_admin_users') }}">
-                                Users
+                                {{ 'option.users'|trans }}
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="{{ path('app_admin_requests') }}">
-                                Requests
+                                {{ 'option.requests'|trans }}
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="{{ path('app_category_index') }}">
-                                Categories
+                                {{ 'option.categories'|trans }}
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="{{ path('app_tag_index') }}">
-                                Tags
+                                {{ 'option.tags'|trans }}
                             </a>
                         </li>
                     </ul>
@@ -101,6 +101,13 @@
         </nav>
     </div>
     <main role="main" class="container-fluid">
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
         {% block body %}{% endblock %}
     </main>
     {% block javascripts %}

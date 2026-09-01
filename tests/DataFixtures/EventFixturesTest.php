@@ -7,6 +7,8 @@
 namespace App\Tests\DataFixtures;
 
 use App\DataFixtures\EventFixtures;
+use App\DataFixtures\CategoryFixtures;
+use App\DataFixtures\TagFixtures;
 use App\Entity\Category;
 use App\Entity\Tag;
 use Doctrine\Persistence\ObjectManager;
@@ -18,12 +20,18 @@ use PHPUnit\Framework\TestCase;
  */
 class EventFixturesTest extends TestCase
 {
+    /**
+     * Test loading data.
+     */
     public function testLoadDataCreatesEvents(): void
     {
         $fixtures = new EventFixtures();
-        $categoryRepo = $this->createMock(ObjectRepository::class);
-        $tagRepo = $this->createMock(ObjectRepository::class);
-        $categoryRepo->method('findAll')->willReturn([(new Category())->setTitle('Test'),]);
+        $categoryRepo = $this->createStub(ObjectRepository::class);
+        $tagRepo = $this->createStub(ObjectRepository::class);
+        $category = new Category();
+        $category->setTitle('Test');
+
+        $categoryRepo->method('findAll')->willReturn([$category]);
 
         $tagRepo->method('findAll')->willReturn([
             new Tag(),
@@ -37,15 +45,34 @@ class EventFixturesTest extends TestCase
                 [Tag::class, $tagRepo],
             ]);
 
-        $manager->expects($this->exactly(20))->method('persist');
+        $manager->expects($this->exactly(25))->method('persist');
         $manager->expects($this->once())->method('flush');
 
         $fixtures->load($manager);
-        $this->assertTrue(true);
+        // $this->assertTrue(true);
     }
 
+    /**
+     * Test if fixtures group is set to 'main'.
+     */
     public function testFixtureGroupIsMain(): void
     {
         $this->assertSame(['main'], EventFixtures::getGroups());
+    }
+
+    /**
+     * Test fixture dependencies.
+     */
+    public function testFixtureDependencies(): void
+    {
+        $fixtures = new EventFixtures();
+
+        $this->assertSame(
+            [
+                CategoryFixtures::class,
+                TagFixtures::class,
+            ],
+            $fixtures->getDependencies()
+        );
     }
 }
