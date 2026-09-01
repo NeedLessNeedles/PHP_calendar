@@ -6,103 +6,465 @@
 
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use App\Entity\Tag;
+use App\Entity\User;
+use App\Service\TagServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * Class TagControllerTest.
  */
 class TagControllerTest extends WebTestCase
 {
-    private function loginAdmin(): void
+    private KernelBrowser $client;
+
+    private EntityManagerInterface $manager;
+
+    /**
+     * Create client and entity manager.
+     */
+    protected function setUp(): void
     {
-        $client = static::createClient();
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        parent::setUp();
 
-        $admin = $em->getRepository(\App\Entity\User::class)->findOneBy([
-            'email' => 'admin.first@gmail.com',
-        ]);
+        $this->client = static::createClient();
 
-        $client->loginUser($admin);
+        $this->manager = static::getContainer()
+            ->get(EntityManagerInterface::class);
     }
 
-    public function testTagIndexPage(): void
+    /**
+     * Get tag service mock.
+     *
+     * @return TagServiceInterface&\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function mockTagService(): TagServiceInterface
     {
-        $client = static::createClient();
-        $client->request('GET', '/tag');
+        $service = $this->createMock(TagServiceInterface::class);
 
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('body');
+        static::getContainer()->set(
+            TagServiceInterface::class,
+            $service
+        );
+
+        return $service;
     }
 
-    public function testTagShowPage(): void
+    /**
+     * Get admin user.
+     *
+     * @return User Admin user.
+     */
+    private function getAdminUser(): User
     {
-        $client = static::createClient();
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-        $tag = $em->getRepository(Tag::class)->findOneBy([]);
-        $client->request('GET', '/tag/'.$tag->getId());
+        $users = $this->manager
+            ->getRepository(User::class)
+            ->findAll();
 
-        $this->assertResponseIsSuccessful();
+        foreach ($users as $user) {
+            if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+                return $user;
+            }
+        }
+
+        self::fail('ROLE_ADMIN user fixture is required.');
     }
 
-    public function testCreateTagAsAdmin(): void
+    /**
+     * Login as administrator.
+     *
+     * @return User Admin user.
+     */
+    private function loginAdmin(): User
     {
-        $client = static::createClient();
-        $this->loginAdmin();
+        $user = $this->getAdminUser();
 
-        $client->request('POST', '/tag/new', [
-            'title' => 'test-tag',
-        ]);
+        $this->client->loginUser($user);
 
-        $this->assertResponseRedirects();
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-        $tag = $em->getRepository(Tag::class)->findOneBy([
-            'title' => 'test-tag',
-        ]);
-
-        $this->assertNotNull($tag);
+        return $user;
     }
 
-    public function testEditTag(): void
+    /**
+     * Create a unique tag.
+     *
+     * @param string|null $title Tag title.
+     *
+     * @return Tag Tag entity.
+     */
+    private function createTag(?string $title = null): Tag
     {
-        $client = static::createClient();
-        $this->loginAdmin();
-
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-        $tag = $em->getRepository(Tag::class)->findOneBy([]);
-
-        $client->request('POST', '/tag/'.$tag->getId().'/edit', [
-            'title' => 'updated-tag',
-            '_token' => 'tag_edit',
-        ]);
-
-        $this->assertResponseRedirects();
-
-        $updated = $em->getRepository(Tag::class)->find($tag->getId());
-        $this->assertSame('updated-tag', $updated->getTitle());
-    }
-
-    public function testDeleteTag(): void
-    {
-        $client = static::createClient();
-        $this->loginAdmin();
-
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-
         $tag = new Tag();
-        $tag->setTitle('to-delete');
 
-        $em->persist($tag);
-        $em->flush();
+        $tag->setTitle(
+            $title ?? 'Tag '.uniqid('', true)
+        );
 
-        $client->request('POST', '/tag/'.$tag->getId(), [
-            '_token' => 'delete'.$tag->getId(),
+        return $tag;
+    }
+
+    /**
+     * Persist a unique tag.
+     *
+     * @param string|null $title Tag title.
+     *
+     * @return Tag Persisted tag.
+     */
+    private function persistTag(?string $title = null): Tag
+    {
+        $tag = $this->createTag($title);
+
+        $this->manager->persist($tag);
+        $this->manager->flush();
+
+        return $tag;
+    }
+
+    /**
+     * Index page can be displayed.
+     */
+    public function testIndex(): void
+    {
+        $this->client->request('GET', '/tag');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('table');
+    }
+
+    /**
+     * Index supports page parameter.
+     */
+    public function testIndexWithPage(): void
+    {
+        $this->client->request('GET', '/tag?page=2');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('table');
+    }
+
+    /**
+     * New tag page can be displayed for administrator.
+     */
+    public function testNewGet(): void
+    {
+        $this->loginAdmin();
+
+        $this->client->request('GET', '/tag/new');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form');
+    }
+
+    /**
+     * Empty tag title is rejected.
+     */
+    public function testNewRejectsEmptyTitle(): void
+    {
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('isTitleUnique');
+
+        $service
+            ->expects($this->never())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $this->client->request('POST', '/tag/new', [
+            'tag' => [
+                'title' => '',
+            ],
         ]);
 
-        $this->assertResponseRedirects();
+        self::assertResponseRedirects('/tag/new');
+    }
 
-        $deleted = $em->getRepository(Tag::class)->find($tag->getId());
-        $this->assertNull($deleted);
+    /**
+     * Duplicate tag title is rejected.
+     */
+    public function testNewRejectsDuplicateTitle(): void
+    {
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $this->client->request('POST', '/tag/new', [
+            'tag' => [
+                'title' => 'Duplicate tag '.uniqid(),
+            ],
+        ]);
+
+        self::assertResponseRedirects('/tag/new');
+    }
+
+    /**
+     * Valid tag is saved.
+     */
+    public function testNewSavesValidTag(): void
+    {
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->isInstanceOf(Tag::class));
+
+        $this->loginAdmin();
+
+        $this->client->request('GET', '/tag/new');
+
+        self::assertResponseIsSuccessful();
+
+        $crawler = $this->client->getCrawler();
+
+        $form = $crawler->filter('form')->form();
+
+        $form['tag[title]'] = 'Valid tag '.uniqid();
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/tag');
+    }
+
+    /**
+     * Show tag page.
+     */
+    public function testShow(): void
+    {
+        $tag = $this->persistTag();
+
+        $this->client->request(
+            'GET',
+            '/tag/'.$tag->getId()
+        );
+
+        self::assertResponseIsSuccessful();
+    }
+
+    /**
+     * Edit tag page can be displayed.
+     */
+    public function testEditGet(): void
+    {
+        $tag = $this->persistTag();
+
+        $this->loginAdmin();
+
+        $this->client->request(
+            'GET',
+            '/tag/'.$tag->getId().'/edit'
+        );
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form');
+    }
+
+    /**
+     * Empty tag title is rejected during edit.
+     */
+    public function testEditRejectsEmptyTitle(): void
+    {
+        $tag = $this->persistTag();
+
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('isTitleUnique');
+
+        $service
+            ->expects($this->never())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/tag/'.$tag->getId().'/edit'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler->filter('form')->form();
+
+        $form['tag[title]'] = '';
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects(
+            '/tag/'.$tag->getId().'/edit'
+        );
+    }
+
+    /**
+     * Duplicate tag title is rejected during edit.
+     */
+    public function testEditRejectsDuplicateTitle(): void
+    {
+        $tag = $this->persistTag();
+
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/tag/'.$tag->getId().'/edit'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler->filter('form')->form();
+
+        $form['tag[title]'] = 'Duplicate tag '.uniqid();
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects(
+            '/tag/'.$tag->getId().'/edit'
+        );
+    }
+
+    /**
+     * Valid tag is saved during edit.
+     */
+    public function testEditSavesValidTag(): void
+    {
+        $tag = $this->persistTag();
+
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->isInstanceOf(Tag::class));
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/tag/'.$tag->getId().'/edit'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler->filter('form')->form();
+
+        $form['tag[title]'] = 'Updated tag '.uniqid();
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/tag');
+    }
+
+    /**
+     * Delete page can be displayed.
+     */
+    public function testDeleteGet(): void
+    {
+        $tag = $this->persistTag();
+
+        $this->loginAdmin();
+
+        $this->client->request(
+            'GET',
+            '/tag/'.$tag->getId().'/delete'
+        );
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form');
+    }
+
+    /**
+     * Tag can be deleted.
+     */
+    public function testDelete(): void
+    {
+        $tag = $this->persistTag();
+
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('delete')
+            ->with($this->isInstanceOf(Tag::class));
+
+        $this->loginAdmin();
+
+        $this->client->request(
+            'GET',
+            '/tag/'.$tag->getId().'/delete'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $crawler = $this->client->getCrawler();
+
+        $form = $crawler->filter('form')->form();
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/tag');
     }
 }
