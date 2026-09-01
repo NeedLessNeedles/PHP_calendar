@@ -6,8 +6,9 @@
 
 namespace App\Tests\Controller;
 
-use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManager;
+use App\Entity\User;
+use App\Service\RegistrationServiceInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -17,118 +18,167 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class RegistrationControllerTest extends WebTestCase
 {
     /**
-     * Test '/register' route.
+     * Browser client.
      */
-    public function testIndex(): void
+    private KernelBrowser $client;
+
+    /**
+     * Create browser client.
+     */
+    protected function setUp(): void
     {
-        // given
-        $client = static::createClient();
+        parent::setUp();
 
-        // when
-        $client->request('GET', '/register');
-
-        // then
-        self::assertResponseIsSuccessful();
+        $this->client = static::createClient();
     }
 
     /**
-     * Test Setup method.
+     * Get registration service mock.
+     *
+     * @return RegistrationServiceInterface&MockObject
      */
-    private KernelBrowser $client;
-    private UserRepository $userRepository;
-
-    protected function setUp(): void
+    private function mockRegistrationService(): RegistrationServiceInterface&MockObject
     {
-        $this->client = static::createClient();
+        $service = $this->createMock(
+            RegistrationServiceInterface::class
+        );
 
-        // Ensure we have a clean database
-        $container = static::getContainer();
+        static::getContainer()->set(
+            RegistrationServiceInterface::class,
+            $service
+        );
 
-        /** @var EntityManager $em */
-        $em = $container->get('doctrine')->getManager();
-        $this->userRepository = $container->get(UserRepository::class);
-
-        foreach ($this->userRepository->findAll() as $user) {
-            $em->remove($user);
-        }
-
-        $em->flush();
+        return $service;
     }
 
-    public function testRegister(): void
-    {
-        // Register a new user
-        $this->client->request('GET', '/register');
-        self::assertResponseIsSuccessful();
-        self::assertPageTitleContains('Register');
-
-        $this->client->submitForm('Register', [
-            'registration_form[email]' => 'me@example.com',
-            'registration_form[plainPassword]' => 'password',
-            'registration_form[agreeTerms]' => true,
-        ]);
-
-        // Ensure the response redirects after submitting the form, the user exists, and is not verified
-        // self::assertResponseRedirects('/'); @TODO: set the appropriate path that the user is redirected to.
-        self::assertCount(1, $this->userRepository->findAll());
-    }
-
+    /**
+     * Registration page can be displayed.
+     */
     public function testRegisterPageLoads(): void
     {
-        $client = static::createClient();
-
-        $client->request('GET', '/register');
-
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('form');
-    }
-
-    public function testRegisterNewUser(): void
-    {
-        $client = static::createClient();
-
-        $crawler = $client->request('GET', '/register');
-
-        $form = $crawler->selectButton('Register')->form([
-            'registration_form[email]' => 'new.user@example.com',
-            'registration_form[plainPassword]' => 'password123',
-            'registration_form[agreeTerms]' => true,
-        ]);
-
-        $client->submit($form);
-
-        $this->assertResponseRedirects();
-
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-        $user = $em->getRepository(User::class)->findOneBy([
-            'email' => 'new.user@example.com',
-        ]);
-
-        $this->assertNotNull($user);
-        $this->assertContains('ROLE_USER', $user->getRoles());
-    }
-
-    public function testPasswordIsHashed(): void
-    {
-        $client = static::createClient();
-
-        $crawler = $client->request('GET', '/register');
-
-        $client->submit($crawler->selectButton('Register')->form([
-            'registration_form[email]' => 'hash.test@example.com',
-            'registration_form[plainPassword]' => 'password123',
-            'registration_form[agreeTerms]' => true,
-        ]));
-
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-        $user = $em->getRepository(User::class)->findOneBy([
-            'email' => 'hash.test@example.com',
-        ]);
-
-        $passwordHasher = static::getContainer()->get(UserPasswordHasherInterface::class);
-
-        $this->assertTrue(
-            $passwordHasher->isPasswordValid($user, 'password123')
+        $crawler = $this->client->request(
+            'GET',
+            '/register'
         );
+
+        self::assertResponseIsSuccessful();
+
+        self::assertGreaterThanOrEqual(
+            1,
+            $crawler->filter('form')->count()
+        );
+    }
+
+    /**
+     * Invalid registration form is rendered again.
+     */
+    public function testRegisterRejectsInvalidForm(): void
+    {
+        $service = $this->mockRegistrationService();
+
+        $service
+            ->expects($this->never())
+            ->method('registerUser');
+
+        $this->client->request(
+            'POST',
+            '/register',
+            [
+                'registration_form' => [
+                    'email' => 'invalid-email',
+                    'plainPassword' => '123',
+                    'agreeTerms' => false,
+                ],
+            ]
+        );
+
+        self::assertResponseIsSuccessful();
+
+        self::assertSelectorExists('form');
+    }
+
+    /**
+     * Valid user registration calls registration service.
+     */
+    public function testRegisterValidUser(): void
+    {
+        $service = $this->mockRegistrationService();
+
+        $service
+            ->expects($this->once())
+            ->method('registerUser')
+            ->with(
+                $this->callback(
+                    static function (User $user): bool {
+                        return 'new.user@example.com'
+                            === $user->getEmail();
+                    }
+                ),
+                'password123'
+            );
+
+        $crawler = $this->client->request(
+            'GET',
+            '/register'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form')
+            ->form();
+
+        $form['registration_form[email]']
+            = 'new.user@example.com';
+
+        $form['registration_form[plainPassword]']
+            = 'password123';
+
+        $form['registration_form[agreeTerms]']
+            = true;
+
+        $this->client->submit($form);
+
+        self::assertResponseIsRedirect();
+    }
+
+    /**
+     * Valid registration passes submitted password to service.
+     */
+    public function testRegisterPassesPlainPasswordToService(): void
+    {
+        $service = $this->mockRegistrationService();
+
+        $service
+            ->expects($this->once())
+            ->method('registerUser')
+            ->with(
+                $this->isInstanceOf(User::class),
+                'another-password'
+            );
+
+        $crawler = $this->client->request(
+            'GET',
+            '/register'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form')
+            ->form();
+
+        $form['registration_form[email]']
+            = 'password.test@example.com';
+
+        $form['registration_form[plainPassword]']
+            = 'another-password';
+
+        $form['registration_form[agreeTerms]']
+            = true;
+
+        $this->client->submit($form);
+
+        self::assertResponseIsRedirect();
     }
 }

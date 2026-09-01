@@ -12,7 +12,6 @@ use App\Service\AdminServiceInterface;
 use App\Service\EventServiceInterface;
 use App\Service\ProfileServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
