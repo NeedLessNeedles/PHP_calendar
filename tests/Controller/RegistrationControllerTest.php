@@ -92,7 +92,7 @@ class RegistrationControllerTest extends WebTestCase
             ]
         );
 
-        self::assertResponseIsSuccessful();
+        self::assertResponseStatusCodeSame(422);
 
         self::assertSelectorExists('form');
     }
@@ -139,7 +139,7 @@ class RegistrationControllerTest extends WebTestCase
 
         $this->client->submit($form);
 
-        self::assertResponseIsRedirect();
+        self::assertResponseRedirects();
     }
 
     /**
@@ -179,6 +179,6 @@ class RegistrationControllerTest extends WebTestCase
 
         $this->client->submit($form);
 
-        self::assertResponseIsRedirect();
+        self::assertResponseRedirects();
     }
 }
