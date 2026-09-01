@@ -17,6 +17,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 class UserFixturesTest extends TestCase
 {
+    /**
+     * Load data.
+     */
     public function testLoadDataPersistsUsers(): void
     {
         $hasher = $this->createMock(UserPasswordHasherInterface::class);
@@ -32,6 +35,9 @@ class UserFixturesTest extends TestCase
         $this->assertTrue(true);
     }
 
+    /**
+     * Test if group is main.
+     */
     public function testFixtureGroupIsMain(): void
     {
         $this->assertSame(['main'], UserFixtures::getGroups());

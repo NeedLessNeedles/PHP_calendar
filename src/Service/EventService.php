@@ -35,10 +35,10 @@ class EventService implements EventServiceInterface
     /**
      * Constructor.
      *
-     * @param EventRepository    $eventRepository Event repository
+     * @param EventRepository    $eventRepository    Event repository
      * @param CategoryRepository $categoryRepository Category repository
-     * @param TagRepository $tagRepository Tag repository
-     * @param PaginatorInterface $paginator       Paginator
+     * @param TagRepository      $tagRepository      Tag repository
+     * @param PaginatorInterface $paginator          Paginator
      */
     public function __construct(private readonly EventRepository $eventRepository, private readonly CategoryRepository $categoryRepository, private readonly TagRepository $tagRepository, private readonly PaginatorInterface $paginator)
     {

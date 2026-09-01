@@ -18,70 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class ProfileControllerTest extends WebTestCase
 {
     /**
-     * Helper.
-     *
-     * @param User $client client
-     *
-     * @return EntityManagerInterface Entity manager interface
-     */
-    private function getEntityManager($client): EntityManagerInterface
-    {
-        return $client->getContainer()->get(EntityManagerInterface::class);
-    }
-
-    /**
-     * Helper.
-     *
-     * @param User $client client
-     *
-     * @return User user
-     */
-    private function getUser($client): User
-    {
-        $user = $this->getEntityManager($client)
-            ->getRepository(User::class)
-            ->findOneBy([
-                'email' => 'user.first@gmail.com',
-            ]);
-
-        $this->assertInstanceOf(User::class, $user);
-
-        return $user;
-    }
-
-    /**
-     * Helper.
-     */
-    private function getCsrfToken($client, string $url, string $selector): string
-    {
-        $client->request('GET', $url);
-
-        $token = $client->getCrawler()
-            ->filter($selector)
-            ->attr('value');
-
-        $this->assertNotNull($token);
-
-        return $token;
-
-    }
-
-    /**
-     * Helper.
-     */
-    private function mockProfileService($client): ProfileServiceInterface&MockObject
-    {
-        $service = $this->createMock(ProfileServiceInterface::class);
-
-        $client->getContainer()->set(
-            ProfileServiceInterface::class,
-            $service
-        );
-
-        return $service;
-    }
-
-    /**
      * Logged user can view profile.
      */
     public function testIndex(): void
@@ -534,5 +470,78 @@ class ProfileControllerTest extends WebTestCase
         );
 
         $this->assertResponseRedirects('/profile');
+    }
+
+    /**
+     * Helper.
+     *
+     * @param User $client client
+     *
+     * @return EntityManagerInterface Entity manager interface
+     */
+    private function getEntityManager($client): EntityManagerInterface
+    {
+        return $client->getContainer()->get(EntityManagerInterface::class);
+    }
+
+    /**
+     * Helper.
+     *
+     * @param User $client client
+     *
+     * @return User user
+     */
+    private function getUser(User $client): User
+    {
+        $user = $this->getEntityManager($client)
+            ->getRepository(User::class)
+            ->findOneBy([
+                'email' => 'user.first@gmail.com',
+            ]);
+
+        $this->assertInstanceOf(User::class, $user);
+
+        return $user;
+    }
+
+    /**
+     * Helper.
+     *
+     * @param string $client   Client
+     * @param string $url      URL
+     * @param string $selector Selector
+     *
+     * @return string Token
+     */
+    private function getCsrfToken(string $client, string $url, string $selector): string
+    {
+        $client->request('GET', $url);
+
+        $token = $client->getCrawler()
+            ->filter($selector)
+            ->attr('value');
+
+        $this->assertNotNull($token);
+
+        return $token;
+    }
+
+    /**
+     * Helper.
+     *
+     * @param <string> $client Client
+     *
+     * @return ProfileServiceInterface&MockObject Profile service interface and Mock object
+     */
+    private function mockProfileService($client): ProfileServiceInterface&MockObject
+    {
+        $service = $this->createMock(ProfileServiceInterface::class);
+
+        $client->getContainer()->set(
+            ProfileServiceInterface::class,
+            $service
+        );
+
+        return $service;
     }
 }

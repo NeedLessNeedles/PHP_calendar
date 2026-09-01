@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
  */
 class CategoryFixturesTest extends TestCase
 {
+    /**
+     * Load data.
+     */
     public function testLoadDataPersistsCategories(): void
     {
         $fixtures = new CategoryFixtures();
@@ -26,6 +29,9 @@ class CategoryFixturesTest extends TestCase
         $this->assertTrue(true);
     }
 
+    /**
+     * Test if group is main.
+     */
     public function testFixtureGroupIsMain(): void
     {
         $this->assertSame(['main'], CategoryFixtures::getGroups());

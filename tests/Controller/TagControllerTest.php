@@ -23,105 +23,6 @@ class TagControllerTest extends WebTestCase
     private EntityManagerInterface $manager;
 
     /**
-     * Create client and entity manager.
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-
-        $this->manager = static::getContainer()
-            ->get(EntityManagerInterface::class);
-    }
-
-    /**
-     * Get tag service mock.
-     *
-     * @return TagServiceInterface&\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function mockTagService(): TagServiceInterface
-    {
-        $service = $this->createMock(TagServiceInterface::class);
-
-        static::getContainer()->set(
-            TagServiceInterface::class,
-            $service
-        );
-
-        return $service;
-    }
-
-    /**
-     * Get admin user.
-     *
-     * @return User Admin user.
-     */
-    private function getAdminUser(): User
-    {
-        $users = $this->manager
-            ->getRepository(User::class)
-            ->findAll();
-
-        foreach ($users as $user) {
-            if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-                return $user;
-            }
-        }
-
-        self::fail('ROLE_ADMIN user fixture is required.');
-    }
-
-    /**
-     * Login as administrator.
-     *
-     * @return User Admin user.
-     */
-    private function loginAdmin(): User
-    {
-        $user = $this->getAdminUser();
-
-        $this->client->loginUser($user);
-
-        return $user;
-    }
-
-    /**
-     * Create a unique tag.
-     *
-     * @param string|null $title Tag title.
-     *
-     * @return Tag Tag entity.
-     */
-    private function createTag(?string $title = null): Tag
-    {
-        $tag = new Tag();
-
-        $tag->setTitle(
-            $title ?? 'Tag '.uniqid('', true)
-        );
-
-        return $tag;
-    }
-
-    /**
-     * Persist a unique tag.
-     *
-     * @param string|null $title Tag title.
-     *
-     * @return Tag Persisted tag.
-     */
-    private function persistTag(?string $title = null): Tag
-    {
-        $tag = $this->createTag($title);
-
-        $this->manager->persist($tag);
-        $this->manager->flush();
-
-        return $tag;
-    }
-
-    /**
      * Index page can be displayed.
      */
     public function testIndex(): void
@@ -258,20 +159,20 @@ class TagControllerTest extends WebTestCase
         self::assertResponseRedirects('/tag');
     }
 
-//    /**
-//     * Show tag page.
-//     */
-//    public function testShow(): void
-//    {
-//        $tag = $this->persistTag();
-//
-//        $this->client->request(
-//            'GET',
-//            '/tag/'.$tag->getId()
-//        );
-//
-//        self::assertResponseIsSuccessful();
-//    }
+    //    /**
+    //     * Show tag page.
+    //     */
+    //    public function testShow(): void
+    //    {
+    //        $tag = $this->persistTag();
+    //
+    //        $this->client->request(
+    //            'GET',
+    //            '/tag/'.$tag->getId()
+    //        );
+    //
+    //        self::assertResponseIsSuccessful();
+    //    }
 
     /**
      * Edit tag page can be displayed.
@@ -466,5 +367,104 @@ class TagControllerTest extends WebTestCase
         $this->client->submit($form);
 
         self::assertResponseRedirects('/tag');
+    }
+
+    /**
+     * Create client and entity manager.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->client = static::createClient();
+
+        $this->manager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+    }
+
+    /**
+     * Get tag service mock.
+     *
+     * @return TagServiceInterface&\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function mockTagService(): TagServiceInterface
+    {
+        $service = $this->createMock(TagServiceInterface::class);
+
+        static::getContainer()->set(
+            TagServiceInterface::class,
+            $service
+        );
+
+        return $service;
+    }
+
+    /**
+     * Get admin user.
+     *
+     * @return User admin user
+     */
+    private function getAdminUser(): User
+    {
+        $users = $this->manager
+            ->getRepository(User::class)
+            ->findAll();
+
+        foreach ($users as $user) {
+            if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+                return $user;
+            }
+        }
+
+        self::fail('ROLE_ADMIN user fixture is required.');
+    }
+
+    /**
+     * Login as administrator.
+     *
+     * @return User admin user
+     */
+    private function loginAdmin(): User
+    {
+        $user = $this->getAdminUser();
+
+        $this->client->loginUser($user);
+
+        return $user;
+    }
+
+    /**
+     * Create a unique tag.
+     *
+     * @param string|null $title tag title
+     *
+     * @return Tag tag entity
+     */
+    private function createTag(?string $title = null): Tag
+    {
+        $tag = new Tag();
+
+        $tag->setTitle(
+            $title ?? 'Tag '.uniqid('', true)
+        );
+
+        return $tag;
+    }
+
+    /**
+     * Persist a unique tag.
+     *
+     * @param string|null $title tag title
+     *
+     * @return Tag persisted tag
+     */
+    private function persistTag(?string $title = null): Tag
+    {
+        $tag = $this->createTag($title);
+
+        $this->manager->persist($tag);
+        $this->manager->flush();
+
+        return $tag;
     }
 }

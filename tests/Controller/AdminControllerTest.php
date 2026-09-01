@@ -21,104 +21,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class AdminControllerTest extends WebTestCase
 {
-    private function getEntityManager($client): EntityManagerInterface
-    {
-        return $client->getContainer()->get(EntityManagerInterface::class);
-    }
-
-    private function getAdmin($client): User
-    {
-        $admin = $this->getEntityManager($client)
-            ->getRepository(User::class)
-            ->findOneBy([
-                'email' => 'admin.first@gmail.com',
-            ]);
-
-        $this->assertInstanceOf(User::class, $admin);
-
-        return $admin;
-    }
-
-    private function getUser($client): User
-    {
-        $user = $this->getEntityManager($client)
-            ->getRepository(User::class)
-            ->findOneBy([
-                'email' => 'user.first@gmail.com',
-            ]);
-
-        $this->assertInstanceOf(User::class, $user);
-
-        return $user;
-    }
-
-    private function getPendingEvent($client): Event
-    {
-        $event = $this->getEntityManager($client)
-            ->getRepository(Event::class)
-            ->findOneBy([
-                'status' => 'pending',
-            ]);
-
-        $this->assertInstanceOf(Event::class, $event);
-
-        return $event;
-    }
-
-    private function mockProfileService($client): ProfileServiceInterface&MockObject
-    {
-        $service = $this->createMock(ProfileServiceInterface::class);
-
-        $client->getContainer()->set(
-            ProfileServiceInterface::class,
-            $service
-        );
-
-        return $service;
-    }
-
-    private function mockAdminService($client): AdminServiceInterface&MockObject
-    {
-        $service = $this->createMock(AdminServiceInterface::class);
-
-        $client->getContainer()->set(
-            AdminServiceInterface::class,
-            $service
-        );
-
-        return $service;
-    }
-
-    private function mockEventService($client): EventServiceInterface&MockObject
-    {
-        $service = $this->createMock(EventServiceInterface::class);
-
-        $client->getContainer()->set(
-            EventServiceInterface::class,
-            $service
-        );
-
-        return $service;
-    }
-
-    private function createPagination(int $page = 1): SlidingPagination
-    {
-        $pagination = new SlidingPagination([
-            'page' => $page,
-            'sortField' => 'user.email',
-            'sortDirection' => 'desc',
-        ]);
-
-        $pagination->setCurrentPageNumber($page);
-        $pagination->setItemNumberPerPage(10);
-        $pagination->setTotalItemCount(0);
-        $pagination->setUsedRoute('app_admin_users');
-        $pagination->setSortableTemplate('@KnpPaginator/Pagination/sortable_link.html.twig');
-        $pagination->setTemplate('@KnpPaginator/Pagination/sliding.html.twig');
-
-        return $pagination;
-    }
-
     /**
      * Index requires authentication.
      */
@@ -771,5 +673,159 @@ class AdminControllerTest extends WebTestCase
         );
 
         $this->assertResponseRedirects('/admin/users');
+    }
+
+    /**
+     * Helper.
+     *
+     * @param <string> $client Client
+     *
+     * @return EntityManagerInterface Entity manager interface
+     */
+    private function getEntityManager($client): EntityManagerInterface
+    {
+        return $client->getContainer()->get(EntityManagerInterface::class);
+    }
+
+    /**
+     * Helper.
+     *
+     * @param <string> $client Client
+     *
+     * @return User user
+     */
+    private function getAdmin($client): User
+    {
+        $admin = $this->getEntityManager($client)
+            ->getRepository(User::class)
+            ->findOneBy([
+                'email' => 'admin.first@gmail.com',
+            ]);
+
+        $this->assertInstanceOf(User::class, $admin);
+
+        return $admin;
+    }
+
+    /**
+     * Helper.
+     *
+     * @param <string> $client Client
+     *
+     * @return User user
+     */
+    private function getUser($client): User
+    {
+        $user = $this->getEntityManager($client)
+            ->getRepository(User::class)
+            ->findOneBy([
+                'email' => 'user.first@gmail.com',
+            ]);
+
+        $this->assertInstanceOf(User::class, $user);
+
+        return $user;
+    }
+
+    /**
+     * Helper.
+     *
+     * @param <string> $client Client
+     *
+     * @return Event event
+     */
+    private function getPendingEvent($client): Event
+    {
+        $event = $this->getEntityManager($client)
+            ->getRepository(Event::class)
+            ->findOneBy([
+                'status' => 'pending',
+            ]);
+
+        $this->assertInstanceOf(Event::class, $event);
+
+        return $event;
+    }
+
+    /**
+     * Helper.
+     *
+     * @param <string> $client Client
+     *
+     * @return ProfileServiceInterface&MockObject Profile service interface and Mock object
+     */
+    private function mockProfileService($client): ProfileServiceInterface&MockObject
+    {
+        $service = $this->createMock(ProfileServiceInterface::class);
+
+        $client->getContainer()->set(
+            ProfileServiceInterface::class,
+            $service
+        );
+
+        return $service;
+    }
+
+    /**
+     * Helper.
+     *
+     * @param <string> $client Client
+     *
+     * @return AdminServiceInterface&MockObject Admin service interface and Mock object
+     */
+    private function mockAdminService($client): AdminServiceInterface&MockObject
+    {
+        $service = $this->createMock(AdminServiceInterface::class);
+
+        $client->getContainer()->set(
+            AdminServiceInterface::class,
+            $service
+        );
+
+        return $service;
+    }
+
+    /**
+     * Helper.
+     *
+     * @param <string> $client Client
+     *
+     * @return EventServiceInterface&MockObject Event service interface and Mock object
+     */
+    private function mockEventService($client): EventServiceInterface&MockObject
+    {
+        $service = $this->createMock(EventServiceInterface::class);
+
+        $client->getContainer()->set(
+            EventServiceInterface::class,
+            $service
+        );
+
+        return $service;
+    }
+
+    /**
+     * Helper.
+     *
+     * @param int $page Page number
+     *
+     * @return SlidingPagination Sliding pagination
+     */
+    private function createPagination(int $page = 1): SlidingPagination
+    {
+        $pagination = new SlidingPagination([
+            'page' => $page,
+            'sortField' => 'user.email',
+            'sortDirection' => 'desc',
+        ]);
+
+        $pagination->setCurrentPageNumber($page);
+        $pagination->setItemNumberPerPage(10);
+        $pagination->setTotalItemCount(0);
+        $pagination->setUsedRoute('app_admin_users');
+        $pagination->setSortableTemplate('@KnpPaginator/Pagination/sortable_link.html.twig');
+        $pagination->setTemplate('@KnpPaginator/Pagination/sliding.html.twig');
+
+        return $pagination;
     }
 }

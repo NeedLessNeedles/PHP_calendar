@@ -77,12 +77,22 @@ class UserRepositoryTest extends KernelTestCase
      */
     public function testUpgradePasswordWithUnsupportedUser(): void
     {
-        $user = new class () implements PasswordAuthenticatedUserInterface {
+        $user = new class() implements PasswordAuthenticatedUserInterface {
+            /**
+             * Gets the password.
+             *
+             * @return string|null Password
+             */
             public function getPassword(): ?string
             {
                 return 'old';
             }
 
+            /**
+             * Gets the user identifier.
+             *
+             * @return string user identifier
+             */
             public function getUserIdentifier(): string
             {
                 return 'unsupported@test.com';

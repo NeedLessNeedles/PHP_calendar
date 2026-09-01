@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
  */
 class TagFixturesTest extends TestCase
 {
+    /**
+     * Load data.
+     */
     public function testLoadDataPersistsTags(): void
     {
         $fixtures = new TagFixtures();
@@ -26,6 +29,9 @@ class TagFixturesTest extends TestCase
         $this->assertTrue(true);
     }
 
+    /**
+     * Test if group is main.
+     */
     public function testFixtureGroupIsMain(): void
     {
         $this->assertSame(['main'], TagFixtures::getGroups());

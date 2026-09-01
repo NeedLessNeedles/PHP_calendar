@@ -41,6 +41,10 @@ class HomeControllerTest extends WebTestCase
 
     /**
      * Get user.
+     *
+     * @param <string> $client Client
+     *
+     * @return User user
      */
     private function getUser($client): User
     {

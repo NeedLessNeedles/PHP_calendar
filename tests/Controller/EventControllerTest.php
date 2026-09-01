@@ -12,7 +12,6 @@ use App\Entity\User;
 use App\Service\EventServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\Pagination\PaginationInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -24,153 +23,6 @@ class EventControllerTest extends WebTestCase
     private KernelBrowser $client;
 
     private EntityManagerInterface $manager;
-
-    /**
-     * Create client and get entity manager.
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-
-        $this->manager = static::getContainer()
-            ->get(EntityManagerInterface::class);
-    }
-
-    /**
-     * Get event service mock.
-     *
-     * @return EventServiceInterface&MockObject
-     */
-    private function mockEventService(): EventServiceInterface&MockObject
-    {
-        $service = $this->createMock(EventServiceInterface::class);
-
-        static::getContainer()->set(
-            EventServiceInterface::class,
-            $service
-        );
-
-        return $service;
-    }
-
-    /**
-     * Get existing user.
-     *
-     * @param string $email Email
-     *
-     * @return User User
-     */
-    private function getUser(
-        string $email = 'user.first@gmail.com'
-    ): User {
-        $user = $this->manager
-            ->getRepository(User::class)
-            ->findOneBy(['email' => $email]);
-
-        self::assertInstanceOf(User::class, $user);
-
-        return $user;
-    }
-
-    /**
-     * Create event fixture.
-     *
-     * The event is not persisted.
-     *
-     * @param string $title Event title
-     *
-     * @return Event Event
-     */
-    private function createEvent(string $title = 'Test event'): Event
-    {
-        $event = new Event();
-
-        $event->setTitle($title);
-        $event->setDescription('Test description');
-        $event->setLocation('Krakow');
-        $event->setStartDate(new \DateTime('+1 day'));
-        $event->setEndDate(new \DateTime('+1 day 2 hours'));
-        $event->setStatus('approved');
-
-        $category = $this->manager
-            ->getRepository(Category::class)
-            ->findOneBy([]);
-
-        if ($category instanceof Category) {
-            $event->setCategory($category);
-        }
-
-        return $event;
-    }
-
-    /**
-     * Persist event fixture.
-     *
-     * @param string $title Event title
-     *
-     * @return Event Persisted event
-     */
-    private function persistEvent(string $title = 'Test event'): Event
-    {
-        $event = $this->createEvent($title);
-
-        self::assertInstanceOf(
-            Category::class,
-            $event->getCategory(),
-            'At least one category fixture is required.'
-        );
-
-        $this->manager->persist($event);
-        $this->manager->flush();
-
-        return $event;
-    }
-
-    /**
-     * Log user in.
-     *
-     * @return User Logged user
-     */
-    private function loginUser(): User
-    {
-        $user = $this->getUser();
-
-        $this->client->loginUser($user);
-
-        return $user;
-    }
-
-    /**
-     * Get event from fixtures.
-     *
-     * @param string $title Event title
-     *
-     * @return Event|null Event
-     */
-    private function getEvent(string $title = 'Test event'): ?Event
-    {
-        return $this->manager
-            ->getRepository(Event::class)
-            ->findOneBy(['title' => $title]);
-    }
-
-    /**
-     * Get category ID from fixtures.
-     *
-     * @return int Category ID
-     */
-    private function getCategoryId(): int
-    {
-        $category = $this->manager
-            ->getRepository(Category::class)
-            ->findOneBy([]);
-
-        self::assertInstanceOf(Category::class, $category);
-
-        return $category->getId();
-    }
 
     /**
      * Index page can be displayed.
@@ -273,10 +125,6 @@ class EventControllerTest extends WebTestCase
             ],
         ]);
 
-        /*
-         * The title field is required in EventType, therefore Symfony
-         * rejects the form before the service validation methods are called.
-         */
         self::assertResponseRedirects('/event/new');
     }
 
@@ -342,12 +190,6 @@ class EventControllerTest extends WebTestCase
             ->method('isTitleUnique')
             ->willReturn(true);
 
-        /*
-         * The controller may use either save() or create(), depending on
-         * the current implementation. We verify the resulting response
-         * and form processing here rather than coupling the test to the
-         * internal persistence method.
-         */
         $service
             ->method('save');
 
@@ -639,5 +481,149 @@ class EventControllerTest extends WebTestCase
             'BEGIN:VCALENDAR',
             $this->client->getResponse()->getContent()
         );
+    }
+
+    /**
+     * Create client and get entity manager.
+     */
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+
+        $this->manager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+    }
+
+    /**
+     * Get event service mock.
+     *
+     * @return EventServiceInterface Event service interface
+     */
+    private function mockEventService(): EventServiceInterface
+    {
+        $service = $this->createMock(EventServiceInterface::class);
+
+        static::getContainer()->set(
+            EventServiceInterface::class,
+            $service
+        );
+
+        return $service;
+    }
+
+    /**
+     * Get existing user.
+     *
+     * @param string $email Email
+     *
+     * @return User User
+     */
+    private function getUser(string $email = 'user.first@gmail.com'): User
+    {
+        $user = $this->manager
+            ->getRepository(User::class)
+            ->findOneBy(['email' => $email]);
+
+        self::assertInstanceOf(User::class, $user);
+
+        return $user;
+    }
+
+    /**
+     * Create event fixture.
+     *
+     * The event is not persisted.
+     *
+     * @param string $title Event title
+     *
+     * @return Event Event
+     */
+    private function createEvent(string $title = 'Test event'): Event
+    {
+        $event = new Event();
+
+        $event->setTitle($title);
+        $event->setDescription('Test description');
+        $event->setLocation('Krakow');
+        $event->setStartDate(new \DateTime('+1 day'));
+        $event->setEndDate(new \DateTime('+1 day 2 hours'));
+        $event->setStatus('approved');
+
+        $category = $this->manager
+            ->getRepository(Category::class)
+            ->findOneBy([]);
+
+        if ($category instanceof Category) {
+            $event->setCategory($category);
+        }
+
+        return $event;
+    }
+
+    /**
+     * Persist event fixture.
+     *
+     * @param string $title Event title
+     *
+     * @return Event Persisted event
+     */
+    private function persistEvent(string $title = 'Test event'): Event
+    {
+        $event = $this->createEvent($title);
+
+        self::assertInstanceOf(
+            Category::class,
+            $event->getCategory(),
+            'At least one category fixture is required.'
+        );
+
+        $this->manager->persist($event);
+        $this->manager->flush();
+
+        return $event;
+    }
+
+    /**
+     * Log user in.
+     *
+     * @return User Logged user
+     */
+    private function loginUser(): User
+    {
+        $user = $this->getUser();
+
+        $this->client->loginUser($user);
+
+        return $user;
+    }
+
+    /**
+     * Get event from fixtures.
+     *
+     * @param string $title Event title
+     *
+     * @return Event|null Event
+     */
+    private function getEvent(string $title = 'Test event'): ?Event
+    {
+        return $this->manager
+            ->getRepository(Event::class)
+            ->findOneBy(['title' => $title]);
+    }
+
+    /**
+     * Get category ID from fixtures.
+     *
+     * @return int Category ID
+     */
+    private function getCategoryId(): int
+    {
+        $category = $this->manager
+            ->getRepository(Category::class)
+            ->findOneBy([]);
+
+        self::assertInstanceOf(Category::class, $category);
+
+        return $category->getId();
     }
 }

@@ -39,7 +39,7 @@ interface AdminServiceInterface
     /**
      * Toggle user block.
      *
-     * @param User $targetUser Target user
+     * @param User $targetUser  Target user
      * @param User $currentUser Current user
      */
     public function toggleBlock(User $targetUser, User $currentUser): void;

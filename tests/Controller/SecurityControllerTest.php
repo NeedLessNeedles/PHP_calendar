@@ -23,35 +23,6 @@ class SecurityControllerTest extends WebTestCase
     private KernelBrowser $client;
 
     /**
-     * Create browser client.
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-    }
-
-    /**
-     * Get security service mock.
-     *
-     * @return SecurityServiceInterface&MockObject
-     */
-    private function mockSecurityService(): SecurityServiceInterface&MockObject
-    {
-        $service = $this->createMock(
-            SecurityServiceInterface::class
-        );
-
-        static::getContainer()->set(
-            SecurityServiceInterface::class,
-            $service
-        );
-
-        return $service;
-    }
-
-    /**
      * Login page can be displayed.
      */
     public function testLoginPageLoads(): void
@@ -121,5 +92,34 @@ class SecurityControllerTest extends WebTestCase
         );
 
         $controller->logout();
+    }
+
+    /**
+     * Create browser client.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->client = static::createClient();
+    }
+
+    /**
+     * Get security service mock.
+     *
+     * @return SecurityServiceInterface&MockObject Security service interface and Mock object
+     */
+    private function mockSecurityService(): SecurityServiceInterface&MockObject
+    {
+        $service = $this->createMock(
+            SecurityServiceInterface::class
+        );
+
+        static::getContainer()->set(
+            SecurityServiceInterface::class,
+            $service
+        );
+
+        return $service;
     }
 }

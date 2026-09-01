@@ -7,7 +7,6 @@
 namespace App\Tests\Controller;
 
 use App\Entity\Category;
-use App\Entity\Event;
 use App\Entity\User;
 use App\Service\CategoryServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,105 +21,6 @@ class CategoryControllerTest extends WebTestCase
     private KernelBrowser $client;
 
     private EntityManagerInterface $manager;
-
-    /**
-     * Create client and entity manager.
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-
-        $this->manager = static::getContainer()
-            ->get(EntityManagerInterface::class);
-    }
-
-    /**
-     * Get category service mock.
-     *
-     * @return CategoryServiceInterface&\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function mockCategoryService(): CategoryServiceInterface
-    {
-        $service = $this->createMock(CategoryServiceInterface::class);
-
-        static::getContainer()->set(
-            CategoryServiceInterface::class,
-            $service
-        );
-
-        return $service;
-    }
-
-    /**
-     * Get admin user.
-     *
-     * @return User Admin user.
-     */
-    private function getAdminUser(): User
-    {
-        $users = $this->manager
-            ->getRepository(User::class)
-            ->findAll();
-
-        foreach ($users as $user) {
-            if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-                return $user;
-            }
-        }
-
-        self::fail('ROLE_ADMIN user fixture is required.');
-    }
-
-    /**
-     * Login as administrator.
-     *
-     * @return User Admin user.
-     */
-    private function loginAdmin(): User
-    {
-        $user = $this->getAdminUser();
-
-        $this->client->loginUser($user);
-
-        return $user;
-    }
-
-    /**
-     * Create a unique category.
-     *
-     * @param string|null $title Category title
-     *
-     * @return Category Category entity.
-     */
-    private function createCategory(?string $title = null): Category
-    {
-        $category = new Category();
-
-        $category->setTitle(
-            $title ?? 'Category '.uniqid('', true)
-        );
-
-        return $category;
-    }
-
-    /**
-     * Persist a unique category.
-     *
-     * @param string|null $title Category title
-     *
-     * @return Category Persisted category.
-     */
-    private function persistCategory(?string $title = null): Category
-    {
-        $category = $this->createCategory($title);
-
-        $this->manager->persist($category);
-        $this->manager->flush();
-
-        return $category;
-    }
 
     /**
      * Index page can be displayed.
@@ -490,5 +390,104 @@ class CategoryControllerTest extends WebTestCase
         $this->client->submit($form);
 
         self::assertResponseRedirects('/category');
+    }
+
+    /**
+     * Create client and entity manager.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->client = static::createClient();
+
+        $this->manager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+    }
+
+    /**
+     * Get category service mock.
+     *
+     * @return CategoryServiceInterface&\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function mockCategoryService(): CategoryServiceInterface
+    {
+        $service = $this->createMock(CategoryServiceInterface::class);
+
+        static::getContainer()->set(
+            CategoryServiceInterface::class,
+            $service
+        );
+
+        return $service;
+    }
+
+    /**
+     * Get admin user.
+     *
+     * @return User admin user
+     */
+    private function getAdminUser(): User
+    {
+        $users = $this->manager
+            ->getRepository(User::class)
+            ->findAll();
+
+        foreach ($users as $user) {
+            if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+                return $user;
+            }
+        }
+
+        self::fail('ROLE_ADMIN user fixture is required.');
+    }
+
+    /**
+     * Login as administrator.
+     *
+     * @return User admin user
+     */
+    private function loginAdmin(): User
+    {
+        $user = $this->getAdminUser();
+
+        $this->client->loginUser($user);
+
+        return $user;
+    }
+
+    /**
+     * Create a unique category.
+     *
+     * @param string|null $title Category title
+     *
+     * @return Category category entity
+     */
+    private function createCategory(?string $title = null): Category
+    {
+        $category = new Category();
+
+        $category->setTitle(
+            $title ?? 'Category '.uniqid('', true)
+        );
+
+        return $category;
+    }
+
+    /**
+     * Persist a unique category.
+     *
+     * @param string|null $title Category title
+     *
+     * @return Category persisted category
+     */
+    private function persistCategory(?string $title = null): Category
+    {
+        $category = $this->createCategory($title);
+
+        $this->manager->persist($category);
+        $this->manager->flush();
+
+        return $category;
     }
 }
