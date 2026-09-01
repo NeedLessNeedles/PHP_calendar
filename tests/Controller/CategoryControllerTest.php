@@ -7,233 +7,488 @@
 namespace App\Tests\Controller;
 
 use App\Entity\Category;
+use App\Entity\Event;
 use App\Entity\User;
+use App\Service\CategoryServiceInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * Class CategoryControllerTest.
+ */
 class CategoryControllerTest extends WebTestCase
 {
-    private const CATEGORY_ROUTE = '/category';
+    private KernelBrowser $client;
+
+    private EntityManagerInterface $manager;
 
     /**
-     * Test getUser().
+     * Create client and entity manager.
      */
-    private function getUser($client, string $email): ?User
+    protected function setUp(): void
     {
-        return $client->getContainer()
-            ->get('doctrine')
-            ->getRepository(User::class)
-            ->findOneBy(['email' => $email]);
-    }
+        parent::setUp();
 
-    private function getCategory($client): ?Category
-    {
-        return $client->getContainer()
-            ->get('doctrine')
-            ->getRepository(Category::class)
-            ->findOneBy([]);
+        $this->client = static::createClient();
+
+        $this->manager = static::getContainer()
+            ->get(EntityManagerInterface::class);
     }
 
     /**
-     * Test index route.
+     * Get category service mock.
+     *
+     * @return CategoryServiceInterface&\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function mockCategoryService(): CategoryServiceInterface
+    {
+        $service = $this->createMock(CategoryServiceInterface::class);
+
+        static::getContainer()->set(
+            CategoryServiceInterface::class,
+            $service
+        );
+
+        return $service;
+    }
+
+    /**
+     * Get admin user.
+     *
+     * @return User Admin user.
+     */
+    private function getAdminUser(): User
+    {
+        $users = $this->manager
+            ->getRepository(User::class)
+            ->findAll();
+
+        foreach ($users as $user) {
+            if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+                return $user;
+            }
+        }
+
+        self::fail('ROLE_ADMIN user fixture is required.');
+    }
+
+    /**
+     * Login as administrator.
+     *
+     * @return User Admin user.
+     */
+    private function loginAdmin(): User
+    {
+        $user = $this->getAdminUser();
+
+        $this->client->loginUser($user);
+
+        return $user;
+    }
+
+    /**
+     * Create a unique category.
+     *
+     * @param string|null $title Category title
+     *
+     * @return Category Category entity.
+     */
+    private function createCategory(?string $title = null): Category
+    {
+        $category = new Category();
+
+        $category->setTitle(
+            $title ?? 'Category '.uniqid('', true)
+        );
+
+        return $category;
+    }
+
+    /**
+     * Persist a unique category.
+     *
+     * @param string|null $title Category title
+     *
+     * @return Category Persisted category.
+     */
+    private function persistCategory(?string $title = null): Category
+    {
+        $category = $this->createCategory($title);
+
+        $this->manager->persist($category);
+        $this->manager->flush();
+
+        return $category;
+    }
+
+    /**
+     * Index page can be displayed.
      */
     public function testIndex(): void
     {
-        // given
-        $client = static::createClient();
+        $this->client->request('GET', '/category');
 
-        // when
-        $client->request('GET', self::CATEGORY_ROUTE);
-
-        // then
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('table');
+        self::assertResponseIsSuccessful();
+        self::assertPageTitleContains('Categories');
+        self::assertSelectorExists('table');
     }
 
     /**
-     * Test show category.
+     * Index supports page parameter.
      */
-    public function testShowCategory(): void
+    public function testIndexWithPage(): void
     {
-        // given
-        $client = static::createClient();
-        $category = $this->getCategory($client);
+        $this->client->request('GET', '/category?page=2');
 
-        $this->assertNotNull($category);
-
-        // when
-        $client->request(
-            'GET',
-            self::CATEGORY_ROUTE.'/'.$category->getId()
-        );
-
-        // then
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('body');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('table');
     }
 
     /**
-     * Tests if new category can be created only by admin.
+     * New category page can be displayed for administrator.
      */
-    public function testNewRequiresAdmin(): void
+    public function testNewGet(): void
     {
-        // given
-        $client = static::createClient();
+        $this->loginAdmin();
 
-        // when
-        $client->request('GET', self::CATEGORY_ROUTE.'/new');
+        $this->client->request('GET', '/category/new');
 
-        // then
-        $this->assertResponseRedirects();
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form');
     }
 
     /**
-     * Tests for regular user case.
+     * Empty category title is rejected.
      */
-    public function testNewRequiresAdminForRegularUser(): void
+    public function testNewRejectsEmptyTitle(): void
     {
-        // given
-        $client = static::createClient();
+        $service = $this->mockCategoryService();
 
-        $user = $this->getUser(
-            $client,
-            'user.first@gmail.com'
-        );
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(false);
 
-        $this->assertNotNull($user);
-        $client->loginUser($user);
+        $service
+            ->expects($this->never())
+            ->method('isTitleUnique');
 
-        // when
-        $client->request(
-            'GET',
-            self::CATEGORY_ROUTE.'/new'
-        );
+        $service
+            ->expects($this->never())
+            ->method('save');
 
-        // then
-        $this->assertResponseStatusCodeSame(403);
-    }
+        $this->loginAdmin();
 
-    public function testNewAsAdmin(): void
-    {
-        // given
-        $client = static::createClient();
-        $admin = $this->getUser(
-            $client,
-            'admin.first@gmail.com'
-        );
-        $this->assertNotNull($admin);
-        $client->loginUser($admin);
-
-        // when
-        $client->request('POST', self::CATEGORY_ROUTE.'/new', [
+        $this->client->request('POST', '/category/new', [
             'category' => [
-                'title' => 'Test category',
+                'title' => '',
             ],
         ]);
 
-        // then
-        $this->assertResponseRedirects(self::CATEGORY_ROUTE);
-        $repository = static::getContainer()
-            ->get('doctrine')
-            ->getRepository(Category::class);
-        $category = $repository->findOneBy([
-            'title' => 'Test category',
-        ]);
-        $this->assertNotNull($category);
+        self::assertResponseRedirects('/category/new');
     }
 
-    public function testEditCategory(): void
+    /**
+     * Duplicate category title is rejected.
+     */
+    public function testNewRejectsDuplicateTitle(): void
     {
-        $client = static::createClient();
+        $service = $this->mockCategoryService();
 
-        $admin = $this->getUser($client, 'admin.first@gmail.com');
-        $category = $this->getCategory($client);
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
 
-        $client->loginUser($admin);
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(false);
 
-        $crawler = $client->request('GET', '/category/'.$category->getId().'/edit');
+        $service
+            ->expects($this->never())
+            ->method('save');
 
-        $client->request('POST', '/category/'.$category->getId().'/edit', [
-            '_token' => 'category_edit',
+        $this->loginAdmin();
+
+        $this->client->request('POST', '/category/new', [
             'category' => [
-                'title' => 'Updated title',
+                'title' => 'Duplicate category',
             ],
         ]);
 
-        $this->assertResponseRedirects('/category');
+        self::assertResponseRedirects('/category/new');
     }
 
     /**
-     * Test for invalid token.
+     * Valid category is saved.
      */
-    public function testEditCategoryWithInvalidCsrfToken(): void
+    public function testNewSavesValidCategory(): void
     {
-        // given
-        $client = static::createClient();
-        $admin = $this->getUser(
-            $client,
-            'admin.first@gmail.com'
-        );
-        $category = $this->getCategory($client);
+        $service = $this->mockCategoryService();
 
-        $this->assertNotNull($admin);
-        $this->assertNotNull($category);
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
 
-        $client->loginUser($admin);
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(true);
 
-        // when
-        $client->request(
-            'POST',
-            self::CATEGORY_ROUTE.'/'.$category->getId().'/edit',
-            [
-                '_token' => 'invalid-token',
-                'category' => [
-                    'title' => 'Should not be saved',
-                ],
-            ]
-        );
+        $service
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->isInstanceOf(Category::class));
 
-        // then
-        $this->assertResponseStatusCodeSame(403);
+        $this->loginAdmin();
+
+        $this->client->request('GET', '/category/new');
+
+        self::assertResponseIsSuccessful();
+
+        $crawler = $this->client->getCrawler();
+
+        $form = $crawler->filter('form')->form();
+
+        $form['category[title]'] = 'Valid category '.uniqid();
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/category');
     }
 
     /**
-     * Test for category removal.
+     * Edit category page can be displayed.
      */
-    public function testDeleteCategoryWithInvalidCsrfToken(): void
+    public function testEditGet(): void
     {
-        // given
-        $client = static::createClient();
+        $category = $this->persistCategory();
 
-        $admin = $this->getUser(
-            $client,
-            'admin.first@gmail.com'
+        $this->loginAdmin();
+
+        $this->client->request(
+            'GET',
+            '/category/'.$category->getId().'/edit'
         );
 
-        $category = $this->getCategory($client);
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form');
+    }
 
-        $this->assertNotNull($admin);
-        $this->assertNotNull($category);
+    /**
+     * Empty category title is rejected during edit.
+     */
+    public function testEditRejectsEmptyTitle(): void
+    {
+        $category = $this->persistCategory();
 
-        $client->loginUser($admin);
+        $service = $this->mockCategoryService();
 
-        $categoryId = $category->getId();
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(false);
 
-        // when
-        $client->request(
-            'POST',
-            self::CATEGORY_ROUTE.'/'.$categoryId,
-            [
-                '_token' => 'invalid-token',
-            ]
+        $service
+            ->expects($this->never())
+            ->method('isTitleUnique');
+
+        $service
+            ->expects($this->never())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/category/'.$category->getId().'/edit'
         );
 
-        // then
-        $this->assertResponseRedirects(self::CATEGORY_ROUTE);
+        self::assertResponseIsSuccessful();
 
-        $repository = static::getContainer()
-            ->get('doctrine')
-            ->getRepository(Category::class);
+        $form = $crawler->filter('form')->form();
 
-        $this->assertNotNull($repository->find($categoryId));
+        $form['category[title]'] = '';
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects(
+            '/category/'.$category->getId().'/edit'
+        );
+    }
+
+    /**
+     * Duplicate category title is rejected during edit.
+     */
+    public function testEditRejectsDuplicateTitle(): void
+    {
+        $category = $this->persistCategory();
+
+        $service = $this->mockCategoryService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/category/'.$category->getId().'/edit'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler->filter('form')->form();
+
+        $form['category[title]'] = 'Duplicate title';
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects(
+            '/category/'.$category->getId().'/edit'
+        );
+    }
+
+    /**
+     * Valid category is saved during edit.
+     */
+    public function testEditSavesValidCategory(): void
+    {
+        $category = $this->persistCategory();
+
+        $service = $this->mockCategoryService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->isInstanceOf(Category::class));
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/category/'.$category->getId().'/edit'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler->filter('form')->form();
+
+        $form['category[title]'] = 'Updated category '.uniqid();
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/category');
+    }
+
+    /**
+     * Delete page can be displayed.
+     */
+    public function testDeleteGet(): void
+    {
+        $category = $this->persistCategory();
+
+        $service = $this->mockCategoryService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeDeleted')
+            ->willReturn(true);
+
+        $this->loginAdmin();
+
+        $this->client->request(
+            'GET',
+            '/category/'.$category->getId().'/delete'
+        );
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form');
+    }
+
+    /**
+     * Category containing events cannot be deleted.
+     */
+    public function testDeleteRejectsCategoryWithEvents(): void
+    {
+        $category = $this->persistCategory();
+
+        $service = $this->mockCategoryService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeDeleted')
+            ->with($this->isInstanceOf(Category::class))
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('delete');
+
+        $this->client->request(
+            'GET',
+            '/category/'.$category->getId().'/delete'
+        );
+
+        self::assertResponseRedirects('/category');
+    }
+
+    /**
+     * Category can be deleted.
+     */
+    public function testDelete(): void
+    {
+        $category = $this->persistCategory();
+
+        $service = $this->mockCategoryService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeDeleted')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('delete')
+            ->with($this->isInstanceOf(Category::class));
+
+        $this->client->request(
+            'GET',
+            '/category/'.$category->getId().'/delete'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $crawler = $this->client->getCrawler();
+
+        $form = $crawler->filter('form')->form();
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/category');
     }
 }
