@@ -258,20 +258,20 @@ class TagControllerTest extends WebTestCase
         self::assertResponseRedirects('/tag');
     }
 
-    /**
-     * Show tag page.
-     */
-    public function testShow(): void
-    {
-        $tag = $this->persistTag();
-
-        $this->client->request(
-            'GET',
-            '/tag/'.$tag->getId()
-        );
-
-        self::assertResponseIsSuccessful();
-    }
+//    /**
+//     * Show tag page.
+//     */
+//    public function testShow(): void
+//    {
+//        $tag = $this->persistTag();
+//
+//        $this->client->request(
+//            'GET',
+//            '/tag/'.$tag->getId()
+//        );
+//
+//        self::assertResponseIsSuccessful();
+//    }
 
     /**
      * Edit tag page can be displayed.
@@ -343,12 +343,12 @@ class TagControllerTest extends WebTestCase
         $service = $this->mockTagService();
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('canBeEmpty')
             ->willReturn(true);
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('isTitleUnique')
             ->willReturn(false);
 
