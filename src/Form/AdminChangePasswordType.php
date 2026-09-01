@@ -32,6 +32,7 @@ class AdminChangePasswordType extends AbstractType
                 PasswordType::class,
                 [
                     'mapped' => false,
+                    'label' => 'label.new_password',
                 ]
             );
     }

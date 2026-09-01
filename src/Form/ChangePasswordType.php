@@ -32,6 +32,7 @@ class ChangePasswordType extends AbstractType
                 PasswordType::class,
                 [
                     'mapped' => false,
+                    'label' => 'label.current_password',
                 ]
             )
             ->add(
@@ -39,6 +40,7 @@ class ChangePasswordType extends AbstractType
                 PasswordType::class,
                 [
                     'mapped' => false,
+                    'label' => 'label.new_password',
                 ]
             );
     }

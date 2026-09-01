@@ -29,6 +29,7 @@ class ChangeEmailType extends AbstractType
                 'email',
                 EmailType::class,
                 [
+                    'label' => 'label.email',
                     'mapped' => false,
                 ]
             );

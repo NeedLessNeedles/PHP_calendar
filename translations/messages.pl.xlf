@@ -175,6 +175,18 @@
           <source>button.unblock</source>
           <target>Odblokuj</target>
         </trans-unit>
+        <trans-unit id="button.export">
+          <source>button.export</source>
+          <target>Eksportuj do ICS</target>
+        </trans-unit>
+        <trans-unit id="button.promote">
+          <source>button.promote</source>
+          <target>Awansuj</target>
+        </trans-unit>
+        <trans-unit id="button.degrade">
+          <source>button.degrade</source>
+          <target>Zdegraduj</target>
+        </trans-unit>
 
         <!-- /home -->
         <trans-unit id="text.welcome_home">
@@ -345,6 +357,22 @@
         <source>alert.delete_category</source>
         <target>Usunąć kategorię?</target>
       </trans-unit>
+      <trans-unit id="alert.delete_event">
+        <source>alert.delete_event</source>
+        <target>Usuń wydarzenie</target>
+      </trans-unit>
+      <trans-unit id="alert.delete_tag">
+        <source>alert.delete_tag</source>
+        <target>Usuń tag</target>
+      </trans-unit>
+      <trans-unit id="alert.delete_item">
+        <source>alert.delete_item</source>
+        <target>Czy na pewno chcesz usunąć ten obiekt?</target>
+      </trans-unit>
+      <trans-unit id="label.none">
+        <source>label.none</source>
+        <target>Wybierz obiekt z listy</target>
+      </trans-unit>
 
       <!-- /admin/requests -->
       <trans-unit id="th.start">
@@ -409,6 +437,30 @@
         <source>message.validation_failed</source>
         <target>Walidacja nie powiodła się!</target>
       </trans-unit>
+      <trans-unit id="message.category_contains_events">
+        <source>message.category_contains_events</source>
+        <target>Nie możesz usunąć kategorii przypisanej do wydarzeń!</target>
+      </trans-unit>
+      <trans-unit id="message.input_fields">
+        <source>message.input_fields</source>
+        <target>Pola tekstowe nie mogą być puste!</target>
+      </trans-unit>
+      <trans-unit id="message.title_already_exists">
+        <source>message.title_already_exists</source>
+        <target>Obiekt o takiej nazwie już istnieje!</target>
+      </trans-unit>
+      <trans-unit id="message.email_already_exists">
+        <source>message.email_already_exists</source>
+        <target>Użytkownik z takim e-mailem już istnieje!</target>
+      </trans-unit>
+      <trans-unit id="message.empty_title">
+        <source>message.empty_title</source>
+        <target>Pola 'Tytuł' lub 'Data rozpoczęcia' (z poprawnym dniem i godziną) nie mogą być puste!</target>
+      </trans-unit>
+      <trans-unit id="message.empty_start_date">
+        <source>message.empty_start_date</source>
+        <target>Pole 'Data rozpoczęcia' nie może być puste lub mieć pustej godziny rozpoczęcia!</target>
+      </trans-unit>
       <trans-unit id="message.blocked_user">
         <source>message.blocked_user</source>
         <target>Użytkownik zablokowany pomyślnie!</target>
@@ -424,6 +476,10 @@
       <trans-unit id="message.user_registered">
         <source>message.user_registered</source>
         <target>Użytkownik zarejestrowany pomyślnie!</target>
+      </trans-unit>
+      <trans-unit id="message.cant_block_yourself">
+        <source>message.cant_block_yourself</source>
+        <target>Nie możesz zablokować siebie samego!</target>
       </trans-unit>
 
       <trans-unit id="message.agree_terms">
@@ -450,6 +506,14 @@
       <trans-unit id="label.repeat_password">
         <source>label.repeat_password</source>
         <target>Powtórz hasło</target>
+      </trans-unit>
+      <trans-unit id="title.change_password">
+        <source>title.change_password</source>
+        <target>Zmień hasło</target>
+      </trans-unit>
+      <trans-unit id="title.change_email">
+        <source>title.change_email</source>
+        <target>Zmień e-mail</target>
       </trans-unit>
     </body>
   </file>
