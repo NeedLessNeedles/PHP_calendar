@@ -491,7 +491,7 @@
       </trans-unit>
       <trans-unit id="message.enter_password">
         <source>message.enter_password</source>
-        <target>Please enter a password</target>
+        <target>'Email' or 'Password' field cannot be empty!</target>
       </trans-unit>
       <trans-unit id="message.but_at_least">
         <source>message.but_at_least</source>

@@ -51,13 +51,26 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $plainPassword = $form->get('plainPassword')->getData();
 
-            $this->registrationService->registerUser(
-                $user,
-                $plainPassword,
-            );
+            if (!$this->registrationService->canBeEmpty($user, $plainPassword)) {
+                $this->addFlash(
+                    'warning',
+                    $this->translator->trans('message.enter_password')
+                );
+
+                return $this->render('registration/register.html.twig', [
+                    'registrationForm' => $form,
+                ]);
+            }
+
+            if ($form->isValid()) {
+                $this->registrationService->registerUser(
+                    $user,
+                    $plainPassword,
+                );
+            }
 
             $this->addFlash(
                 'success',

@@ -8,12 +8,12 @@
             <h1 class="h3 mb-3 font-weight-normal">{{ 'title.please_sign_up'|trans }}</h1>
             {{ form_errors(registrationForm) }}
 
-            {{ form_start(registrationForm) }}
+            {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
             {{ form_row(registrationForm.email) }}
             {{ form_row(registrationForm.plainPassword, {
                 label: 'label.password'
             }) }}
-            {{ form_row(registrationForm.agreeTerms) }}
+{#            {{ form_row(registrationForm.agreeTerms) }}#}
 
             <div class="d-flex flex-direction-row gap-2">
                 <p>{{ 'label.already_have'|trans }}</p>
