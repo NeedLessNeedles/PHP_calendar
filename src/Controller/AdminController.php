@@ -280,7 +280,7 @@ class AdminController extends AbstractController
             );
         }
 
-        $this->adminService->toggleBlock($user, $this->getUser());
+        $this->adminService->toggleBlock($user, $currentUser);
 
         $this->addFlash(
             'success',

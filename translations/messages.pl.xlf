@@ -355,15 +355,15 @@
       </trans-unit>
       <trans-unit id="alert.delete_category">
         <source>alert.delete_category</source>
-        <target>Usunąć kategorię?</target>
+        <target>Czy na pewno chcesz usunąć tę kategorię?</target>
       </trans-unit>
       <trans-unit id="alert.delete_event">
         <source>alert.delete_event</source>
-        <target>Usuń wydarzenie</target>
+        <target>Czy na pewno chcesz usunąć to wydarzenie?</target>
       </trans-unit>
       <trans-unit id="alert.delete_tag">
         <source>alert.delete_tag</source>
-        <target>Usuń tag</target>
+        <target>Czy na pewno chcesz usunąć ten tag?</target>
       </trans-unit>
       <trans-unit id="alert.delete_item">
         <source>alert.delete_item</source>
@@ -463,7 +463,7 @@
       </trans-unit>
       <trans-unit id="message.blocked_user">
         <source>message.blocked_user</source>
-        <target>Użytkownik zablokowany pomyślnie!</target>
+        <target>Status użytkownika zmieniony pomyślnie!</target>
       </trans-unit>
       <trans-unit id="message.request_approved">
         <source>message.request_approved</source>
