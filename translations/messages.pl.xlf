@@ -488,11 +488,11 @@
       </trans-unit>
       <trans-unit id="message.enter_password">
         <source>message.enter_password</source>
-        <target>Wprowadź hasło</target>
+        <target>Pole 'Email' lub 'Hasło' nie może być puste!</target>
       </trans-unit>
       <trans-unit id="message.but_at_least">
         <source>message.but_at_least</source>
-        <target>Twoje hasło powinno mieć conajmniej 8 znkaów</target>
+        <target>Twoje hasło powinno mieć conajmniej 8 znaków</target>
       </trans-unit>
 
       <trans-unit id="label.new_password">
