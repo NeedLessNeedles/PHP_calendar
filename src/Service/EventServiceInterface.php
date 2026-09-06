@@ -20,6 +20,7 @@ interface EventServiceInterface
     /**
      * Get paginated list.
      *
+     * @param User|null $owner     Owner
      * @param int         $page       Page number
      * @param int|null    $categoryId Category ID
      * @param string|null $title      Title

@@ -45,6 +45,7 @@ class EventController extends AbstractController
     )]
     public function index(Request $request): Response
     {
+        $owner = $this->getUser();
         $page = $request->query->getInt('page', 1);
 
         $categoryId = $request->query->get('categoryId');
@@ -54,8 +55,6 @@ class EventController extends AbstractController
         $tagId = is_numeric($tagId) ? (int) $tagId : null;
 
         $title = $request->query->get('title');
-
-        $owner = $this->getUser();
 
         $pagination = $this->eventService->getPaginatedList(
             $owner,
@@ -147,9 +146,10 @@ class EventController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['GET', 'PUT'],
     )]
+    #[IsGranted(EventVoter::EDIT, 'event')]
     public function edit(Request $request, Event $event): Response
     {
-        if ($event->getOwner() !== $this->getUser()) {
+        if (!$this->isGranted('ROLE_ADMIN') && $event->getOwner() !== $this->getUser()) {
             $this->addFlash(
                 'warning',
                 $this->translator->trans('message.record_not_found')
@@ -227,9 +227,10 @@ class EventController extends AbstractController
         requirements: ['id' => '[1-9]\d*'],
         methods: ['GET', 'DELETE'],
     )]
+    #[IsGranted(EventVoter::DELETE, 'event')]
     public function delete(Request $request, Event $event): Response
     {
-        if ($event->getOwner() !== $this->getUser()) {
+        if (!$this->isGranted('ROLE_ADMIN') && $event->getOwner() !== $this->getUser()) {
             $this->addFlash(
                 'warning',
                 $this->translator->trans('message.record_not_found')

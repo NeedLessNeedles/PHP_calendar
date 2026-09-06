@@ -33,6 +33,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * Query all records.
      *
+     * @param User|null $owner     Owner
      * @param int|null    $categoryId Category ID
      * @param string|null $title      Title
      * @param int|null    $tagId      Tag ID
@@ -46,9 +47,13 @@ class EventRepository extends ServiceEntityRepository
             ->leftJoin('event.category', 'category')
             ->addSelect('category')
             ->leftJoin('event.tags', 'tag')
-            ->addSelect('tag')
-            ->andWhere('event.owner = :owner')
-            ->setParameter('owner', $owner);
+            ->addSelect('tag');
+
+        if (!in_array('ROLE_ADMIN', $owner->getRoles(), true)) {
+            $queryBuilder
+                ->andWhere('event.owner = :owner')
+                ->setParameter('owner', $owner);
+        }
 
         if (null !== $categoryId) {
             $queryBuilder

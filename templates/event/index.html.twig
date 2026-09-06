@@ -140,8 +140,12 @@
 
                     {% if app.user %}
                         <td>
-                            <a class="btn btn-primary btn-sm edit-event-btn" href="{{ path('app_event_edit', {'id': event.id}) }}">{{ 'button.edit'|trans }}</a>
-                            <a class="btn btn-danger btn-sm" href="{{ path('app_event_delete', {'id': event.id}) }}">{{ 'button.delete'|trans }}</a>
+                            {% if is_granted('EVENT_EDIT', event) %}
+                                <a class="btn btn-primary btn-sm edit-event-btn" href="{{ path('app_event_edit', {'id': event.id}) }}">{{ 'button.edit'|trans }}</a>
+                            {% endif %}
+                            {% if is_granted('EVENT_DELETE', event) %}
+                                <a class="btn btn-danger btn-sm" href="{{ path('app_event_delete', {'id': event.id}) }}">{{ 'button.delete'|trans }}</a>
+                            {% endif %}
                         </td>
                     {% else %}
                         <td>-</td>
