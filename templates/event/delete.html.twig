@@ -5,7 +5,7 @@
 {% block body %}
     <div class="container d-flex justify-content-center align-items-center mt-2" style="max-width: 500px;">
         <div class="auth-card d-flex flex-column gap-2">
-            <h1 class="h3 mb-1 font-weight-normal">{{ 'alert.delete_event'|trans({'%id%': category.id|default('')}) }}</h1>
+            <h3 class="h3 mb-1 font-weight-normal">{{ 'alert.delete_event'|trans({'%id%': category.id|default('')}) }}</h3>
             <div>
                 {{ form_start(form) }}
                 {{ form_widget(form) }}

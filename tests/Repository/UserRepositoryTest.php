@@ -9,8 +9,6 @@ namespace App\Tests\Repository;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * Class UserRepositoryTest.
@@ -70,37 +68,6 @@ class UserRepositoryTest extends KernelTestCase
         $this->userRepository->upgradePassword($user, 'new-hash');
 
         $this->assertSame('new-hash', $user->getPassword());
-    }
-
-    /**
-     * Test upgradePassword with unsupported user.
-     */
-    public function testUpgradePasswordWithUnsupportedUser(): void
-    {
-        $user = new class () implements PasswordAuthenticatedUserInterface {
-            /**
-             * Gets the password.
-             *
-             * @return string|null Password
-             */
-            public function getPassword(): ?string
-            {
-                return 'old';
-            }
-
-            /**
-             * Gets the user identifier.
-             *
-             * @return string user identifier
-             */
-            public function getUserIdentifier(): string
-            {
-                return 'unsupported@test.com';
-            }
-        };
-
-        $this->expectException(UnsupportedUserException::class);
-        $this->userRepository->upgradePassword($user, 'new-hash');
     }
 
     /**

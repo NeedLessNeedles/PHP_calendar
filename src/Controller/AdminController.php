@@ -280,7 +280,7 @@ class AdminController extends AbstractController
             );
         }
 
-        $this->adminService->toggleBlock($user, $this->getUser());
+        $this->adminService->toggleBlock($user, $currentUser);
 
         $this->addFlash(
             'success',
@@ -306,10 +306,7 @@ class AdminController extends AbstractController
     {
         $page = $request->query->getInt('page', 1);
 
-        $pagination = $this->eventService->getPaginatedList(
-            $page,
-            status: 'pending'
-        );
+        $pagination = $this->adminService->getPaginatedList($page);
 
         return $this->render('admin/requests.html.twig', [
             'pagination' => $pagination,

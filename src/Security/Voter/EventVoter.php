@@ -11,14 +11,32 @@ use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class EventVoter.
  */
 class EventVoter extends Voter
 {
+    /**
+     * Edit permission.
+     *
+     * @var string
+     */
     public const EDIT = 'EVENT_EDIT';
+
+    /**
+     * View permission.
+     *
+     * @var string
+     */
     public const VIEW = 'EVENT_VIEW';
+    /**
+     * Delete permission.
+     *
+     * @var string
+     */
     public const DELETE = 'EVENT_DELETE';
 
     /**
@@ -60,15 +78,10 @@ class EventVoter extends Voter
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
-
-        /** @var Event $event */
-        $event = $subject;
-
-        if (!$user instanceof User) {
-            if (self::VIEW === $attribute) {
-                return true;
-            }
-
+        if (!$user instanceof UserInterface) {
+            return false;
+        }
+        if (!$subject instanceof Event) {
             return false;
         }
 
@@ -76,19 +89,50 @@ class EventVoter extends Voter
             return true;
         }
 
-        if (self::VIEW === $attribute) {
-            return true;
-        }
+        return match ($attribute) {
+            self::EDIT => $this->canEdit($subject, $user),
+            self::DELETE => $this->canDelete($subject, $user),
+            self::VIEW => $this->canView($subject, $user),
+            default => false,
+        };
+    }
 
-        if (self::DELETE === $attribute) {
-            return $event->getOwner() === $user
-                && 'approved' === $event->getStatus();
-        }
+    /**
+     * Checks if user can delete event.
+     *
+     * @param Event         $event Event entity
+     * @param UserInterface $user  User
+     *
+     * @return bool Result
+     */
+    private function canDelete(Event $event, UserInterface $user): bool
+    {
+        return $event->getOwner() === $user;
+    }
 
-        if (self::EDIT === $attribute) {
-            return $event->getOwner() === $user;
-        }
+    /**
+     * Checks if user can edit an event.
+     *
+     * @param Event         $event Event entity
+     * @param UserInterface $user  User
+     *
+     * @return bool Result
+     */
+    private function canEdit(Event $event, UserInterface $user): bool
+    {
+        return $event->getOwner() === $user;
+    }
 
-        return false;
+    /**
+     * Checks if a user can view an event.
+     *
+     * @param Event         $event Event entity
+     * @param UserInterface $user  User
+     *
+     * @return bool Result
+     */
+    private function canView(Event $event, UserInterface $user): bool
+    {
+        return $event->getOwner() === $user;
     }
 }

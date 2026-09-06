@@ -20,6 +20,7 @@ interface EventServiceInterface
     /**
      * Get paginated list.
      *
+     * @param User|null   $owner      Owner
      * @param int         $page       Page number
      * @param int|null    $categoryId Category ID
      * @param string|null $title      Title
@@ -28,7 +29,7 @@ interface EventServiceInterface
      *
      * @return PaginationInterface Paginated list
      */
-    public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): PaginationInterface;
+    public function getPaginatedList(?User $owner, int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): PaginationInterface;
 
     /**
      * Get all categories.
@@ -58,14 +59,6 @@ interface EventServiceInterface
      * @param Event $event Event entity
      */
     public function delete(Event $event): void;
-
-    /**
-     * Create event.
-     *
-     * @param Event     $event Event
-     * @param User|null $user  User
-     */
-    public function create(Event $event, ?User $user): void;
 
     /**
      * Export approved current and upcoming events to ICS format.

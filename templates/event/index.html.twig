@@ -111,6 +111,7 @@
                 <th>{{ 'th.end_date'|trans }}</th>
                 <th>{{ 'th.location'|trans }}</th>
                 <th>{{ 'th.status'|trans }}</th>
+                <th>Owner</th>
                 <th>{{ 'th.category'|trans }}</th>
                 <th>{{ 'option.tags'|trans }}</th>
                 <th>{{ 'th.actions'|trans }}</th>
@@ -125,6 +126,7 @@
                     <td>{{ event.endDate ? event.endDate|format_date('medium') : '-' }}</td>
                     <td>{{ event.location }}</td>
                     <td>{{ event.status }}</td>
+                    <td>{{ event.owner ? event.owner.email : '-' }}</td>
                     <td>{{ event.category }}</td>
                     <td>
                         {% for tag in event.tags %}
@@ -138,8 +140,12 @@
 
                     {% if app.user %}
                         <td>
-                            <a class="btn btn-primary btn-sm edit-event-btn" href="{{ path('app_event_edit', {'id': event.id}) }}">{{ 'button.edit'|trans }}</a>
-                            <a class="btn btn-danger btn-sm" href="{{ path('app_event_delete', {'id': event.id}) }}">{{ 'button.delete'|trans }}</a>
+                            {% if is_granted('EVENT_EDIT', event) %}
+                                <a class="btn btn-primary btn-sm edit-event-btn" href="{{ path('app_event_edit', {'id': event.id}) }}">{{ 'button.edit'|trans }}</a>
+                            {% endif %}
+                            {% if is_granted('EVENT_DELETE', event) %}
+                                <a class="btn btn-danger btn-sm" href="{{ path('app_event_delete', {'id': event.id}) }}">{{ 'button.delete'|trans }}</a>
+                            {% endif %}
                         </td>
                     {% else %}
                         <td>-</td>
@@ -158,7 +164,7 @@
         </div>
     {% else %}
         <div class="d-flex justify-content-center gap-2 mt-2 mb-2">
-            <h3>Sign in to view the existing records or create the new event proposal above.</h3>
+            <h3>{{ 'header.not_logged_info'|trans }}</h3>
         </div>
     {% endif %}
 

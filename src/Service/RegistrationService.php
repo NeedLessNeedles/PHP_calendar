@@ -40,4 +40,29 @@ class RegistrationService implements RegistrationServiceInterface
         $this->entityManager->persist($user);
         $this->entityManager->flush();
     }
+
+    /**
+     * User registration.
+     *
+     * @param User   $user          User
+     * @param string $plainPassword Plain password
+     *
+     * @return bool Bool
+     */
+    public function canBeEmpty(User $user, ?string $plainPassword): bool
+    {
+        if (null === $user->getEmail()) {
+            return false;
+        }
+
+        if ('' === trim($user->getEmail())) {
+            return false;
+        }
+
+        if (null === $plainPassword) {
+            return false;
+        }
+
+        return '' !== trim($plainPassword);
+    }
 }

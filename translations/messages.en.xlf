@@ -358,15 +358,15 @@
       </trans-unit>
       <trans-unit id="alert.delete_category">
         <source>alert.delete_category</source>
-        <target>Delete category</target>
+        <target>Are you sure you want to delete this category?</target>
       </trans-unit>
       <trans-unit id="alert.delete_event">
         <source>alert.delete_event</source>
-        <target>Delete event</target>
+        <target>Are you sure you want to delete this event?</target>
       </trans-unit>
       <trans-unit id="alert.delete_tag">
         <source>alert.delete_tag</source>
-        <target>Delete tag</target>
+        <target>Are you sure you want to delete this tag?</target>
       </trans-unit>
       <trans-unit id="alert.delete_item">
         <source>alert.delete_category_content</source>
@@ -466,7 +466,7 @@
       </trans-unit>
       <trans-unit id="message.blocked_user">
         <source>message.blocked_user</source>
-        <target>User blocked successfully!</target>
+        <target>User's status changed successfully!</target>
       </trans-unit>
       <trans-unit id="message.request_approved">
         <source>message.request_approved</source>
@@ -485,17 +485,21 @@
         <target>You cant block yourself!</target>
       </trans-unit>
 
-      <trans-unit id="message.agree_terms">
-        <source>message.agree_terms</source>
-        <target>You should agree to our terms!</target>
-      </trans-unit>
+<!--       <trans-unit id="message.agree_terms"> -->
+<!--         <source>message.agree_terms</source> -->
+<!--         <target>You should agree to our terms!</target> -->
+<!--       </trans-unit> -->
       <trans-unit id="message.enter_password">
         <source>message.enter_password</source>
-        <target>Please enter a password</target>
+        <target>'Email' or 'Password' field cannot be empty!</target>
       </trans-unit>
       <trans-unit id="message.but_at_least">
         <source>message.but_at_least</source>
         <target>Your password should be at least 8 characters!</target>
+      </trans-unit>
+      <trans-unit id="message.account_already_exists">
+        <source>message.account_already_exists</source>
+        <target>There is already an account with this email!</target>
       </trans-unit>
 
       <trans-unit id="label.new_password">
