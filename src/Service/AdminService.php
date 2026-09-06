@@ -11,6 +11,8 @@ use App\Entity\Event;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Repository\UserRepository;
 use App\Repository\EventRepository;
+use Knp\Component\Pager\PaginatorInterface;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 
 /**
  * Class AdminService.
@@ -18,14 +20,50 @@ use App\Repository\EventRepository;
 class AdminService implements AdminServiceInterface
 {
     /**
+     * Items per page.
+     *
+     * Use constants to define configuration options that rarely change instead
+     * of specifying them in app/config/config.yml.
+     * See https://symfony.com/doc/current/best_practices.html#configuration
+     *
+     * @varant int
+     */
+    private const PAGINATOR_ITEMS_PER_PAGE = 5;
+
+    /**
      * Constructor.
      *
      * @param UserPasswordHasherInterface $passwordHasher  Password hasher
      * @param UserRepository              $userRepository  User repository
      * @param EventRepository             $eventRepository event repository
+     * @param PaginatorInterface $paginator          Paginator
      */
-    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher, private readonly UserRepository $userRepository, private readonly EventRepository $eventRepository)
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher, private readonly UserRepository $userRepository, private readonly EventRepository $eventRepository, private readonly PaginatorInterface $paginator)
     {
+    }
+
+    /**
+     * Get paginated pending events.
+     *
+     * @param int $page Page number
+     *
+     * @return PaginationInterface Paginated list
+     */
+    public function getPaginatedList(int $page): PaginationInterface
+    {
+        return $this->paginator->paginate(
+            $this->eventRepository->queryAll(
+                null,
+                status: 'pending'
+            ),
+            $page,
+            self::PAGINATOR_ITEMS_PER_PAGE,
+            [
+                'sortFieldAllowList' => ['event.startDate', 'event.title'],
+                'defaultSortFieldName' => 'event.startDate',
+                'defaultSortDirection' => 'desc',
+            ]
+        );
     }
 
     /**

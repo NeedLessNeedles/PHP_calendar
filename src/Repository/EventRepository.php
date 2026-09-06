@@ -49,7 +49,7 @@ class EventRepository extends ServiceEntityRepository
             ->leftJoin('event.tags', 'tag')
             ->addSelect('tag');
 
-        if (!in_array('ROLE_ADMIN', $owner->getRoles(), true)) {
+        if (null !== $owner && !in_array('ROLE_ADMIN', $owner->getRoles(), true)) {
             $queryBuilder
                 ->andWhere('event.owner = :owner')
                 ->setParameter('owner', $owner);

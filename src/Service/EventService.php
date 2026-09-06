@@ -56,7 +56,7 @@ class EventService implements EventServiceInterface
      *
      * @return PaginationInterface Paginated list
      */
-    public function getPaginatedList(?User $owner, int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): PaginationInterface
+    public function getPaginatedList(?User $owner, ?int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): PaginationInterface
     {
         return $this->paginator->paginate(
             $this->eventRepository->queryAll($owner, $categoryId, $title, $tagId, $status),

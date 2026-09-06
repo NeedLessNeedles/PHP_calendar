@@ -306,10 +306,7 @@ class AdminController extends AbstractController
     {
         $page = $request->query->getInt('page', 1);
 
-        $pagination = $this->eventService->getPaginatedList(
-            $page,
-            status: 'pending'
-        );
+        $pagination = $this->adminService->getPaginatedList($page);
 
         return $this->render('admin/requests.html.twig', [
             'pagination' => $pagination,

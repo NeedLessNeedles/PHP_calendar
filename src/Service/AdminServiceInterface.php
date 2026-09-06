@@ -8,12 +8,22 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Entity\Event;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 
 /**
  * Interface AdminServiceInterface.
  */
 interface AdminServiceInterface
 {
+    /**
+     * Get paginated pending events.
+     *
+     * @param int $page Page number
+     *
+     * @return PaginationInterface Paginated list
+     */
+    public function getPaginatedList(int $page): PaginationInterface;
+
     /**
      * Change password.
      *

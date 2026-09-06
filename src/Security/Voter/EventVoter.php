@@ -72,7 +72,6 @@ class EventVoter extends Voter
      * @param string         $attribute Attribute
      * @param mixed          $subject   Subject
      * @param TokenInterface $token     Token
-     * @param Vote|null      $vote      Vote object
      *
      * @return bool Vote
      */
