@@ -481,11 +481,15 @@
         <source>message.cant_block_yourself</source>
         <target>Nie możesz zablokować siebie samego!</target>
       </trans-unit>
-
-      <trans-unit id="message.agree_terms">
-        <source>message.agree_terms</source>
-        <target>Zaakceptuj warunki!</target>
+      <trans-unit id="title.event_requests">
+        <source>title.event_requests</source>
+        <target>Propozycje wydarzeń</target>
       </trans-unit>
+
+<!--       <trans-unit id="message.agree_terms"> -->
+<!--         <source>message.agree_terms</source> -->
+<!--         <target>Zaakceptuj warunki!</target> -->
+<!--       </trans-unit> -->
       <trans-unit id="message.enter_password">
         <source>message.enter_password</source>
         <target>Pole 'Email' lub 'Hasło' nie może być puste!</target>
@@ -495,6 +499,10 @@
         <target>Twoje hasło powinno mieć conajmniej 8 znaków</target>
       </trans-unit>
 
+      <trans-unit id="message.account_already_exists">
+        <source>message.account_already_exists</source>
+        <target>Konto z tym emailem już istnieje!</target>
+      </trans-unit>
       <trans-unit id="label.new_password">
         <source>label.new_password</source>
         <target>Nowe hasło</target>

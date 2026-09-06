@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="pl" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="message.enter_password">
+                <source>message.enter_password</source>
+                <target>Pole 'Email' lub 'Hasło' nie może być puste!</target>
+            </trans-unit>
+            <trans-unit id="message.but_at_least">
+              <source>message.but_at_least</source>
+              <target>Twoje hasło powinno mieć conajmniej 8 znaków!</target>
+            </trans-unit>
+            <trans-unit id="message.account_already_exists">
+              <source>message.account_already_exists</source>
+              <target>Konto z tym emailem już istnieje!</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

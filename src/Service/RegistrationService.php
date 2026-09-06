@@ -6,7 +6,6 @@
 
 namespace App\Service;
 
-use App\Entity\Category;
 use App\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,6 +41,14 @@ class RegistrationService implements RegistrationServiceInterface
         $this->entityManager->flush();
     }
 
+    /**
+     * User registration.
+     *
+     * @param User   $user          User
+     * @param string $plainPassword Plain password
+     *
+     * @return bool Bool
+     */
     public function canBeEmpty(User $user, ?string $plainPassword): bool
     {
         if (null === $user->getEmail()) {

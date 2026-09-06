@@ -36,7 +36,7 @@ class AdminService implements AdminServiceInterface
      * @param UserPasswordHasherInterface $passwordHasher  Password hasher
      * @param UserRepository              $userRepository  User repository
      * @param EventRepository             $eventRepository event repository
-     * @param PaginatorInterface $paginator          Paginator
+     * @param PaginatorInterface          $paginator       Paginator
      */
     public function __construct(private readonly UserPasswordHasherInterface $passwordHasher, private readonly UserRepository $userRepository, private readonly EventRepository $eventRepository, private readonly PaginatorInterface $paginator)
     {

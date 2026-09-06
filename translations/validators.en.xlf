@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="message.enter_password">
+                <source>message.enter_password</source>
+                <target>Provide a password.</target>
+            </trans-unit>
+            <trans-unit id="message.but_at_least">
+              <source>message.but_at_least</source>
+              <target>Your password should be at least 8 characters!</target>
+            </trans-unit>
+            <trans-unit id="message.account_already_exists">
+              <source>message.account_already_exists</source>
+              <target>There is already an account with this email!</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

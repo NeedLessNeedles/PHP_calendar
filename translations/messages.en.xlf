@@ -485,10 +485,10 @@
         <target>You cant block yourself!</target>
       </trans-unit>
 
-      <trans-unit id="message.agree_terms">
-        <source>message.agree_terms</source>
-        <target>You should agree to our terms!</target>
-      </trans-unit>
+<!--       <trans-unit id="message.agree_terms"> -->
+<!--         <source>message.agree_terms</source> -->
+<!--         <target>You should agree to our terms!</target> -->
+<!--       </trans-unit> -->
       <trans-unit id="message.enter_password">
         <source>message.enter_password</source>
         <target>'Email' or 'Password' field cannot be empty!</target>
@@ -496,6 +496,10 @@
       <trans-unit id="message.but_at_least">
         <source>message.but_at_least</source>
         <target>Your password should be at least 8 characters!</target>
+      </trans-unit>
+      <trans-unit id="message.account_already_exists">
+        <source>message.account_already_exists</source>
+        <target>There is already an account with this email!</target>
       </trans-unit>
 
       <trans-unit id="label.new_password">

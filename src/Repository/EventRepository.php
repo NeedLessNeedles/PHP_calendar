@@ -33,7 +33,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * Query all records.
      *
-     * @param User|null $owner     Owner
+     * @param User|null   $owner      Owner
      * @param int|null    $categoryId Category ID
      * @param string|null $title      Title
      * @param int|null    $tagId      Tag ID

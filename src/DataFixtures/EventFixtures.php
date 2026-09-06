@@ -85,8 +85,8 @@ class EventFixtures extends AbstractBaseFixtures implements DependentFixtureInte
                 $this->faker->dateTimeBetween('-10 days', '+1 days')
             );
             $event->setStatus('pending');
-//            $author = $this->getRandomReference('user', User::class);
-//            $event->setOwner($author);
+            //            $author = $this->getRandomReference('user', User::class);
+            //            $event->setOwner($author);
             $event->setCategory(
                 $this->faker->randomElement($categories)
             );

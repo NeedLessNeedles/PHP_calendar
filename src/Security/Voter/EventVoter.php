@@ -100,8 +100,8 @@ class EventVoter extends Voter
     /**
      * Checks if user can delete event.
      *
-     * @param Event          $event Event entity
-     * @param UserInterface $user User
+     * @param Event         $event Event entity
+     * @param UserInterface $user  User
      *
      * @return bool Result
      */
@@ -113,8 +113,8 @@ class EventVoter extends Voter
     /**
      * Checks if user can edit an event.
      *
-     * @param Event          $event Event entity
-     * @param UserInterface $user User
+     * @param Event         $event Event entity
+     * @param UserInterface $user  User
      *
      * @return bool Result
      */
@@ -126,8 +126,8 @@ class EventVoter extends Voter
     /**
      * Checks if a user can view an event.
      *
-     * @param Event          $event Event entity
-     * @param UserInterface $user User
+     * @param Event         $event Event entity
+     * @param UserInterface $user  User
      *
      * @return bool Result
      */
