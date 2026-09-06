@@ -68,18 +68,21 @@ class UserFixtures extends AbstractBaseFixtures implements FixtureGroupInterface
             $this->manager->persist($user);
         }
 
-        foreach ($defaultUsers as $defaultUser) {
+        foreach ($defaultUsers as $i => $defaultUser) {
             $user = new User();
             $user->setEmail($defaultUser);
             $user->setRoles(['ROLE_USER']);
+
             $hashedPassword = $this->passwordHasher->hashPassword(
                 $user,
                 'user1234'
             );
+
             $user->setPassword($hashedPassword);
             $user->setIsBlocked(false);
 
             $this->manager->persist($user);
+            $this->addReference('user_'.$i, $user);
         }
 
         $this->manager->flush();

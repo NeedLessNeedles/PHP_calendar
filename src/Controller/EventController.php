@@ -55,7 +55,10 @@ class EventController extends AbstractController
 
         $title = $request->query->get('title');
 
+        $owner = $this->getUser();
+
         $pagination = $this->eventService->getPaginatedList(
+            $owner,
             $page,
             $categoryId,
             $title,
@@ -86,7 +89,9 @@ class EventController extends AbstractController
     )]
     public function new(Request $request): Response
     {
+        $user = $this->getUser();
         $event = new Event();
+        $event->setOwner($user);
 
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
@@ -129,31 +134,6 @@ class EventController extends AbstractController
     }
 
     /**
-     * Show action.
-     *
-     * @param Event $event event
-     *
-     * @return Response HTTP response
-     */
-    #[Route(
-        '/{id}',
-        name: 'app_event_show',
-        requirements: ['id' => '[1-9]\d*'],
-        methods: ['GET']
-    )]
-    public function show(Event $event): Response
-    {
-        $this->denyAccessUnlessGranted(
-            EventVoter::VIEW,
-            $event
-        );
-
-        return $this->render('event/show.html.twig', [
-            'event' => $event,
-        ]);
-    }
-
-    /**
      * Edit action.
      *
      * @param Request $request request
@@ -169,6 +149,14 @@ class EventController extends AbstractController
     )]
     public function edit(Request $request, Event $event): Response
     {
+        if ($event->getOwner() !== $this->getUser()) {
+            $this->addFlash(
+                'warning',
+                $this->translator->trans('message.record_not_found')
+            );
+
+            return $this->redirectToRoute('app_event_index');
+        }
         $form = $this->createForm(
             EventType::class,
             $event,
@@ -241,6 +229,14 @@ class EventController extends AbstractController
     )]
     public function delete(Request $request, Event $event): Response
     {
+        if ($event->getOwner() !== $this->getUser()) {
+            $this->addFlash(
+                'warning',
+                $this->translator->trans('message.record_not_found')
+            );
+
+            return $this->redirectToRoute('app_event_index');
+        }
         $form = $this->createForm(EventType::class, $event, [
             'method' => 'DELETE',
             'action' => $this->generateUrl('app_event_delete', ['id' => $event->getId()]),

@@ -111,6 +111,7 @@
                 <th>{{ 'th.end_date'|trans }}</th>
                 <th>{{ 'th.location'|trans }}</th>
                 <th>{{ 'th.status'|trans }}</th>
+                <th>Owner</th>
                 <th>{{ 'th.category'|trans }}</th>
                 <th>{{ 'option.tags'|trans }}</th>
                 <th>{{ 'th.actions'|trans }}</th>
@@ -125,6 +126,7 @@
                     <td>{{ event.endDate ? event.endDate|format_date('medium') : '-' }}</td>
                     <td>{{ event.location }}</td>
                     <td>{{ event.status }}</td>
+                    <td>{{ event.owner ? event.owner.email : '-' }}</td>
                     <td>{{ event.category }}</td>
                     <td>
                         {% for tag in event.tags %}

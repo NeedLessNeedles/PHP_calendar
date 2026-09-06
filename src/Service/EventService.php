@@ -55,10 +55,10 @@ class EventService implements EventServiceInterface
      *
      * @return PaginationInterface Paginated list
      */
-    public function getPaginatedList(int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): PaginationInterface
+    public function getPaginatedList(?User $owner, int $page, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->eventRepository->queryAll($categoryId, $title, $tagId, $status),
+            $this->eventRepository->queryAll($owner, $categoryId, $title, $tagId, $status),
             $page,
             self::PAGINATOR_ITEMS_PER_PAGE,
             [
@@ -106,7 +106,6 @@ class EventService implements EventServiceInterface
         }
 
         $this->eventRepository->save($event);
-        $event->setOwner($user);
     }
 
     /**
@@ -117,30 +116,6 @@ class EventService implements EventServiceInterface
     public function delete(Event $event): void
     {
         $this->eventRepository->delete($event);
-    }
-
-    /**
-     * Create event.
-     *
-     * @param Event     $event Event
-     * @param User|null $user  User
-     */
-    public function create(Event $event, ?User $user): void
-    {
-        if ($user && in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-            $event->setStatus('approved');
-        } elseif ($user) {
-            $event->setStatus('approved');
-        } else {
-            $event->setStatus('pending');
-        }
-
-        if (!$event->getCategory()) {
-            throw new \LogicException('Category is required');
-        }
-        $event->setOwner($user);
-
-        $this->eventRepository->save($event);
     }
 
     /**

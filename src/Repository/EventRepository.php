@@ -8,6 +8,7 @@ namespace App\Repository;
 
 use App\Entity\Event;
 use App\Entity\Category;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
@@ -39,13 +40,15 @@ class EventRepository extends ServiceEntityRepository
      *
      * @return QueryBuilder Query builder
      */
-    public function queryAll(?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): QueryBuilder
+    public function queryAll(?User $owner, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('event')
             ->leftJoin('event.category', 'category')
             ->addSelect('category')
             ->leftJoin('event.tags', 'tag')
-            ->addSelect('tag');
+            ->addSelect('tag')
+            ->andWhere('event.owner = :owner')
+            ->setParameter('owner', $owner);
 
         if (null !== $categoryId) {
             $queryBuilder
