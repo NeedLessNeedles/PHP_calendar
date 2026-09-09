@@ -45,4 +45,93 @@ class RegistrationServiceTest extends TestCase
 
         $this->assertSame('hashed-password', $user->getPassword());
     }
+
+    /**
+     * Test if user can be empty.
+     */
+    public function testCanBeEmptyReturnsTrueForValidData(): void
+    {
+        $user = new User();
+        $user->setEmail('test@test.com');
+
+        $service = new RegistrationService(
+            $this->createStub(UserPasswordHasherInterface::class),
+            $this->createStub(EntityManagerInterface::class)
+        );
+
+        $this->assertTrue(
+            $service->canBeEmpty($user, 'plain-password')
+        );
+    }
+
+    /**
+     * Test if empty email is rejected.
+     */
+    public function testCanBeEmptyReturnsFalseForEmptyEmail(): void
+    {
+        $user = new User();
+        $user->setEmail('   ');
+
+        $service = new RegistrationService(
+            $this->createStub(UserPasswordHasherInterface::class),
+            $this->createStub(EntityManagerInterface::class)
+        );
+
+        $this->assertFalse(
+            $service->canBeEmpty($user, 'plain-password')
+        );
+    }
+
+    /**
+     * Test if missing email is rejected.
+     */
+    public function testCanBeEmptyReturnsFalseForMissingEmail(): void
+    {
+        $user = new User();
+
+        $service = new RegistrationService(
+            $this->createStub(UserPasswordHasherInterface::class),
+            $this->createStub(EntityManagerInterface::class)
+        );
+
+        $this->assertFalse(
+            $service->canBeEmpty($user, 'plain-password')
+        );
+    }
+
+    /**
+     * Test if missing password is rejected.
+     */
+    public function testCanBeEmptyReturnsFalseForMissingPassword(): void
+    {
+        $user = new User();
+        $user->setEmail('test@test.com');
+
+        $service = new RegistrationService(
+            $this->createStub(UserPasswordHasherInterface::class),
+            $this->createStub(EntityManagerInterface::class)
+        );
+
+        $this->assertFalse(
+            $service->canBeEmpty($user, null)
+        );
+    }
+
+    /**
+     * Test if empty password is rejected.
+     */
+    public function testCanBeEmptyReturnsFalseForEmptyPassword(): void
+    {
+        $user = new User();
+        $user->setEmail('test@test.com');
+
+        $service = new RegistrationService(
+            $this->createStub(UserPasswordHasherInterface::class),
+            $this->createStub(EntityManagerInterface::class)
+        );
+
+        $this->assertFalse(
+            $service->canBeEmpty($user, '   ')
+        );
+    }
 }

@@ -41,7 +41,7 @@ class EventRepository extends ServiceEntityRepository
      *
      * @return QueryBuilder Query builder
      */
-    public function queryAll(?User $owner, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): QueryBuilder
+    public function queryAll(?User $owner = null, ?int $categoryId = null, ?string $title = null, ?int $tagId = null, ?string $status = null): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('event')
             ->leftJoin('event.category', 'category')

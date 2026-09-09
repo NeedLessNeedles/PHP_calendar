@@ -61,9 +61,7 @@ class RegistrationControllerTest extends WebTestCase
                 ],
             ]
         );
-
         self::assertResponseStatusCodeSame(422);
-
         self::assertSelectorExists('form');
     }
 
