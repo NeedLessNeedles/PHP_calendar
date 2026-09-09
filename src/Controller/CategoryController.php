@@ -197,6 +197,7 @@ class CategoryController extends AbstractController
     )]
     public function delete(Request $request, Category $category): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         if (!$this->categoryService->canBeDeleted($category)) {
             $this->addFlash(
                 'warning',

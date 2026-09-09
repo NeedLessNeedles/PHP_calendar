@@ -7,10 +7,12 @@
 namespace App\Entity;
 
 use App\Repository\EventRepository;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Event.
@@ -20,6 +22,8 @@ use Doctrine\Common\Collections\Collection;
  * @ORM\Table(name="event")
  */
 #[ORM\Entity(repositoryClass: EventRepository::class)]
+//#[ORM\UniqueConstraint(name: 'uq_event_title', columns: ['title'])]
+#[UniqueEntity(fields: ['title'])]
 class Event
 {
     /**
@@ -33,7 +37,9 @@ class Event
     /**
      * Title.
      */
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 64)]
+    #[Assert\Type('string')]
+    #[Assert\Length(min: 3, max: 64)]
     private ?string $title = null;
 
     /**
@@ -52,12 +58,15 @@ class Event
      * Start date.
      */
     #[ORM\Column]
+    #[Assert\Type(\DateTimeInterface::class)]
+    #[Assert\NotNull]
     private ?\DateTime $startDate = null;
 
     /**
      * End date.
      */
     #[ORM\Column(nullable: true)]
+    #[Assert\Type(\DateTimeInterface::class)]
     private ?\DateTime $endDate = null;
 
     /**
