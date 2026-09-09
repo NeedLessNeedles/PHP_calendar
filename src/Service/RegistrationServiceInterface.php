@@ -20,4 +20,14 @@ interface RegistrationServiceInterface
      * @param string $plainPassword Plain password
      */
     public function registerUser(User $user, string $plainPassword): void;
+
+    /**
+     * User registration.
+     *
+     * @param User   $user          User
+     * @param string $plainPassword Plain password
+     *
+     * @return bool Bool
+     */
+    public function canBeEmpty(User $user, ?string $plainPassword): bool;
 }
