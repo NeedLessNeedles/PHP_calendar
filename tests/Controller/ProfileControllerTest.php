@@ -11,6 +11,7 @@ use App\Service\ProfileServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * Class ProfileControllerTest.
@@ -62,7 +63,8 @@ class ProfileControllerTest extends WebTestCase
             '/profile/change_password'
         );
 
-        $this->assertResponseStatusCodeSame(403);
+        //$this->assertResponseStatusCodeSame(403);
+        $this->assertResponseRedirects('/login');
     }
 
     /**
@@ -77,7 +79,8 @@ class ProfileControllerTest extends WebTestCase
             '/profile/change_email'
         );
 
-        $this->assertResponseStatusCodeSame(403);
+        //$this->assertResponseStatusCodeSame(403);
+        $this->assertResponseRedirects('/login');
     }
 
     /**
@@ -287,23 +290,16 @@ class ProfileControllerTest extends WebTestCase
 
         $client->loginUser($user);
 
-        $token = $this->getCsrfToken(
-            $client,
-            '/profile/change_password',
-            'input[name="change_password[_token]"]'
+        $crawler = $client->request(
+            'GET',
+            '/profile/change_password'
         );
 
-        $client->request(
-            'POST',
-            '/profile/change_password',
-            [
-                'change_password' => [
-                    'currentPassword' => 'anything',
-                    'newPassword' => $password,
-                    '_token' => $token,
-                ],
-            ]
-        );
+        $form = $crawler->filter('form')->form();
+
+        $form['change_password[newPassword]'] = $password;
+
+        $client->submit($form);
 
         $this->assertResponseRedirects('/profile');
     }
@@ -473,13 +469,25 @@ class ProfileControllerTest extends WebTestCase
     }
 
     /**
+     * Profile page requires authentication.
+     */
+    public function testIndexRequiresLogin(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/profile');
+
+        $this->assertResponseStatusCodeSame(403);
+    }
+
+    /**
      * Helper.
      *
-     * @param User $client client
+     * @param KernelBrowser $client client
      *
      * @return EntityManagerInterface Entity manager interface
      */
-    private function getEntityManager($client): EntityManagerInterface
+    private function getEntityManager(KernelBrowser $client): EntityManagerInterface
     {
         return $client->getContainer()->get(EntityManagerInterface::class);
     }
@@ -487,11 +495,11 @@ class ProfileControllerTest extends WebTestCase
     /**
      * Helper.
      *
-     * @param User $client client
+     * @param KernelBrowser $client client
      *
      * @return User user
      */
-    private function getUser(User $client): User
+    private function getUser(KernelBrowser $client): User
     {
         $user = $this->getEntityManager($client)
             ->getRepository(User::class)
@@ -507,13 +515,13 @@ class ProfileControllerTest extends WebTestCase
     /**
      * Helper.
      *
-     * @param string $client   Client
+     * @param KernelBrowser $client   Client
      * @param string $url      URL
      * @param string $selector Selector
      *
      * @return string Token
      */
-    private function getCsrfToken(string $client, string $url, string $selector): string
+    private function getCsrfToken(KernelBrowser $client, string $url, string $selector): string
     {
         $client->request('GET', $url);
 

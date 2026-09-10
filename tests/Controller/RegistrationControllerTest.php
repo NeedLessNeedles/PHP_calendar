@@ -112,9 +112,6 @@ class RegistrationControllerTest extends WebTestCase
         $form['registration_form[plainPassword]']
             = 'password123';
 
-//        $form['registration_form[agreeTerms]']
-//            = true;
-
         $this->client->submit($form);
 
         self::assertResponseRedirects();
@@ -143,12 +140,10 @@ class RegistrationControllerTest extends WebTestCase
                 'registration_form' => [
                     'email' => 'test@example.com',
                     'plainPassword' => 'password123',
-                    //'agreeTerms' => true,
                 ],
             ]
         );
 
-        //self::assertResponseIsSuccessful();
         self::assertResponseStatusCodeSame(422);
         self::assertSelectorExists('form');
     }
@@ -188,9 +183,6 @@ class RegistrationControllerTest extends WebTestCase
 
         $form['registration_form[plainPassword]']
             = 'another-password';
-
-//        $form['registration_form[agreeTerms]']
-//            = true;
 
         $this->client->submit($form);
 
