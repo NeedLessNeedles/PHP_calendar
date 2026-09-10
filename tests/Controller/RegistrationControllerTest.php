@@ -47,6 +47,10 @@ class RegistrationControllerTest extends WebTestCase
         $service = $this->mockRegistrationService();
 
         $service
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
             ->expects($this->never())
             ->method('registerUser');
 
@@ -75,6 +79,10 @@ class RegistrationControllerTest extends WebTestCase
         $service = $this->mockRegistrationService();
 
         $service
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
             ->expects($this->once())
             ->method('registerUser')
             ->with(
@@ -99,17 +107,45 @@ class RegistrationControllerTest extends WebTestCase
             ->form();
 
         $form['registration_form[email]']
-            = 'new.user@example.com';
+            = 'registration-controller-valid-1@example.test';
 
         $form['registration_form[plainPassword]']
             = 'password123';
 
-        $form['registration_form[agreeTerms]']
-            = true;
-
         $this->client->submit($form);
 
         self::assertResponseRedirects();
+    }
+
+    /**
+     * Registration with empty data is rejected by registration service.
+     */
+    public function testRegisterRejectsEmptyData(): void
+    {
+        $service = $this->mockRegistrationService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('registerUser');
+
+        $this->client->request(
+            'POST',
+            '/register',
+            [
+                'registration_form' => [
+                    'email' => 'test@example.com',
+                    'plainPassword' => 'password123',
+                ],
+            ]
+        );
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertSelectorExists('form');
     }
 
     /**
@@ -118,6 +154,10 @@ class RegistrationControllerTest extends WebTestCase
     public function testRegisterPassesPlainPasswordToService(): void
     {
         $service = $this->mockRegistrationService();
+
+        $service
+            ->method('canBeEmpty')
+            ->willReturn(true);
 
         $service
             ->expects($this->once())
@@ -139,13 +179,10 @@ class RegistrationControllerTest extends WebTestCase
             ->form();
 
         $form['registration_form[email]']
-            = 'password.test@example.com';
+            = 'registration-controller-valid-2@example.test';
 
         $form['registration_form[plainPassword]']
             = 'another-password';
-
-        $form['registration_form[agreeTerms]']
-            = true;
 
         $this->client->submit($form);
 

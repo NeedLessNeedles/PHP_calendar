@@ -13,6 +13,9 @@ use App\Repository\UserRepository;
 use App\Service\AdminService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Knp\Component\Pager\PaginatorInterface;
+use Knp\Component\Pager\Pagination\PaginationInterface;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Class AdminServiceTest.
@@ -26,6 +29,8 @@ class AdminServiceTest extends TestCase
     private UserPasswordHasherInterface $passwordHasher;
 
     private AdminService $service;
+
+    private PaginatorInterface $paginator;
 
     /**
      * Test setup.
@@ -41,11 +46,15 @@ class AdminServiceTest extends TestCase
         $this->passwordHasher = $this->createStub(
             UserPasswordHasherInterface::class
         );
+        $this->paginator = $this->createStub(
+            PaginatorInterface::class
+        );
 
         $this->service = new AdminService(
             $this->passwordHasher,
             $this->userRepository,
-            $this->eventRepository
+            $this->eventRepository,
+            $this->paginator
         );
     }
 
@@ -69,7 +78,8 @@ class AdminServiceTest extends TestCase
         $this->service = new AdminService(
             $passwordHasher,
             $this->userRepository,
-            $this->eventRepository
+            $this->eventRepository,
+            $this->paginator
         );
 
         $this->service->changePassword(
@@ -103,7 +113,8 @@ class AdminServiceTest extends TestCase
         $this->service = new AdminService(
             $this->passwordHasher,
             $this->userRepository,
-            $eventRepository
+            $eventRepository,
+            $this->paginator
         );
 
         $this->service->approveEvent($event);
@@ -133,7 +144,8 @@ class AdminServiceTest extends TestCase
         $this->service = new AdminService(
             $this->passwordHasher,
             $this->userRepository,
-            $eventRepository
+            $eventRepository,
+            $this->paginator
         );
 
         $this->service->rejectEvent($event);
@@ -214,7 +226,8 @@ class AdminServiceTest extends TestCase
         $this->service = new AdminService(
             $this->passwordHasher,
             $userRepository,
-            $this->eventRepository
+            $this->eventRepository,
+            $this->paginator
         );
 
         $this->service->toggleBlock(
@@ -252,7 +265,8 @@ class AdminServiceTest extends TestCase
         $this->service = new AdminService(
             $this->passwordHasher,
             $userRepository,
-            $this->eventRepository
+            $this->eventRepository,
+            $this->paginator
         );
 
         $this->service->toggleBlock(
@@ -302,7 +316,8 @@ class AdminServiceTest extends TestCase
         $this->service = new AdminService(
             $this->passwordHasher,
             $userRepository,
-            $this->eventRepository
+            $this->eventRepository,
+            $this->paginator
         );
 
         $this->assertSame(
@@ -337,7 +352,8 @@ class AdminServiceTest extends TestCase
         $this->service = new AdminService(
             $this->passwordHasher,
             $userRepository,
-            $this->eventRepository
+            $this->eventRepository,
+            $this->paginator
         );
 
         $this->assertSame(
@@ -366,7 +382,8 @@ class AdminServiceTest extends TestCase
         $this->service = new AdminService(
             $this->passwordHasher,
             $userRepository,
-            $this->eventRepository
+            $this->eventRepository,
+            $this->paginator
         );
 
         $this->service->toggleAdminRole($user);
@@ -405,7 +422,8 @@ class AdminServiceTest extends TestCase
         $this->service = new AdminService(
             $this->passwordHasher,
             $userRepository,
-            $this->eventRepository
+            $this->eventRepository,
+            $this->paginator
         );
 
         $this->service->toggleAdminRole($user);
@@ -443,7 +461,8 @@ class AdminServiceTest extends TestCase
         $this->service = new AdminService(
             $this->passwordHasher,
             $userRepository,
-            $this->eventRepository
+            $this->eventRepository,
+            $this->paginator
         );
         $this->expectException(
             \LogicException::class
@@ -453,6 +472,67 @@ class AdminServiceTest extends TestCase
         );
 
         $this->service->toggleAdminRole($user);
+    }
+
+    /**
+     * Test getting paginated pending events.
+     */
+    public function testGetPaginatedList(): void
+    {
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $pagination = $this->createStub(PaginationInterface::class);
+
+        $eventRepository = $this->createMock(
+            EventRepository::class
+        );
+
+        $eventRepository
+            ->expects($this->once())
+            ->method('queryAll')
+            ->with(
+                null,
+                null,
+                null,
+                null,
+                'pending'
+            )
+            ->willReturn($queryBuilder);
+
+        $paginator = $this->createMock(
+            PaginatorInterface::class
+        );
+
+        $paginator
+            ->expects($this->once())
+            ->method('paginate')
+            ->with(
+                $queryBuilder,
+                2,
+                5,
+                [
+                    'sortFieldAllowList' => [
+                        'event.startDate',
+                        'event.title',
+                    ],
+                    'defaultSortFieldName' => 'event.startDate',
+                    'defaultSortDirection' => 'desc',
+                ]
+            )
+            ->willReturn($pagination);
+
+        $this->service = new AdminService(
+            $this->passwordHasher,
+            $this->userRepository,
+            $eventRepository,
+            $paginator
+        );
+
+        $result = $this->service->getPaginatedList(2);
+
+        $this->assertSame(
+            $pagination,
+            $result
+        );
     }
 
     /**

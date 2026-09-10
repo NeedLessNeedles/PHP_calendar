@@ -9,12 +9,13 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Form\EventType;
 use App\Service\EventServiceInterface;
+use App\Security\Voter\EventVoter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Security\Voter\EventVoter;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Class EventController.
@@ -197,7 +198,7 @@ class EventController extends AbstractController
 
                 $this->addFlash(
                     'success',
-                    $this->translator->trans('message.created_successfully')
+                    $this->translator->trans('message.updated_successfully')
                 );
 
                 return $this->redirectToRoute('app_event_index');

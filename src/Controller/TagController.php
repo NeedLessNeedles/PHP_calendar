@@ -110,26 +110,6 @@ class TagController extends AbstractController
         );
     }
 
-    //    /**
-    //     * Show action.
-    //     *
-    //     * @param Tag $tag Tag
-    //     *
-    //     * @return Response HTTP response
-    //     */
-    //    #[Route(
-    //        '/{id}',
-    //        name: 'app_tag_show',
-    //        requirements: ['id' => '[1-9]\d*'],
-    //        methods: ['GET']
-    //    )]
-    //    public function show(Tag $tag): Response
-    //    {
-    //        return $this->render('tag/show.html.twig', [
-    //            'tag' => $tag,
-    //        ]);
-    //    }
-
     /**
      * Edit action.
      *

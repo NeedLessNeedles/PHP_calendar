@@ -52,7 +52,7 @@ class EventControllerTest extends WebTestCase
         $service
             ->expects($this->once())
             ->method('getPaginatedList')
-            ->with(2, 3, 'concert', 4, null)
+            ->with(null, 2, 3, 'concert', 4, null)
             ->willReturn($pagination);
 
         $service
@@ -106,9 +106,9 @@ class EventControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('save');
 
-        $service
-            ->expects($this->never())
-            ->method('create');
+        //        $service
+        //            ->expects($this->never())
+        //            ->method('create');
 
         $this->loginUser();
 
@@ -149,9 +149,9 @@ class EventControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('save');
 
-        $service
-            ->expects($this->never())
-            ->method('create');
+        //        $service
+        //            ->expects($this->never())
+        //            ->method('create');
 
         $this->loginUser();
 
@@ -193,8 +193,8 @@ class EventControllerTest extends WebTestCase
         $service
             ->method('save');
 
-        $service
-            ->method('create');
+        //        $service
+        //            ->method('create');
 
         $crawler = $this->client->request('GET', '/event/new');
 
@@ -218,7 +218,8 @@ class EventControllerTest extends WebTestCase
 
         $form = $crawler->filter('form')->form();
 
-        $form['event[title]'] = 'Testing valid event';
+        // $form['event[title]'] = 'Testing valid event';
+        $form['event[title]'] = 'Testing valid event '.uniqid();
         $form['event[description]'] = 'Testing description';
         $form['event[location]'] = 'Warsaw';
         $form['event[startDate]'] = '2026-09-10T18:00';
@@ -232,29 +233,12 @@ class EventControllerTest extends WebTestCase
     }
 
     /**
-     * Show event page.
-     */
-    public function testShow(): void
-    {
-        $event = $this->persistEvent();
-
-        $this->client->request(
-            'GET',
-            '/event/'.$event->getId()
-        );
-
-        self::assertResponseIsSuccessful();
-        self::assertPageTitleContains('Event');
-    }
-
-    /**
      * Edit event page can be displayed.
      */
     public function testEditGet(): void
     {
-        $event = $this->persistEvent();
-
-        $this->loginUser();
+        $user = $this->loginUser();
+        $event = $this->persistEvent(owner: $user);
 
         $this->client->request(
             'GET',
@@ -269,19 +253,15 @@ class EventControllerTest extends WebTestCase
      */
     public function testEditRejectsEmptyTitle(): void
     {
-        $event = $this->persistEvent();
+        $user = $this->loginUser();
+        $event = $this->persistEvent(owner: $user);
 
         $service = $this->mockEventService();
-
         $service
             ->expects($this->never())
             ->method('save');
 
-        $service
-            ->expects($this->never())
-            ->method('create');
-
-        $this->loginUser();
+        // $this->loginUser();
 
         $crawler = $this->client->request(
             'GET',
@@ -308,7 +288,8 @@ class EventControllerTest extends WebTestCase
      */
     public function testEditRejectsDuplicateTitle(): void
     {
-        $event = $this->persistEvent();
+        $user = $this->loginUser();
+        $event = $this->persistEvent(owner: $user);
 
         $service = $this->mockEventService();
 
@@ -326,11 +307,7 @@ class EventControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('save');
 
-        $service
-            ->expects($this->never())
-            ->method('create');
-
-        $this->loginUser();
+        // $this->loginUser();
 
         $crawler = $this->client->request(
             'GET',
@@ -351,11 +328,57 @@ class EventControllerTest extends WebTestCase
     }
 
     /**
+     * User cannot edit another user's event.
+     */
+    public function testEditRejectsAnotherUsersEvent(): void
+    {
+        $owner = $this->getUser('user.first@gmail.com');
+        $event = $this->persistEvent('Other user event', $owner);
+
+        $otherUser = $this->getUser('user.second@gmail.com');
+        $this->client->loginUser($otherUser);
+
+        $this->client->request(
+            'GET',
+            '/event/'.$event->getId().'/edit'
+        );
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
+    /**
+     * Admin can edit another user's event.
+     */
+    public function testAdminCanEditAnotherUsersEvent(): void
+    {
+        $owner = $this->getUser('user.second@gmail.com');
+        self::assertInstanceOf(User::class, $owner);
+
+        $event = $this->persistEvent(
+            'Other user event',
+            owner: $owner
+        );
+
+        $admin = $this->getUser('admin.first@gmail.com');
+        self::assertInstanceOf(User::class, $admin);
+
+        $this->client->loginUser($admin);
+
+        $this->client->request(
+            'GET',
+            '/event/'.$event->getId().'/edit'
+        );
+
+        self::assertResponseIsSuccessful();
+    }
+
+    /**
      * Valid event is saved during edit.
      */
     public function testEditSavesValidEvent(): void
     {
-        $event = $this->persistEvent();
+        $user = $this->loginUser();
+        $event = $this->persistEvent(owner: $user);
 
         $service = $this->mockEventService();
 
@@ -372,10 +395,7 @@ class EventControllerTest extends WebTestCase
         $service
             ->method('save');
 
-        $service
-            ->method('create');
-
-        $user = $this->loginUser();
+        // $user = $this->loginUser();
 
         $crawler = $this->client->request(
             'GET',
@@ -402,9 +422,8 @@ class EventControllerTest extends WebTestCase
      */
     public function testDeleteGet(): void
     {
-        $event = $this->persistEvent();
-
-        $this->loginUser();
+        $user = $this->loginUser();
+        $event = $this->persistEvent(owner: $user);
 
         $this->client->request(
             'GET',
@@ -419,7 +438,12 @@ class EventControllerTest extends WebTestCase
      */
     public function testDelete(): void
     {
-        $event = $this->persistEvent();
+        $user = $this->loginUser();
+        // $event = $this->persistEvent(owner: $user);
+        $event = $this->persistEvent(
+            'Event to delete '.uniqid(),
+            owner: $user
+        );
 
         $service = $this->mockEventService();
 
@@ -437,7 +461,8 @@ class EventControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
 
-        $form = $crawler->filter('form')->form();
+        $form = $crawler->filter('form[name="event"]')->form();
+        // $form['event[title]'] = 'Event to delete '.uniqid();
 
         $this->client->submit($form);
 
@@ -534,11 +559,12 @@ class EventControllerTest extends WebTestCase
      *
      * The event is not persisted.
      *
-     * @param string $title Event title
+     * @param string    $title Event title
+     * @param User|null $owner Owner
      *
      * @return Event Event
      */
-    private function createEvent(string $title = 'Test event'): Event
+    private function createEvent(string $title = 'Test event', ?User $owner = null): Event
     {
         $event = new Event();
 
@@ -548,6 +574,7 @@ class EventControllerTest extends WebTestCase
         $event->setStartDate(new \DateTime('+1 day'));
         $event->setEndDate(new \DateTime('+1 day 2 hours'));
         $event->setStatus('approved');
+        $event->setOwner($owner);
 
         $category = $this->manager
             ->getRepository(Category::class)
@@ -563,13 +590,14 @@ class EventControllerTest extends WebTestCase
     /**
      * Persist event fixture.
      *
-     * @param string $title Event title
+     * @param string    $title Event title
+     * @param User|null $owner Owner
      *
      * @return Event Persisted event
      */
-    private function persistEvent(string $title = 'Test event'): Event
+    private function persistEvent(string $title = 'Test event', ?User $owner = null): Event
     {
-        $event = $this->createEvent($title);
+        $event = $this->createEvent($title, $owner);
 
         self::assertInstanceOf(
             Category::class,

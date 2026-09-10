@@ -291,6 +291,10 @@
           <source>th.status</source>
           <target>Status</target>
         </trans-unit>
+        <trans-unit id="th.owner">
+          <source>th.owner</source>
+          <target>Owner</target>
+        </trans-unit>
         <trans-unit id="th.category">
           <source>th.category</source>
           <target>Category</target>
@@ -381,10 +385,6 @@
       <trans-unit id="th.start">
         <source>th.start</source>
         <target>Start</target>
-      </trans-unit>
-      <trans-unit id="th.owner">
-        <source>th.owner</source>
-        <target>Owner</target>
       </trans-unit>
       <trans-unit id="title.pending_events">
         <source>title.pending_events</source>
@@ -485,10 +485,6 @@
         <target>You cant block yourself!</target>
       </trans-unit>
 
-<!--       <trans-unit id="message.agree_terms"> -->
-<!--         <source>message.agree_terms</source> -->
-<!--         <target>You should agree to our terms!</target> -->
-<!--       </trans-unit> -->
       <trans-unit id="message.enter_password">
         <source>message.enter_password</source>
         <target>'Email' or 'Password' field cannot be empty!</target>

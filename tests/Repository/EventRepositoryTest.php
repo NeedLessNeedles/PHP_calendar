@@ -8,6 +8,7 @@ namespace App\Tests\Repository;
 
 use App\Entity\Category;
 use App\Entity\Event;
+use App\Entity\User;
 use App\Repository\EventRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -72,7 +73,9 @@ class EventRepositoryTest extends KernelTestCase
      */
     public function testQueryAllWithTitleFilter(): void
     {
-        $qb = $this->eventRepository->queryAll(null, 'test');
+        $qb = $this->eventRepository->queryAll(
+            title: 'test'
+        );
 
         $this->assertStringContainsString(
             'LOWER(event.title) LIKE LOWER(:title)',
@@ -303,5 +306,70 @@ class EventRepositoryTest extends KernelTestCase
 
             $previousDate = $currentDate;
         }
+    }
+
+    /**
+     * Test for query builder with owner filter.
+     */
+    public function testQueryAllWithOwnerFilter(): void
+    {
+        $user = new User();
+        $user->setEmail('user@test.com');
+
+        $qb = $this->eventRepository->queryAll(
+            owner: $user
+        );
+
+        $this->assertStringContainsString(
+            'event.owner = :owner',
+            $qb->getDQL()
+        );
+
+        $this->assertSame(
+            $user,
+            $qb->getParameter('owner')->getValue()
+        );
+    }
+
+    /**
+     * Test that admin does not get owner filter.
+     */
+    public function testQueryAllForAdminDoesNotAddOwnerFilter(): void
+    {
+        $admin = new User();
+        $admin->setEmail('admin@test.com');
+        $admin->setRoles(['ROLE_ADMIN']);
+
+        $qb = $this->eventRepository->queryAll(
+            owner: $admin
+        );
+
+        $this->assertStringNotContainsString(
+            'event.owner = :owner',
+            $qb->getDQL()
+        );
+
+        $this->assertNull(
+            $qb->getParameter('owner')
+        );
+    }
+
+    /**
+     * Test that null owner does not add owner filter.
+     */
+    public function testQueryAllWithoutOwnerDoesNotAddOwnerFilter(): void
+    {
+        $qb = $this->eventRepository->queryAll(
+            owner: null
+        );
+
+        $this->assertStringNotContainsString(
+            'event.owner = :owner',
+            $qb->getDQL()
+        );
+
+        $this->assertNull(
+            $qb->getParameter('owner')
+        );
     }
 }

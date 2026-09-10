@@ -65,12 +65,16 @@ class RegistrationController extends AbstractController
                 ]);
             }
 
-            if ($form->isValid()) {
-                $this->registrationService->registerUser(
-                    $user,
-                    $plainPassword,
-                );
+            if (!$form->isValid()) {
+                return $this->render('registration/register.html.twig', [
+                    'registrationForm' => $form,
+                ]);
             }
+
+            $this->registrationService->registerUser(
+                $user,
+                $plainPassword,
+            );
 
             $this->addFlash(
                 'success',
