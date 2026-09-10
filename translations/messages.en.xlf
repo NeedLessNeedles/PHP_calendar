@@ -386,10 +386,6 @@
         <source>th.start</source>
         <target>Start</target>
       </trans-unit>
-      <trans-unit id="th.owner">
-        <source>th.owner</source>
-        <target>Owner</target>
-      </trans-unit>
       <trans-unit id="title.pending_events">
         <source>title.pending_events</source>
         <target>Pending events</target>
