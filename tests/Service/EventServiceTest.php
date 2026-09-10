@@ -215,7 +215,7 @@ class EventServiceTest extends TestCase
         $this->service->save($event, $user);
 
         $this->assertSame('approved', $event->getStatus());
-        //$this->assertSame($user, $event->getOwner());
+        // $this->assertSame($user, $event->getOwner());
     }
 
     /**
@@ -247,7 +247,7 @@ class EventServiceTest extends TestCase
         $this->service->save($event, $user);
 
         $this->assertSame('approved', $event->getStatus());
-        //$this->assertSame($user, $event->getOwner());
+        // $this->assertSame($user, $event->getOwner());
     }
 
     /**

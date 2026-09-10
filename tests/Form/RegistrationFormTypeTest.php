@@ -34,7 +34,7 @@ class RegistrationFormTypeTest extends KernelTestCase
     {
         $model = new User();
         $form = $this->formFactory->create(RegistrationFormType::class, $model);
-        $form->submit(['email' => 'test@example.com', 'agreeTerms' => true, 'plainPassword' => 'secret123']);
+        $form->submit(['email' => 'test@example.com', 'plainPassword' => 'secret123']);
         self::assertTrue($form->isSynchronized());
         self::assertSame('test@example.com', $model->getEmail());
     }
@@ -46,17 +46,7 @@ class RegistrationFormTypeTest extends KernelTestCase
     {
         $form = $this->formFactory->create(RegistrationFormType::class);
         self::assertTrue($form->has('email'));
-        self::assertTrue($form->has('agreeTerms'));
         self::assertTrue($form->has('plainPassword'));
-    }
-
-    /**
-     * Test agree terms field mapping.
-     */
-    public function testAgreeTermsIsNotMapped(): void
-    {
-        $form = $this->formFactory->create(RegistrationFormType::class);
-        self::assertFalse($form->get('agreeTerms')->getConfig()->getMapped());
     }
 
     /**

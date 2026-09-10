@@ -63,7 +63,7 @@ class ProfileControllerTest extends WebTestCase
             '/profile/change_password'
         );
 
-        //$this->assertResponseStatusCodeSame(403);
+        // $this->assertResponseStatusCodeSame(403);
         $this->assertResponseRedirects('/login');
     }
 
@@ -79,7 +79,7 @@ class ProfileControllerTest extends WebTestCase
             '/profile/change_email'
         );
 
-        //$this->assertResponseStatusCodeSame(403);
+        // $this->assertResponseStatusCodeSame(403);
         $this->assertResponseRedirects('/login');
     }
 
@@ -516,8 +516,8 @@ class ProfileControllerTest extends WebTestCase
      * Helper.
      *
      * @param KernelBrowser $client   Client
-     * @param string $url      URL
-     * @param string $selector Selector
+     * @param string        $url      URL
+     * @param string        $selector Selector
      *
      * @return string Token
      */

@@ -34,6 +34,7 @@
         </include>
         <exclude>
             <directory>src/DataFixtures</directory>
+            <directory>tests/DataFixtures</directory>
             <directory>src/Security</directory>
         </exclude>
 

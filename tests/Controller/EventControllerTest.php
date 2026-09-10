@@ -106,9 +106,9 @@ class EventControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('save');
 
-//        $service
-//            ->expects($this->never())
-//            ->method('create');
+        //        $service
+        //            ->expects($this->never())
+        //            ->method('create');
 
         $this->loginUser();
 
@@ -149,9 +149,9 @@ class EventControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('save');
 
-//        $service
-//            ->expects($this->never())
-//            ->method('create');
+        //        $service
+        //            ->expects($this->never())
+        //            ->method('create');
 
         $this->loginUser();
 
@@ -193,8 +193,8 @@ class EventControllerTest extends WebTestCase
         $service
             ->method('save');
 
-//        $service
-//            ->method('create');
+        //        $service
+        //            ->method('create');
 
         $crawler = $this->client->request('GET', '/event/new');
 
@@ -218,7 +218,7 @@ class EventControllerTest extends WebTestCase
 
         $form = $crawler->filter('form')->form();
 
-        //$form['event[title]'] = 'Testing valid event';
+        // $form['event[title]'] = 'Testing valid event';
         $form['event[title]'] = 'Testing valid event '.uniqid();
         $form['event[description]'] = 'Testing description';
         $form['event[location]'] = 'Warsaw';
@@ -261,7 +261,7 @@ class EventControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('save');
 
-        //$this->loginUser();
+        // $this->loginUser();
 
         $crawler = $this->client->request(
             'GET',
@@ -307,7 +307,7 @@ class EventControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('save');
 
-        //$this->loginUser();
+        // $this->loginUser();
 
         $crawler = $this->client->request(
             'GET',
@@ -395,7 +395,7 @@ class EventControllerTest extends WebTestCase
         $service
             ->method('save');
 
-        //$user = $this->loginUser();
+        // $user = $this->loginUser();
 
         $crawler = $this->client->request(
             'GET',
@@ -439,7 +439,7 @@ class EventControllerTest extends WebTestCase
     public function testDelete(): void
     {
         $user = $this->loginUser();
-        //$event = $this->persistEvent(owner: $user);
+        // $event = $this->persistEvent(owner: $user);
         $event = $this->persistEvent(
             'Event to delete '.uniqid(),
             owner: $user
@@ -462,7 +462,7 @@ class EventControllerTest extends WebTestCase
         self::assertResponseIsSuccessful();
 
         $form = $crawler->filter('form[name="event"]')->form();
-        //$form['event[title]'] = 'Event to delete '.uniqid();
+        // $form['event[title]'] = 'Event to delete '.uniqid();
 
         $this->client->submit($form);
 
@@ -559,7 +559,7 @@ class EventControllerTest extends WebTestCase
      *
      * The event is not persisted.
      *
-     * @param string $title Event title
+     * @param string    $title Event title
      * @param User|null $owner Owner
      *
      * @return Event Event
@@ -590,7 +590,7 @@ class EventControllerTest extends WebTestCase
     /**
      * Persist event fixture.
      *
-     * @param string $title Event title
+     * @param string    $title Event title
      * @param User|null $owner Owner
      *
      * @return Event Persisted event

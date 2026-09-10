@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="event")
  */
 #[ORM\Entity(repositoryClass: EventRepository::class)]
-//#[ORM\UniqueConstraint(name: 'uq_event_title', columns: ['title'])]
+// #[ORM\UniqueConstraint(name: 'uq_event_title', columns: ['title'])]
 #[UniqueEntity(fields: ['title'])]
 class Event
 {

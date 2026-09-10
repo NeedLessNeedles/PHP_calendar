@@ -142,37 +142,24 @@ class TagControllerTest extends WebTestCase
             ->method('save')
             ->with($this->isInstanceOf(Tag::class));
 
+        $this->client->restart();
         $this->loginAdmin();
 
-        $this->client->request('GET', '/tag/new');
+        $crawler = $this->client->request(
+            'GET',
+            '/tag/new'
+        );
 
         self::assertResponseIsSuccessful();
 
-        $crawler = $this->client->getCrawler();
-
         $form = $crawler->filter('form')->form();
 
-        $form['tag[title]'] = 'Valid tag '.uniqid();
+        $form['tag[title]'] = 'New tag '.uniqid();
 
         $this->client->submit($form);
 
         self::assertResponseRedirects('/tag');
     }
-
-    //    /**
-    //     * Show tag page.
-    //     */
-    //    public function testShow(): void
-    //    {
-    //        $tag = $this->persistTag();
-    //
-    //        $this->client->request(
-    //            'GET',
-    //            '/tag/'.$tag->getId()
-    //        );
-    //
-    //        self::assertResponseIsSuccessful();
-    //    }
 
     /**
      * Edit tag page can be displayed.
@@ -353,14 +340,12 @@ class TagControllerTest extends WebTestCase
 
         $this->loginAdmin();
 
-        $this->client->request(
+        $crawler = $this->client->request(
             'GET',
             '/tag/'.$tag->getId().'/delete'
         );
 
         self::assertResponseIsSuccessful();
-
-        $crawler = $this->client->getCrawler();
 
         $form = $crawler->filter('form')->form();
 

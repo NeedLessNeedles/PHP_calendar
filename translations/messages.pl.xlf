@@ -287,6 +287,10 @@
         <source>th.status</source>
         <target>Stan</target>
       </trans-unit>
+      <trans-unit id="th.owner">
+        <source>th.owner</source>
+        <target>Właściciel</target>
+      </trans-unit>
       <trans-unit id="th.category">
         <source>th.category</source>
         <target>Kategoria</target>
