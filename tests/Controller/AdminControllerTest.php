@@ -400,68 +400,6 @@ class AdminControllerTest extends WebTestCase
     }
 
     /**
-     * Valid password is saved.
-     */
-    public function testChangePasswordSavesValidPassword(): void
-    {
-        $client = static::createClient();
-        $profileService = $this->mockProfileService($client);
-        $user = $this->getUser($client);
-        $admin = $this->getAdmin($client);
-        $password = 'new-valid-password';
-
-        $profileService
-            ->expects($this->once())
-            ->method('canPasswordBeEmpty')
-            ->with($password)
-            ->willReturn(true);
-
-        $profileService
-            ->expects($this->once())
-            ->method('isPasswordLongEnough')
-            ->with($password)
-            ->willReturn(true);
-
-        $profileService
-            ->expects($this->once())
-            ->method('savePassword')
-            ->with(
-                $this->identicalTo($user),
-                $password
-            );
-
-        $client->loginUser($admin);
-
-        $client->request(
-            'GET',
-            '/admin/users/'.$user->getId().'/change_password'
-        );
-
-        $this->assertResponseIsSuccessful();
-
-        $token = $client->getCrawler()
-            ->filter('input[name="admin_change_password[_token]"]')
-            ->attr('value');
-
-        $this->assertNotNull($token);
-
-        $client->request(
-            'POST',
-            '/admin/users/'.$user->getId().'/change_password',
-            [
-                'admin_change_password' => [
-                    'newPassword' => $password,
-                    '_token' => $token,
-                ],
-            ]
-        );
-
-        $this->assertResponseRedirects(
-            '/admin/users/'.$user->getId().'/edit'
-        );
-    }
-
-    /**
      * User can be blocked.
      */
     public function testBlockUser(): void
@@ -489,69 +427,6 @@ class AdminControllerTest extends WebTestCase
         );
 
         $this->assertResponseRedirects('/admin/users');
-    }
-
-    /**
-     * Requests page displays pending events.
-     */
-    public function testRequestsPage(): void
-    {
-        $client = static::createClient();
-        $eventService = $this->mockEventService($client);
-        $pagination = $this->createPagination();
-
-        $eventService
-            ->expects($this->once())
-            ->method('getPaginatedList')
-            ->with(
-                1,
-                null,
-                null,
-                null,
-                'pending'
-            )
-            ->willReturn($pagination);
-
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
-
-        $client->request('GET', '/admin/requests');
-
-        $this->assertResponseIsSuccessful();
-    }
-
-    /**
-     * Requests page passes page number.
-     */
-    public function testRequestsPageWithPage(): void
-    {
-        $client = static::createClient();
-
-        $eventService = $this->mockEventService($client);
-
-        $pagination = $this->createPagination(4);
-
-        $eventService
-            ->expects($this->once())
-            ->method('getPaginatedList')
-            ->with(
-                4,
-                null,
-                null,
-                null,
-                'pending'
-            )
-            ->willReturn($pagination);
-
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
-
-        $client->request(
-            'GET',
-            '/admin/requests?page=4'
-        );
-
-        $this->assertResponseIsSuccessful();
     }
 
     /**

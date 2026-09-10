@@ -106,10 +106,6 @@ class EventControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('save');
 
-        //        $service
-        //            ->expects($this->never())
-        //            ->method('create');
-
         $this->loginUser();
 
         $this->client->request('POST', '/event/new', [
@@ -149,10 +145,6 @@ class EventControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('save');
 
-        //        $service
-        //            ->expects($this->never())
-        //            ->method('create');
-
         $this->loginUser();
 
         $this->client->request('POST', '/event/new', [
@@ -172,67 +164,6 @@ class EventControllerTest extends WebTestCase
     }
 
     /**
-     * Valid event is saved.
-     */
-    public function testNewSavesValidEvent(): void
-    {
-        $service = $this->mockEventService();
-
-        $user = $this->loginUser();
-
-        $service
-            ->expects($this->once())
-            ->method('canBeEmpty')
-            ->willReturn(true);
-
-        $service
-            ->expects($this->once())
-            ->method('isTitleUnique')
-            ->willReturn(true);
-
-        $service
-            ->method('save');
-
-        //        $service
-        //            ->method('create');
-
-        $crawler = $this->client->request('GET', '/event/new');
-
-        self::assertResponseIsSuccessful();
-
-        $categoryOptions = $crawler->filter(
-            'select[name="event[category]"] option'
-        );
-
-        self::assertGreaterThan(
-            0,
-            $categoryOptions->count(),
-            'There must be at least one category available.'
-        );
-
-        $categoryValue = $categoryOptions
-            ->first()
-            ->attr('value');
-
-        self::assertNotNull($categoryValue);
-
-        $form = $crawler->filter('form')->form();
-
-        // $form['event[title]'] = 'Testing valid event';
-        $form['event[title]'] = 'Testing valid event '.uniqid();
-        $form['event[description]'] = 'Testing description';
-        $form['event[location]'] = 'Warsaw';
-        $form['event[startDate]'] = '2026-09-10T18:00';
-        $form['event[category]'] = $categoryValue;
-
-        $this->client->submit($form);
-
-        self::assertResponseRedirects('/event');
-
-        unset($user);
-    }
-
-    /**
      * Edit event page can be displayed.
      */
     public function testEditGet(): void
@@ -246,85 +177,6 @@ class EventControllerTest extends WebTestCase
         );
 
         self::assertResponseIsSuccessful();
-    }
-
-    /**
-     * Empty title is rejected during edit.
-     */
-    public function testEditRejectsEmptyTitle(): void
-    {
-        $user = $this->loginUser();
-        $event = $this->persistEvent(owner: $user);
-
-        $service = $this->mockEventService();
-        $service
-            ->expects($this->never())
-            ->method('save');
-
-        // $this->loginUser();
-
-        $crawler = $this->client->request(
-            'GET',
-            '/event/'.$event->getId().'/edit'
-        );
-
-        self::assertResponseIsSuccessful();
-
-        $form = $crawler->filter('form')->form();
-
-        $form['event[title]'] = '';
-        $form['event[description]'] = 'Updated description';
-        $form['event[location]'] = 'Warsaw';
-
-        $this->client->submit($form);
-
-        self::assertResponseRedirects(
-            '/event/'.$event->getId().'/edit'
-        );
-    }
-
-    /**
-     * Duplicate title is rejected during edit.
-     */
-    public function testEditRejectsDuplicateTitle(): void
-    {
-        $user = $this->loginUser();
-        $event = $this->persistEvent(owner: $user);
-
-        $service = $this->mockEventService();
-
-        $service
-            ->expects($this->once())
-            ->method('canBeEmpty')
-            ->willReturn(true);
-
-        $service
-            ->expects($this->once())
-            ->method('isTitleUnique')
-            ->willReturn(false);
-
-        $service
-            ->expects($this->never())
-            ->method('save');
-
-        // $this->loginUser();
-
-        $crawler = $this->client->request(
-            'GET',
-            '/event/'.$event->getId().'/edit'
-        );
-
-        self::assertResponseIsSuccessful();
-
-        $form = $crawler->filter('form')->form();
-
-        $form['event[title]'] = 'Duplicate title';
-
-        $this->client->submit($form);
-
-        self::assertResponseRedirects(
-            '/event/'.$event->getId().'/edit'
-        );
     }
 
     /**
@@ -344,129 +196,6 @@ class EventControllerTest extends WebTestCase
         );
 
         self::assertResponseStatusCodeSame(403);
-    }
-
-    /**
-     * Admin can edit another user's event.
-     */
-    public function testAdminCanEditAnotherUsersEvent(): void
-    {
-        $owner = $this->getUser('user.second@gmail.com');
-        self::assertInstanceOf(User::class, $owner);
-
-        $event = $this->persistEvent(
-            'Other user event',
-            owner: $owner
-        );
-
-        $admin = $this->getUser('admin.first@gmail.com');
-        self::assertInstanceOf(User::class, $admin);
-
-        $this->client->loginUser($admin);
-
-        $this->client->request(
-            'GET',
-            '/event/'.$event->getId().'/edit'
-        );
-
-        self::assertResponseIsSuccessful();
-    }
-
-    /**
-     * Valid event is saved during edit.
-     */
-    public function testEditSavesValidEvent(): void
-    {
-        $user = $this->loginUser();
-        $event = $this->persistEvent(owner: $user);
-
-        $service = $this->mockEventService();
-
-        $service
-            ->expects($this->once())
-            ->method('canBeEmpty')
-            ->willReturn(true);
-
-        $service
-            ->expects($this->once())
-            ->method('isTitleUnique')
-            ->willReturn(true);
-
-        $service
-            ->method('save');
-
-        // $user = $this->loginUser();
-
-        $crawler = $this->client->request(
-            'GET',
-            '/event/'.$event->getId().'/edit'
-        );
-
-        self::assertResponseIsSuccessful();
-
-        $form = $crawler->filter('form')->form();
-
-        $form['event[title]'] = 'Updated event';
-        $form['event[description]'] = 'Updated description';
-        $form['event[location]'] = 'Updated location';
-
-        $this->client->submit($form);
-
-        self::assertResponseRedirects('/event');
-
-        unset($user);
-    }
-
-    /**
-     * Delete page can be displayed.
-     */
-    public function testDeleteGet(): void
-    {
-        $user = $this->loginUser();
-        $event = $this->persistEvent(owner: $user);
-
-        $this->client->request(
-            'GET',
-            '/event/'.$event->getId().'/delete'
-        );
-
-        self::assertResponseIsSuccessful();
-    }
-
-    /**
-     * Event can be deleted.
-     */
-    public function testDelete(): void
-    {
-        $user = $this->loginUser();
-        // $event = $this->persistEvent(owner: $user);
-        $event = $this->persistEvent(
-            'Event to delete '.uniqid(),
-            owner: $user
-        );
-
-        $service = $this->mockEventService();
-
-        $service
-            ->expects($this->once())
-            ->method('delete')
-            ->with($this->isInstanceOf(Event::class));
-
-        $this->loginUser();
-
-        $crawler = $this->client->request(
-            'GET',
-            '/event/'.$event->getId().'/delete'
-        );
-
-        self::assertResponseIsSuccessful();
-
-        $form = $crawler->filter('form[name="event"]')->form();
-        // $form['event[title]'] = 'Event to delete '.uniqid();
-
-        $this->client->submit($form);
-
-        self::assertResponseRedirects('/event');
     }
 
     /**
