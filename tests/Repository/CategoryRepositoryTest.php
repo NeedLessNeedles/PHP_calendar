@@ -69,11 +69,14 @@ class CategoryRepositoryTest extends KernelTestCase
      */
     public function testSave(): void
     {
-        $title = 'Repository test category '.uniqid();
         $category = new Category();
+        $title = 'Repository test category '.uniqid();
+
         $category->setTitle($title);
         $this->categoryRepository->save($category);
+
         $this->assertNotNull($category->getId());
+
         $savedCategory = $this->categoryRepository->find($category->getId());
 
         $this->assertInstanceOf(Category::class, $savedCategory);
@@ -86,18 +89,14 @@ class CategoryRepositoryTest extends KernelTestCase
     public function testDelete(): void
     {
         $category = new Category();
-        $category->setTitle(
-            'Repository category to delete'
-        );
+        $category->setTitle('Repository category to delete '.uniqid());
 
         $this->categoryRepository->save($category);
         $categoryId = $category->getId();
         $this->assertNotNull($categoryId);
-        $this->categoryRepository->delete($category);
 
-        $deletedCategory = $this->categoryRepository->find(
-            $categoryId
-        );
+        $this->categoryRepository->delete($category);
+        $deletedCategory = $this->categoryRepository->find($categoryId);
 
         $this->assertNull($deletedCategory);
     }

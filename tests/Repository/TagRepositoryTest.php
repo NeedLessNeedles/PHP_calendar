@@ -86,9 +86,7 @@ class TagRepositoryTest extends KernelTestCase
     public function testDelete(): void
     {
         $tag = new Tag();
-        $tag->setTitle(
-            'Repository tag to delete'
-        );
+        $tag->setTitle('Repository tag to delete '.uniqid());
 
         $this->tagRepository->save($tag);
         $tagId = $tag->getId();

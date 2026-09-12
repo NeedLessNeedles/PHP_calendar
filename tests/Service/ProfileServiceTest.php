@@ -33,17 +33,9 @@ class ProfileServiceTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->userRepository = $this->createStub(
-            UserRepository::class
-        );
-
-        $this->paginator = $this->createStub(
-            PaginatorInterface::class
-        );
-
-        $this->passwordHasher = $this->createStub(
-            UserPasswordHasherInterface::class
-        );
+        $this->userRepository = $this->createStub(UserRepository::class);
+        $this->paginator = $this->createStub(PaginatorInterface::class);
+        $this->passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
 
         $this->service = new ProfileService(
             $this->userRepository,

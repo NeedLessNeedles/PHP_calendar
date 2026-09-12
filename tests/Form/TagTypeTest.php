@@ -26,6 +26,7 @@ class TagTypeTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
+
         $this->formFactory = self::getContainer()->get(FormFactoryInterface::class);
     }
 
@@ -37,6 +38,7 @@ class TagTypeTest extends KernelTestCase
         $model = new Tag();
         $form = $this->formFactory->create(TagType::class, $model);
         $form->submit(['title' => 'Music']);
+
         self::assertTrue($form->isSynchronized());
         self::assertSame('Music', $model->getTitle());
     }
@@ -47,6 +49,7 @@ class TagTypeTest extends KernelTestCase
     public function testFormHasTitleField(): void
     {
         $form = $this->formFactory->create(TagType::class);
+
         self::assertTrue($form->has('title'));
     }
 
@@ -57,6 +60,7 @@ class TagTypeTest extends KernelTestCase
     {
         $form = $this->formFactory->create(TagType::class);
         $config = $form->get('title')->getConfig();
+
         self::assertSame(TextType::class, $config->getType()->getInnerType()::class);
         self::assertTrue($config->getRequired());
         self::assertSame('label.title', $config->getOption('label'));
@@ -69,6 +73,7 @@ class TagTypeTest extends KernelTestCase
     public function testFormHasTagDataClass(): void
     {
         $form = $this->formFactory->create(TagType::class);
+
         self::assertSame(Tag::class, $form->getConfig()->getDataClass());
     }
 
@@ -81,6 +86,7 @@ class TagTypeTest extends KernelTestCase
         $resolver = new OptionsResolver();
         $type->configureOptions($resolver);
         $options = $resolver->resolve();
+
         self::assertSame(Tag::class, $options['data_class']);
     }
 
@@ -90,6 +96,7 @@ class TagTypeTest extends KernelTestCase
     public function testBlockPrefix(): void
     {
         $type = new TagType();
+
         self::assertSame('tag', $type->getBlockPrefix());
     }
 }

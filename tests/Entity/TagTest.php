@@ -59,15 +59,9 @@ class TagTest extends TestCase
         $result = $tag->addEvent($event);
 
         $this->assertSame($tag, $result);
-
         $this->assertCount(1, $tag->getEvents());
-        $this->assertTrue(
-            $tag->getEvents()->contains($event)
-        );
-
-        $this->assertTrue(
-            $event->getTags()->contains($tag)
-        );
+        $this->assertTrue($tag->getEvents()->contains($event));
+        $this->assertTrue($event->getTags()->contains($tag));
     }
 
     /**
@@ -82,10 +76,7 @@ class TagTest extends TestCase
         $tag->addEvent($event);
 
         $this->assertCount(1, $tag->getEvents());
-
-        $this->assertTrue(
-            $tag->getEvents()->contains($event)
-        );
+        $this->assertTrue($tag->getEvents()->contains($event));
     }
 
     /**
@@ -102,11 +93,7 @@ class TagTest extends TestCase
         $this->assertSame($tag, $result);
         $this->assertCount(0, $tag->getEvents());
 
-        $this->assertFalse(
-            $tag->getEvents()->contains($event)
-        );
-        $this->assertFalse(
-            $event->getTags()->contains($tag)
-        );
+        $this->assertFalse($tag->getEvents()->contains($event));
+        $this->assertFalse($event->getTags()->contains($tag));
     }
 }

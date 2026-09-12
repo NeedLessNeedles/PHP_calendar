@@ -27,7 +27,6 @@ class AdminControllerTest extends WebTestCase
     public function testIndexRequiresLogin(): void
     {
         $client = static::createClient();
-
         $client->request('GET', '/admin');
 
         $this->assertResponseRedirects();

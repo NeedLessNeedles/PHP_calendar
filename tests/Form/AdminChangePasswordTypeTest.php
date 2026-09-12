@@ -34,9 +34,7 @@ class AdminChangePasswordTypeTest extends KernelTestCase
     {
         $form = $this->formFactory->create(AdminChangePasswordType::class);
 
-        $form->submit([
-            'newPassword' => 'secret123',
-        ]);
+        $form->submit(['newPassword' => 'secret123',]);
 
         self::assertTrue($form->isSynchronized());
         self::assertSame('secret123', $form->get('newPassword')->getData());

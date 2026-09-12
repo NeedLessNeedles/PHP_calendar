@@ -30,13 +30,8 @@ class TagServiceTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->tagRepository = $this->createStub(
-            TagRepository::class
-        );
-
-        $this->paginator = $this->createStub(
-            PaginatorInterface::class
-        );
+        $this->tagRepository = $this->createStub(TagRepository::class);
+        $this->paginator = $this->createStub(PaginatorInterface::class);
 
         $this->service = new TagService(
             $this->tagRepository,
@@ -51,14 +46,8 @@ class TagServiceTest extends TestCase
     {
         $queryBuilder = $this->createStub(QueryBuilder::class);
         $pagination = $this->createStub(PaginationInterface::class);
-
-        $tagRepository = $this->createMock(
-            TagRepository::class
-        );
-
-        $paginator = $this->createMock(
-            PaginatorInterface::class
-        );
+        $tagRepository = $this->createMock(TagRepository::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
 
         $tagRepository
             ->expects($this->once())
@@ -98,10 +87,7 @@ class TagServiceTest extends TestCase
      */
     public function testSave(): void
     {
-        $tagRepository = $this->createMock(
-            TagRepository::class
-        );
-
+        $tagRepository = $this->createMock(TagRepository::class);
         $tag = new Tag();
 
         $tagRepository
@@ -124,9 +110,7 @@ class TagServiceTest extends TestCase
     {
         $tag = new Tag();
 
-        $this->assertFalse(
-            $this->service->canBeEmpty($tag)
-        );
+        $this->assertFalse($this->service->canBeEmpty($tag));
     }
 
     /**
@@ -137,9 +121,7 @@ class TagServiceTest extends TestCase
         $tag = new Tag();
         $tag->setTitle('   ');
 
-        $this->assertFalse(
-            $this->service->canBeEmpty($tag)
-        );
+        $this->assertFalse($this->service->canBeEmpty($tag));
     }
 
     /**
@@ -150,9 +132,7 @@ class TagServiceTest extends TestCase
         $tag = new Tag();
         $tag->setTitle('Music');
 
-        $this->assertTrue(
-            $this->service->canBeEmpty($tag)
-        );
+        $this->assertTrue($this->service->canBeEmpty($tag));
     }
 
     /**
@@ -163,9 +143,7 @@ class TagServiceTest extends TestCase
         $tag = new Tag();
         $tag->setTitle('   ');
 
-        $this->assertFalse(
-            $this->service->isTitleUnique($tag)
-        );
+        $this->assertFalse($this->service->isTitleUnique($tag));
     }
 
     /**
@@ -173,9 +151,7 @@ class TagServiceTest extends TestCase
      */
     public function testIsTitleUniqueReturnsTrueWhenTagDoesNotExist(): void
     {
-        $tagRepository = $this->createMock(
-            TagRepository::class
-        );
+        $tagRepository = $this->createMock(TagRepository::class);
 
         $tagRepository
             ->expects($this->once())
@@ -191,9 +167,7 @@ class TagServiceTest extends TestCase
         $tag = new Tag();
         $tag->setTitle('Music');
 
-        $this->assertTrue(
-            $this->service->isTitleUnique($tag)
-        );
+        $this->assertTrue($this->service->isTitleUnique($tag));
     }
 
     /**
@@ -201,9 +175,7 @@ class TagServiceTest extends TestCase
      */
     public function testIsTitleUniqueReturnsTrueForSameTag(): void
     {
-        $tagRepository = $this->createMock(
-            TagRepository::class
-        );
+        $tagRepository = $this->createMock(TagRepository::class);
 
         $tag = new Tag();
         $tag->setTitle('Music');
@@ -233,9 +205,7 @@ class TagServiceTest extends TestCase
      */
     public function testIsTitleUniqueReturnsFalseForAnotherTag(): void
     {
-        $tagRepository = $this->createMock(
-            TagRepository::class
-        );
+        $tagRepository = $this->createMock(TagRepository::class);
 
         $tag = new Tag();
         $tag->setTitle('Music');
@@ -261,9 +231,7 @@ class TagServiceTest extends TestCase
             $this->paginator
         );
 
-        $this->assertFalse(
-            $this->service->isTitleUnique($tag)
-        );
+        $this->assertFalse($this->service->isTitleUnique($tag));
     }
 
     /**
@@ -271,10 +239,7 @@ class TagServiceTest extends TestCase
      */
     public function testDelete(): void
     {
-        $tagRepository = $this->createMock(
-            TagRepository::class
-        );
-
+        $tagRepository = $this->createMock(TagRepository::class);
         $tag = new Tag();
 
         $tagRepository

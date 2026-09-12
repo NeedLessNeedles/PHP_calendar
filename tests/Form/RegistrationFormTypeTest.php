@@ -24,6 +24,7 @@ class RegistrationFormTypeTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
+
         $this->formFactory = self::getContainer()->get(FormFactoryInterface::class);
     }
 
@@ -35,6 +36,7 @@ class RegistrationFormTypeTest extends KernelTestCase
         $model = new User();
         $form = $this->formFactory->create(RegistrationFormType::class, $model);
         $form->submit(['email' => 'test@example.com', 'plainPassword' => 'secret123']);
+
         self::assertTrue($form->isSynchronized());
         self::assertSame('test@example.com', $model->getEmail());
     }
@@ -45,6 +47,7 @@ class RegistrationFormTypeTest extends KernelTestCase
     public function testFormHasAllFields(): void
     {
         $form = $this->formFactory->create(RegistrationFormType::class);
+
         self::assertTrue($form->has('email'));
         self::assertTrue($form->has('plainPassword'));
     }
@@ -55,6 +58,7 @@ class RegistrationFormTypeTest extends KernelTestCase
     public function testPlainPasswordIsNotMapped(): void
     {
         $form = $this->formFactory->create(RegistrationFormType::class);
+
         self::assertFalse($form->get('plainPassword')->getConfig()->getMapped());
     }
 }

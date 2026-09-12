@@ -78,16 +78,12 @@ class UserRepositoryTest extends KernelTestCase
     public function testSave(): void
     {
         $user = new User();
-        $user->setEmail(
-            'save-test-'.uniqid().'@test.com'
-        );
+        $user->setEmail('save-test-'.uniqid().'@test.com');
         $user->setPassword('password');
         $this->userRepository->save($user);
         $this->assertNotNull($user->getId());
 
-        $savedUser = $this->userRepository->find(
-            $user->getId()
-        );
+        $savedUser = $this->userRepository->find($user->getId());
         $this->assertInstanceOf(
             User::class,
             $savedUser
@@ -104,14 +100,24 @@ class UserRepositoryTest extends KernelTestCase
      */
     public function testFindAllUsers(): void
     {
-        $users = $this->userRepository->findAllUsers();
-        $this->assertIsArray($users);
+        $user = new User();
+        $user->setEmail('find-all-test-'.uniqid().'@test.com');
+        $user->setPassword('password');
 
-        foreach ($users as $user) {
-            $this->assertInstanceOf(
-                User::class,
-                $user
-            );
+        $this->userRepository->save($user);
+        $users = $this->userRepository->findAllUsers();
+
+        self::assertNotEmpty($users);
+
+        $userIds = array_map(
+            static fn (User $user): ?int => $user->getId(),
+            $users
+        );
+
+        self::assertContains($user->getId(), $userIds);
+
+        foreach ($users as $foundUser) {
+            self::assertInstanceOf(User::class, $foundUser);
         }
     }
 
@@ -122,16 +128,12 @@ class UserRepositoryTest extends KernelTestCase
     {
         $initialCount = $this->userRepository->countAdministrators();
         $admin = new User();
-        $admin->setEmail(
-            'admin-count-test-'.uniqid().'@test.com'
-        );
+        $admin->setEmail('admin-count-test-'.uniqid().'@test.com');
         $admin->setPassword('password');
         $admin->setRoles(['ROLE_ADMIN']);
 
         $user = new User();
-        $user->setEmail(
-            'user-count-test-'.uniqid().'@test.com'
-        );
+        $user->setEmail('user-count-test-'.uniqid().'@test.com');
         $user->setPassword('password');
         $user->setRoles(['ROLE_USER']);
 
@@ -154,9 +156,7 @@ class UserRepositoryTest extends KernelTestCase
         $initialCount = $this->userRepository->countAdministrators();
 
         $user = new User();
-        $user->setEmail(
-            'regular-count-test-'.uniqid().'@test.com'
-        );
+        $user->setEmail('regular-count-test-'.uniqid().'@test.com');
         $user->setPassword('password');
         $user->setRoles(['ROLE_USER']);
 
@@ -174,7 +174,6 @@ class UserRepositoryTest extends KernelTestCase
     public function testUpgradePasswordRejectsUnsupportedUser(): void
     {
         $user = $this->createStub(PasswordAuthenticatedUserInterface::class);
-
         $this->expectException(UnsupportedUserException::class);
 
         $this->userRepository->upgradePassword(

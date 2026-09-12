@@ -29,6 +29,7 @@ class EventTypeTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
+
         $this->formFactory = self::getContainer()->get(FormFactoryInterface::class);
     }
 
@@ -37,7 +38,13 @@ class EventTypeTest extends KernelTestCase
      */
     public function testSubmitValidData(): void
     {
-        $formData = ['title' => 'Test event', 'description' => 'Some description', 'location' => 'Warsaw', 'startDate' => '2025-01-01 10:00:00', 'endDate' => '2025-01-02 10:00:00'];
+        $formData = [
+            'title' => 'Test event',
+            'description' => 'Some description',
+            'location' => 'Warsaw',
+            'startDate' => '2025-01-01 10:00:00',
+            'endDate' => '2025-01-02 10:00:00',
+        ];
         $model = new Event();
         $form = $this->formFactory->create(EventType::class, $model);
         $form->submit($formData);
@@ -103,6 +110,7 @@ class EventTypeTest extends KernelTestCase
     public function testFormHasEventDataClass(): void
     {
         $form = $this->formFactory->create(EventType::class);
+
         self::assertSame(Event::class, $form->getConfig()->getDataClass());
     }
 
@@ -112,6 +120,7 @@ class EventTypeTest extends KernelTestCase
     public function testFormDefaultOptions(): void
     {
         $form = $this->formFactory->create(EventType::class);
+
         self::assertSame(Event::class, $form->getConfig()->getDataClass());
     }
 
@@ -121,6 +130,7 @@ class EventTypeTest extends KernelTestCase
     public function testBlockPrefix(): void
     {
         $type = new EventType();
+
         self::assertSame('event', $type->getBlockPrefix());
     }
 
