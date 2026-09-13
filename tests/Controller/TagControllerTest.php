@@ -10,6 +10,7 @@ use App\Entity\Tag;
 use App\Entity\User;
 use App\Service\TagServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -50,7 +51,6 @@ class TagControllerTest extends WebTestCase
     public function testNewGet(): void
     {
         $this->loginAdmin();
-
         $this->client->request('GET', '/tag/new');
 
         self::assertResponseIsSuccessful();
@@ -126,7 +126,6 @@ class TagControllerTest extends WebTestCase
     public function testEditGet(): void
     {
         $tag = $this->persistTag();
-
         $this->loginAdmin();
 
         $this->client->request(
@@ -144,7 +143,6 @@ class TagControllerTest extends WebTestCase
     public function testDeleteGet(): void
     {
         $tag = $this->persistTag();
-
         $this->loginAdmin();
 
         $this->client->request(
@@ -172,7 +170,7 @@ class TagControllerTest extends WebTestCase
     /**
      * Get tag service mock.
      *
-     * @return TagServiceInterface&\PHPUnit\Framework\MockObject\MockObject
+     * @return TagServiceInterface&MockObject
      */
     private function mockTagService(): TagServiceInterface
     {
@@ -187,37 +185,31 @@ class TagControllerTest extends WebTestCase
     }
 
     /**
-     * Get admin user.
+     * Helper for creating admin user.
      *
      * @return User admin user
      */
-    private function getAdminUser(): User
+    private function createAdmin(): User
     {
-        $users = $this->manager
-            ->getRepository(User::class)
-            ->findAll();
+        $user = new User();
+        $user->setEmail('tag-admin-'.uniqid('', true).'@test.com');
+        $user->setPassword('password');
+        $user->setRoles(['ROLE_ADMIN']);
 
-        foreach ($users as $user) {
-            if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-                return $user;
-            }
-        }
-
-        self::fail('ROLE_ADMIN user fixture is required.');
+        return $user;
     }
 
     /**
-     * Login as administrator.
-     *
-     * @return User admin user
+     * Helper for logging as administrator.
      */
-    private function loginAdmin(): User
+    private function loginAdmin(): void
     {
-        $user = $this->getAdminUser();
+        $user = $this->createAdmin();
+
+        $this->manager->persist($user);
+        $this->manager->flush();
 
         $this->client->loginUser($user);
-
-        return $user;
     }
 
     /**

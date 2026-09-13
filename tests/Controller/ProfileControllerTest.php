@@ -25,12 +25,12 @@ class ProfileControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $user = $this->getUser($client);
+        $user = $this->persistUser($client);
         $client->loginUser($user);
 
         $client->request('GET', '/profile');
 
-        $this->assertResponseIsSuccessful();
+        self::assertResponseIsSuccessful();
     }
 
     /**
@@ -40,7 +40,7 @@ class ProfileControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $user = $this->getUser($client);
+        $user = $this->persistUser($client);
         $client->loginUser($user);
 
         $client->request(
@@ -63,7 +63,6 @@ class ProfileControllerTest extends WebTestCase
             '/profile/change_password'
         );
 
-        // $this->assertResponseStatusCodeSame(403);
         $this->assertResponseRedirects('/login');
     }
 
@@ -79,7 +78,6 @@ class ProfileControllerTest extends WebTestCase
             '/profile/change_email'
         );
 
-        // $this->assertResponseStatusCodeSame(403);
         $this->assertResponseRedirects('/login');
     }
 
@@ -89,9 +87,7 @@ class ProfileControllerTest extends WebTestCase
     public function testChangePasswordInvalidForm(): void
     {
         $client = static::createClient();
-
         $profileService = $this->mockProfileService($client);
-
         $password = 'valid-password';
 
         $profileService
@@ -110,7 +106,7 @@ class ProfileControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('savePassword');
 
-        $user = $this->getUser($client);
+        $user = $this->persistUser($client);
         $client->loginUser($user);
 
         $client->request(
@@ -132,9 +128,7 @@ class ProfileControllerTest extends WebTestCase
     public function testChangeEmailInvalidForm(): void
     {
         $client = static::createClient();
-
         $profileService = $this->mockProfileService($client);
-
         $email = 'not-an-email';
 
         $profileService
@@ -152,7 +146,7 @@ class ProfileControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('saveEmail');
 
-        $user = $this->getUser($client);
+        $user = $this->persistUser($client);
         $client->loginUser($user);
 
         $client->request(
@@ -174,7 +168,6 @@ class ProfileControllerTest extends WebTestCase
     public function testChangePasswordRejectsEmptyPassword(): void
     {
         $client = static::createClient();
-
         $profileService = $this->mockProfileService($client);
 
         $profileService
@@ -191,7 +184,7 @@ class ProfileControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('savePassword');
 
-        $user = $this->getUser($client);
+        $user = $this->persistUser($client);
         $client->loginUser($user);
 
         $client->request(
@@ -216,9 +209,7 @@ class ProfileControllerTest extends WebTestCase
     public function testChangePasswordRejectsShortPassword(): void
     {
         $client = static::createClient();
-
         $profileService = $this->mockProfileService($client);
-
         $password = 'short';
 
         $profileService
@@ -237,7 +228,7 @@ class ProfileControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('savePassword');
 
-        $user = $this->getUser($client);
+        $user = $this->persistUser($client);
         $client->loginUser($user);
 
         $client->request(
@@ -263,7 +254,7 @@ class ProfileControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $user = $this->getUser($client);
+        $user = $this->persistUser($client);
         $client->loginUser($user);
 
         $client->request(
@@ -280,7 +271,6 @@ class ProfileControllerTest extends WebTestCase
     public function testChangeEmailRejectsEmptyEmail(): void
     {
         $client = static::createClient();
-
         $profileService = $this->mockProfileService($client);
 
         $profileService
@@ -297,7 +287,7 @@ class ProfileControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('saveEmail');
 
-        $user = $this->getUser($client);
+        $user = $this->persistUser($client);
         $client->loginUser($user);
 
         $client->request(
@@ -321,10 +311,8 @@ class ProfileControllerTest extends WebTestCase
     public function testChangeEmailRejectsDuplicateEmail(): void
     {
         $client = static::createClient();
-
         $profileService = $this->mockProfileService($client);
-
-        $user = $this->getUser($client);
+        $user = $this->persistUser($client);
         $email = 'duplicate@example.com';
 
         $profileService
@@ -378,48 +366,6 @@ class ProfileControllerTest extends WebTestCase
     /**
      * Helper.
      *
-     * @param KernelBrowser $client client
-     *
-     * @return User user
-     */
-    private function getUser(KernelBrowser $client): User
-    {
-        $user = $this->getEntityManager($client)
-            ->getRepository(User::class)
-            ->findOneBy([
-                'email' => 'user.first@gmail.com',
-            ]);
-
-        $this->assertInstanceOf(User::class, $user);
-
-        return $user;
-    }
-
-    /**
-     * Helper.
-     *
-     * @param KernelBrowser $client   Client
-     * @param string        $url      URL
-     * @param string        $selector Selector
-     *
-     * @return string Token
-     */
-    private function getCsrfToken(KernelBrowser $client, string $url, string $selector): string
-    {
-        $client->request('GET', $url);
-
-        $token = $client->getCrawler()
-            ->filter($selector)
-            ->attr('value');
-
-        $this->assertNotNull($token);
-
-        return $token;
-    }
-
-    /**
-     * Helper.
-     *
      * @param <string> $client Client
      *
      * @return ProfileServiceInterface&MockObject Profile service interface and Mock object
@@ -434,5 +380,37 @@ class ProfileControllerTest extends WebTestCase
         );
 
         return $service;
+    }
+
+    /**
+     * Helper for persisting the example user.
+     *
+     * @param KernelBrowser $client Client
+     *
+     * @return User user
+     */
+    private function persistUser(KernelBrowser $client): User
+    {
+        $user = $this->createUser();
+
+        $this->getEntityManager($client)->persist($user);
+        $this->getEntityManager($client)->flush();
+
+        return $user;
+    }
+
+    /**
+     * Helper for creating regular user.
+     *
+     * @return User admin user
+     */
+    private function createUser(): User
+    {
+        $user = new User();
+        $user->setEmail('profile-test-'.uniqid('', true).'@test.com');
+        $user->setPassword('password');
+        $user->setRoles(['ROLE_USER']);
+
+        return $user;
     }
 }

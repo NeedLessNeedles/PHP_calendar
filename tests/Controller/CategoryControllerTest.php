@@ -10,6 +10,7 @@ use App\Entity\Category;
 use App\Entity\User;
 use App\Service\CategoryServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -180,7 +181,7 @@ class CategoryControllerTest extends WebTestCase
     /**
      * Get category service mock.
      *
-     * @return CategoryServiceInterface&\PHPUnit\Framework\MockObject\MockObject
+     * @return CategoryServiceInterface&MockObject
      */
     private function mockCategoryService(): CategoryServiceInterface
     {
@@ -192,40 +193,6 @@ class CategoryControllerTest extends WebTestCase
         );
 
         return $service;
-    }
-
-    /**
-     * Get admin user.
-     *
-     * @return User admin user
-     */
-    private function getAdminUser(): User
-    {
-        $users = $this->manager
-            ->getRepository(User::class)
-            ->findAll();
-
-        foreach ($users as $user) {
-            if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-                return $user;
-            }
-        }
-
-        self::fail('ROLE_ADMIN user fixture is required.');
-    }
-
-    /**
-     * Login as administrator.
-     *
-     * @return User admin user
-     */
-    private function loginAdmin(): User
-    {
-        $user = $this->getAdminUser();
-
-        $this->client->loginUser($user);
-
-        return $user;
     }
 
     /**
@@ -261,5 +228,33 @@ class CategoryControllerTest extends WebTestCase
         $this->manager->flush();
 
         return $category;
+    }
+
+    /**
+     * Helper for logging as administrator.
+     */
+    private function loginAdmin(): void
+    {
+        $user = $this->createAdmin();
+
+        $this->manager->persist($user);
+        $this->manager->flush();
+
+        $this->client->loginUser($user);
+    }
+
+    /**
+     * Helper for creating admin user.
+     *
+     * @return User admin user
+     */
+    private function createAdmin(): User
+    {
+        $user = new User();
+        $user->setEmail('category-admin-'.uniqid('', true).'@test.com');
+        $user->setPassword('password');
+        $user->setRoles(['ROLE_ADMIN']);
+
+        return $user;
     }
 }
