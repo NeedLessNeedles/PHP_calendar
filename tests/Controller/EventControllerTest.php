@@ -46,8 +46,7 @@ class EventControllerTest extends WebTestCase
     public function testIndexWithFilters(): void
     {
         $service = $this->mockEventService();
-
-        $pagination = $this->createMock(PaginationInterface::class);
+        $pagination = $this->createStub(PaginationInterface::class);
 
         $service
             ->expects($this->once())
@@ -80,15 +79,15 @@ class EventControllerTest extends WebTestCase
      */
     public function testNewGet(): void
     {
-        $service = $this->mockEventService();
+        $service = $this->createStub(EventServiceInterface::class);
 
-        $service
-            ->method('getCategories')
-            ->willReturn([]);
+        $service->method('getCategories')->willReturn([]);
+        $service->method('getTags')->willReturn([]);
 
-        $service
-            ->method('getTags')
-            ->willReturn([]);
+        static::getContainer()->set(
+            EventServiceInterface::class,
+            $service
+        );
 
         $this->client->request('GET', '/event/new');
 
@@ -101,6 +100,7 @@ class EventControllerTest extends WebTestCase
     public function testNewRejectsEmptyTitle(): void
     {
         $service = $this->mockEventService();
+        $category = $this->persistCategory();
 
         $service
             ->expects($this->never())
@@ -113,10 +113,9 @@ class EventControllerTest extends WebTestCase
                 'title' => '',
                 'description' => 'Description',
                 'location' => 'Krakow',
-                'startDate' => (new \DateTime('+1 day'))
-                    ->format('Y-m-d\TH:i'),
+                'startDate' => (new \DateTime('+1 day'))->format('Y-m-d\TH:i'),
                 'endDate' => '',
-                'category' => $this->getCategoryId(),
+                'category' => $category->getId(),
                 'tags' => [],
             ],
         ]);
@@ -130,6 +129,7 @@ class EventControllerTest extends WebTestCase
     public function testNewRejectsDuplicateTitle(): void
     {
         $service = $this->mockEventService();
+        $category = $this->persistCategory();
 
         $service
             ->expects($this->once())
@@ -152,10 +152,9 @@ class EventControllerTest extends WebTestCase
                 'title' => 'Duplicate event',
                 'description' => 'Description',
                 'location' => 'Krakow',
-                'startDate' => (new \DateTime('+1 day'))
-                    ->format('Y-m-d\TH:i'),
+                'startDate' => (new \DateTime('+1 day'))->format('Y-m-d\TH:i'),
                 'endDate' => '',
-                'category' => $this->getCategoryId(),
+                'category' => $category->getId(),
                 'tags' => [],
             ],
         ]);
@@ -184,10 +183,14 @@ class EventControllerTest extends WebTestCase
      */
     public function testEditRejectsAnotherUsersEvent(): void
     {
-        $owner = $this->getUser('user.first@gmail.com');
-        $event = $this->persistEvent('Other user event', $owner);
+        $owner = $this->persistUser();
 
-        $otherUser = $this->getUser('user.second@gmail.com');
+        $event = $this->persistEvent(
+            'Other user event '.uniqid(),
+            $owner
+        );
+
+        $otherUser = $this->persistUser();
         $this->client->loginUser($otherUser);
 
         $this->client->request(
@@ -266,25 +269,7 @@ class EventControllerTest extends WebTestCase
     }
 
     /**
-     * Get existing user.
-     *
-     * @param string $email Email
-     *
-     * @return User User
-     */
-    private function getUser(string $email = 'user.first@gmail.com'): User
-    {
-        $user = $this->manager
-            ->getRepository(User::class)
-            ->findOneBy(['email' => $email]);
-
-        self::assertInstanceOf(User::class, $user);
-
-        return $user;
-    }
-
-    /**
-     * Create event fixture.
+     * Helper for creating the example event.
      *
      * The event is not persisted.
      *
@@ -304,20 +289,13 @@ class EventControllerTest extends WebTestCase
         $event->setEndDate(new \DateTime('+1 day 2 hours'));
         $event->setStatus('approved');
         $event->setOwner($owner);
-
-        $category = $this->manager
-            ->getRepository(Category::class)
-            ->findOneBy([]);
-
-        if ($category instanceof Category) {
-            $event->setCategory($category);
-        }
+        $event->setCategory($this->persistCategory());
 
         return $event;
     }
 
     /**
-     * Persist event fixture.
+     * Helper for persisting the example event.
      *
      * @param string    $title Event title
      * @param User|null $owner Owner
@@ -331,7 +309,7 @@ class EventControllerTest extends WebTestCase
         self::assertInstanceOf(
             Category::class,
             $event->getCategory(),
-            'At least one category fixture is required.'
+            'Event category cannot be empty.'
         );
 
         $this->manager->persist($event);
@@ -347,7 +325,7 @@ class EventControllerTest extends WebTestCase
      */
     private function loginUser(): User
     {
-        $user = $this->getUser();
+        $user = $this->persistUser();
 
         $this->client->loginUser($user);
 
@@ -355,32 +333,61 @@ class EventControllerTest extends WebTestCase
     }
 
     /**
-     * Get event from fixtures.
+     * Helper for creating the example category.
      *
-     * @param string $title Event title
-     *
-     * @return Event|null Event
+     * @return Category Category
      */
-    private function getEvent(string $title = 'Test event'): ?Event
+    private function createCategory(): Category
     {
-        return $this->manager
-            ->getRepository(Event::class)
-            ->findOneBy(['title' => $title]);
+        $category = new Category();
+
+        $category->setTitle('Event test category '.uniqid('', true));
+
+        return $category;
     }
 
     /**
-     * Get category ID from fixtures.
+     * Helper for persisting the example category.
      *
-     * @return int Category ID
+     * @return Category Category
      */
-    private function getCategoryId(): int
+    private function persistCategory(): Category
     {
-        $category = $this->manager
-            ->getRepository(Category::class)
-            ->findOneBy([]);
+        $category = $this->createCategory();
 
-        self::assertInstanceOf(Category::class, $category);
+        $this->manager->persist($category);
+        $this->manager->flush();
 
-        return $category->getId();
+        return $category;
+    }
+
+    /**
+     * Helper for persisting the example user.
+     *
+     * @return User user
+     */
+    private function persistUser(): User
+    {
+        $user = $this->createUser();
+
+        $this->manager->persist($user);
+        $this->manager->flush();
+
+        return $user;
+    }
+
+    /**
+     * Helper for creating regular user.
+     *
+     * @return User admin user
+     */
+    private function createUser(): User
+    {
+        $user = new User();
+        $user->setEmail('event-test-'.uniqid('', true).'@test.com');
+        $user->setPassword('password');
+        $user->setRoles(['ROLE_USER']);
+
+        return $user;
     }
 }

@@ -24,8 +24,8 @@ class ProfileControllerTest extends WebTestCase
     public function testIndex(): void
     {
         $client = static::createClient();
-
         $user = $this->persistUser($client);
+
         $client->loginUser($user);
 
         $client->request('GET', '/profile');
