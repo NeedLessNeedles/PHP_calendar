@@ -89,6 +89,83 @@ class TagControllerTest extends WebTestCase
     }
 
     /**
+     * Empty tag title is rejected while editing.
+     */
+    public function testEditRejectsEmptyTitle(): void
+    {
+        $tag = $this->persistTag();
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('isTitleUnique');
+
+        $service
+            ->expects($this->never())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $this->client->request(
+            'PUT',
+            '/tag/'.$tag->getId().'/edit',
+            [
+                'tag' => [
+                    'title' => '',
+                ],
+            ]
+        );
+
+        self::assertResponseRedirects(
+            '/tag/'.$tag->getId().'/edit'
+        );
+    }
+
+    /**
+     * Duplicate tag title is rejected while editing.
+     */
+    public function testEditRejectsDuplicateTitle(): void
+    {
+        $tag = $this->persistTag();
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $this->client->request(
+            'PUT',
+            '/tag/'.$tag->getId().'/edit',
+            [
+                'tag' => [
+                    'title' => 'Duplicate tag '.uniqid('', true),
+                ],
+            ]
+        );
+
+        self::assertResponseRedirects(
+            '/tag/'.$tag->getId().'/edit'
+        );
+    }
+
+    /**
      * Duplicate tag title is rejected.
      */
     public function testNewRejectsDuplicateTitle(): void
@@ -155,6 +232,118 @@ class TagControllerTest extends WebTestCase
     }
 
     /**
+     * Valid tag can be created.
+     */
+    public function testNewSavesValidTag(): void
+    {
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request('GET', '/tag/new');
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="tag"]')
+            ->form();
+
+        $form['tag[title]'] = 'New tag '.uniqid('', true);
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/tag');
+    }
+
+    /**
+     * Valid tag can be edited.
+     */
+    public function testEditSavesValidTag(): void
+    {
+        $tag = $this->persistTag();
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('save')
+            ->with(self::isInstanceOf(Tag::class));
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/tag/'.$tag->getId().'/edit'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="tag"]')
+            ->form();
+
+        $form['tag[title]'] = 'Updated tag '.uniqid('', true);
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/tag');
+    }
+
+    /**
+     * Tag can be deleted.
+     */
+    public function testDelete(): void
+    {
+        $tag = $this->persistTag();
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('delete')
+            ->with(self::isInstanceOf(Tag::class));
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/tag/'.$tag->getId().'/delete'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="tag"]')
+            ->form();
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/tag');
+    }
+
+    /**
      * Create client and entity manager.
      */
     protected function setUp(): void
@@ -162,6 +351,7 @@ class TagControllerTest extends WebTestCase
         parent::setUp();
 
         $this->client = static::createClient();
+        $this->client->disableReboot();
 
         $this->manager = static::getContainer()
             ->get(EntityManagerInterface::class);
