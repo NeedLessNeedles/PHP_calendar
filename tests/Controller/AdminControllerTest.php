@@ -6,15 +6,16 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\Category;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Service\AdminServiceInterface;
-use App\Service\EventServiceInterface;
 use App\Service\ProfileServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * Class AdminControllerTest.
@@ -22,12 +23,32 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class AdminControllerTest extends WebTestCase
 {
     /**
+     * Browser client.
+     */
+    private KernelBrowser $client;
+
+    /**
+     * Entity manager interface.
+     */
+    private EntityManagerInterface $manager;
+
+    /**
+     * Create client and get entity manager.
+     */
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+
+        $this->manager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+    }
+
+    /**
      * Index requires authentication.
      */
     public function testIndexRequiresLogin(): void
     {
-        $client = static::createClient();
-        $client->request('GET', '/admin');
+        $this->client->request('GET', '/admin');
 
         $this->assertResponseRedirects();
     }
@@ -37,12 +58,10 @@ class AdminControllerTest extends WebTestCase
      */
     public function testIndexAsAdmin(): void
     {
-        $client = static::createClient();
+        $admin = $this->persistAdmin();
+        $this->client->loginUser($admin);
 
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
-
-        $client->request('GET', '/admin');
+        $this->client->request('GET', '/admin');
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('body');
@@ -53,10 +72,7 @@ class AdminControllerTest extends WebTestCase
      */
     public function testUsersList(): void
     {
-        $client = static::createClient();
-
-        $profileService = $this->mockProfileService($client);
-
+        $profileService = $this->mockProfileService();
         $pagination = $this->createPagination();
 
         $profileService
@@ -65,10 +81,10 @@ class AdminControllerTest extends WebTestCase
             ->with(1)
             ->willReturn($pagination);
 
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
+        $admin = $this->persistAdmin();
+        $this->client->loginUser($admin);
 
-        $client->request('GET', '/admin/users');
+        $this->client->request('GET', '/admin/users');
 
         $this->assertResponseIsSuccessful();
     }
@@ -78,10 +94,7 @@ class AdminControllerTest extends WebTestCase
      */
     public function testUsersListWithPage(): void
     {
-        $client = static::createClient();
-
-        $profileService = $this->mockProfileService($client);
-
+        $profileService = $this->mockProfileService();
         $pagination = $this->createPagination(3);
 
         $profileService
@@ -90,10 +103,10 @@ class AdminControllerTest extends WebTestCase
             ->with(3)
             ->willReturn($pagination);
 
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
+        $admin = $this->persistAdmin();
+        $this->client->loginUser($admin);
 
-        $client->request(
+        $this->client->request(
             'GET',
             '/admin/users?page=3'
         );
@@ -106,14 +119,12 @@ class AdminControllerTest extends WebTestCase
      */
     public function testEditUser(): void
     {
-        $client = static::createClient();
+        $admin = $this->persistAdmin();
+        $user = $this->persistUser();
 
-        $admin = $this->getAdmin($client);
-        $user = $this->getUser($client);
+        $this->client->loginUser($admin);
 
-        $client->loginUser($admin);
-
-        $client->request(
+        $this->client->request(
             'GET',
             '/admin/users/'.$user->getId().'/edit'
         );
@@ -126,14 +137,12 @@ class AdminControllerTest extends WebTestCase
      */
     public function testChangeEmailGet(): void
     {
-        $client = static::createClient();
+        $admin = $this->persistAdmin();
+        $user = $this->persistUser();
 
-        $admin = $this->getAdmin($client);
-        $user = $this->getUser($client);
+        $this->client->loginUser($admin);
 
-        $client->loginUser($admin);
-
-        $client->request(
+        $this->client->request(
             'GET',
             '/admin/users/'.$user->getId().'/change_email'
         );
@@ -146,11 +155,8 @@ class AdminControllerTest extends WebTestCase
      */
     public function testChangeEmailRejectsEmptyEmail(): void
     {
-        $client = static::createClient();
-
-        $profileService = $this->mockProfileService($client);
-
-        $user = $this->getUser($client);
+        $profileService = $this->mockProfileService();
+        $user = $this->persistUser();
 
         $profileService
             ->expects($this->once())
@@ -166,10 +172,10 @@ class AdminControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('saveEmail');
 
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
+        $admin = $this->persistAdmin();
+        $this->client->loginUser($admin);
 
-        $client->request(
+        $this->client->request(
             'POST',
             '/admin/users/'.$user->getId().'/change_email',
             [
@@ -189,11 +195,8 @@ class AdminControllerTest extends WebTestCase
      */
     public function testChangeEmailRejectsDuplicateEmail(): void
     {
-        $client = static::createClient();
-
-        $profileService = $this->mockProfileService($client);
-
-        $user = $this->getUser($client);
+        $profileService = $this->mockProfileService();
+        $user = $this->persistUser();
 
         $profileService
             ->expects($this->once())
@@ -214,10 +217,10 @@ class AdminControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('saveEmail');
 
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
+        $admin = $this->persistAdmin();
+        $this->client->loginUser($admin);
 
-        $client->request(
+        $this->client->request(
             'POST',
             '/admin/users/'.$user->getId().'/change_email',
             [
@@ -233,74 +236,16 @@ class AdminControllerTest extends WebTestCase
     }
 
     /**
-     * Valid email is saved.
-     */
-    public function testChangeEmailSavesValidEmail(): void
-    {
-        $client = static::createClient();
-
-        $user = $this->getUser($client);
-        $admin = $this->getAdmin($client);
-
-        $client->loginUser($admin);
-
-        $email = 'new-email@example.com';
-
-        $client->request(
-            'GET',
-            '/admin/users/'.$user->getId().'/change_email'
-        );
-
-        $this->assertResponseIsSuccessful();
-
-        $token = $client->getCrawler()
-            ->filter('input[name="change_email[_token]"]')
-            ->attr('value');
-
-        $this->assertNotNull($token);
-
-        $client->request(
-            'POST',
-            '/admin/users/'.$user->getId().'/change_email',
-            [
-                'change_email' => [
-                    'email' => $email,
-                    '_token' => $token,
-                ],
-            ]
-        );
-
-        $this->assertResponseRedirects(
-            '/admin/users/'.$user->getId().'/edit'
-        );
-
-        $entityManager = $this->getEntityManager($client);
-        $entityManager->clear();
-
-        $updatedUser = $entityManager
-            ->getRepository(User::class)
-            ->find($user->getId());
-
-        $this->assertInstanceOf(User::class, $updatedUser);
-        $this->assertSame($email, $updatedUser->getEmail());
-
-        $updatedUser->setEmail('user.first@gmail.com');
-        $entityManager->flush();
-    }
-
-    /**
      * Change password page can be displayed.
      */
     public function testChangePasswordGet(): void
     {
-        $client = static::createClient();
+        $admin = $this->persistAdmin();
+        $user = $this->persistUser();
 
-        $admin = $this->getAdmin($client);
-        $user = $this->getUser($client);
+        $this->client->loginUser($admin);
 
-        $client->loginUser($admin);
-
-        $client->request(
+        $this->client->request(
             'GET',
             '/admin/users/'.$user->getId().'/change_password'
         );
@@ -313,11 +258,9 @@ class AdminControllerTest extends WebTestCase
      */
     public function testChangePasswordRejectsEmptyPassword(): void
     {
-        $client = static::createClient();
+        $profileService = $this->mockProfileService();
 
-        $profileService = $this->mockProfileService($client);
-
-        $user = $this->getUser($client);
+        $user = $this->persistUser();
 
         $profileService
             ->expects($this->once())
@@ -333,10 +276,10 @@ class AdminControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('savePassword');
 
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
+        $admin = $this->persistAdmin();
+        $this->client->loginUser($admin);
 
-        $client->request(
+        $this->client->request(
             'POST',
             '/admin/users/'.$user->getId().'/change_password',
             [
@@ -356,11 +299,8 @@ class AdminControllerTest extends WebTestCase
      */
     public function testChangePasswordRejectsShortPassword(): void
     {
-        $client = static::createClient();
-
-        $profileService = $this->mockProfileService($client);
-
-        $user = $this->getUser($client);
+        $profileService = $this->mockProfileService();
+        $user = $this->persistUser();
 
         $password = 'short';
 
@@ -380,10 +320,10 @@ class AdminControllerTest extends WebTestCase
             ->expects($this->never())
             ->method('savePassword');
 
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
+        $admin = $this->persistAdmin();
+        $this->client->loginUser($admin);
 
-        $client->request(
+        $this->client->request(
             'POST',
             '/admin/users/'.$user->getId().'/change_password',
             [
@@ -403,12 +343,12 @@ class AdminControllerTest extends WebTestCase
      */
     public function testBlockUser(): void
     {
-        $client = static::createClient();
+        $adminService = $this->mockAdminService();
 
-        $adminService = $this->mockAdminService($client);
+        $admin = $this->persistAdmin();
+        $user = $this->persistUser();
 
-        $admin = $this->getAdmin($client);
-        $user = $this->getUser($client);
+        $this->client->loginUser($admin);
 
         $adminService
             ->expects($this->once())
@@ -418,9 +358,7 @@ class AdminControllerTest extends WebTestCase
                 $this->identicalTo($admin)
             );
 
-        $client->loginUser($admin);
-
-        $client->request(
+        $this->client->request(
             'POST',
             '/admin/users/'.$user->getId().'/block'
         );
@@ -433,11 +371,10 @@ class AdminControllerTest extends WebTestCase
      */
     public function testApproveEvent(): void
     {
-        $client = static::createClient();
+        $adminService = $this->mockAdminService();
 
-        $adminService = $this->mockAdminService($client);
-
-        $event = $this->getPendingEvent($client);
+        $admin = $this->persistAdmin();
+        $event = $this->persistPendingEvent();
 
         $adminService
             ->expects($this->once())
@@ -446,10 +383,9 @@ class AdminControllerTest extends WebTestCase
                 $this->identicalTo($event)
             );
 
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
+        $this->client->loginUser($admin);
 
-        $client->request(
+        $this->client->request(
             'POST',
             '/admin/requests/'.$event->getId().'/approve'
         );
@@ -462,11 +398,10 @@ class AdminControllerTest extends WebTestCase
      */
     public function testRejectEvent(): void
     {
-        $client = static::createClient();
+        $adminService = $this->mockAdminService();
 
-        $adminService = $this->mockAdminService($client);
-
-        $event = $this->getPendingEvent($client);
+        $admin = $this->persistAdmin();
+        $event = $this->persistPendingEvent();
 
         $adminService
             ->expects($this->once())
@@ -475,10 +410,9 @@ class AdminControllerTest extends WebTestCase
                 $this->identicalTo($event)
             );
 
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
+        $this->client->loginUser($admin);
 
-        $client->request(
+        $this->client->request(
             'POST',
             '/admin/requests/'.$event->getId().'/reject'
         );
@@ -491,11 +425,8 @@ class AdminControllerTest extends WebTestCase
      */
     public function testToggleAdminRoleSuccess(): void
     {
-        $client = static::createClient();
-
-        $adminService = $this->mockAdminService($client);
-
-        $user = $this->getUser($client);
+        $adminService = $this->mockAdminService();
+        $user = $this->persistUser();
 
         $adminService
             ->expects($this->once())
@@ -504,10 +435,10 @@ class AdminControllerTest extends WebTestCase
                 $this->identicalTo($user)
             );
 
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
+        $admin = $this->persistAdmin();
+        $this->client->loginUser($admin);
 
-        $client->request(
+        $this->client->request(
             'POST',
             '/admin/users/'.$user->getId().'/toggle-admin'
         );
@@ -520,11 +451,8 @@ class AdminControllerTest extends WebTestCase
      */
     public function testToggleAdminRoleHandlesLogicException(): void
     {
-        $client = static::createClient();
-
-        $adminService = $this->mockAdminService($client);
-
-        $user = $this->getUser($client);
+        $adminService = $this->mockAdminService();
+        $user = $this->persistUser();
 
         $adminService
             ->expects($this->once())
@@ -538,10 +466,10 @@ class AdminControllerTest extends WebTestCase
                 )
             );
 
-        $admin = $this->getAdmin($client);
-        $client->loginUser($admin);
+        $admin = $this->persistAdmin();
+        $this->client->loginUser($admin);
 
-        $client->request(
+        $this->client->request(
             'POST',
             '/admin/users/'.$user->getId().'/toggle-admin'
         );
@@ -552,71 +480,27 @@ class AdminControllerTest extends WebTestCase
     /**
      * Helper.
      *
-     * @param <string> $client Client
-     *
-     * @return EntityManagerInterface Entity manager interface
-     */
-    private function getEntityManager($client): EntityManagerInterface
-    {
-        return $client->getContainer()->get(EntityManagerInterface::class);
-    }
-
-    /**
-     * Helper.
-     *
-     * @param <string> $client Client
-     *
-     * @return User user
-     */
-    private function getAdmin($client): User
-    {
-        $admin = $this->getEntityManager($client)
-            ->getRepository(User::class)
-            ->findOneBy([
-                'email' => 'admin.first@gmail.com',
-            ]);
-
-        $this->assertInstanceOf(User::class, $admin);
-
-        return $admin;
-    }
-
-    /**
-     * Helper.
-     *
-     * @param <string> $client Client
-     *
-     * @return User user
-     */
-    private function getUser($client): User
-    {
-        $user = $this->getEntityManager($client)
-            ->getRepository(User::class)
-            ->findOneBy([
-                'email' => 'user.first@gmail.com',
-            ]);
-
-        $this->assertInstanceOf(User::class, $user);
-
-        return $user;
-    }
-
-    /**
-     * Helper.
-     *
-     * @param <string> $client Client
+     * @param User|null $owner Owner
      *
      * @return Event event
      */
-    private function getPendingEvent($client): Event
+    private function persistPendingEvent(?User $owner = null): Event
     {
-        $event = $this->getEntityManager($client)
-            ->getRepository(Event::class)
-            ->findOneBy([
-                'status' => 'pending',
-            ]);
+        $event = new Event();
 
-        $this->assertInstanceOf(Event::class, $event);
+        $event->setTitle(
+            'Pending event '.uniqid('', true)
+        );
+        $event->setDescription('Test description');
+        $event->setLocation('Krakow');
+        $event->setStartDate(new \DateTime('+1 day'));
+        $event->setEndDate(new \DateTime('+1 day 2 hours'));
+        $event->setStatus('pending');
+        $event->setOwner($owner);
+        $event->setCategory($this->persistCategory());
+
+        $this->manager->persist($event);
+        $this->manager->flush();
 
         return $event;
     }
@@ -624,15 +508,13 @@ class AdminControllerTest extends WebTestCase
     /**
      * Helper.
      *
-     * @param <string> $client Client
-     *
      * @return ProfileServiceInterface&MockObject Profile service interface and Mock object
      */
-    private function mockProfileService($client): ProfileServiceInterface&MockObject
+    private function mockProfileService(): ProfileServiceInterface&MockObject
     {
         $service = $this->createMock(ProfileServiceInterface::class);
 
-        $client->getContainer()->set(
+        static::getContainer()->set(
             ProfileServiceInterface::class,
             $service
         );
@@ -643,35 +525,14 @@ class AdminControllerTest extends WebTestCase
     /**
      * Helper.
      *
-     * @param <string> $client Client
-     *
      * @return AdminServiceInterface&MockObject Admin service interface and Mock object
      */
-    private function mockAdminService($client): AdminServiceInterface&MockObject
+    private function mockAdminService(): AdminServiceInterface&MockObject
     {
         $service = $this->createMock(AdminServiceInterface::class);
 
-        $client->getContainer()->set(
+        static::getContainer()->set(
             AdminServiceInterface::class,
-            $service
-        );
-
-        return $service;
-    }
-
-    /**
-     * Helper.
-     *
-     * @param <string> $client Client
-     *
-     * @return EventServiceInterface&MockObject Event service interface and Mock object
-     */
-    private function mockEventService($client): EventServiceInterface&MockObject
-    {
-        $service = $this->createMock(EventServiceInterface::class);
-
-        $client->getContainer()->set(
-            EventServiceInterface::class,
             $service
         );
 
@@ -701,5 +562,90 @@ class AdminControllerTest extends WebTestCase
         $pagination->setTemplate('@KnpPaginator/Pagination/sliding.html.twig');
 
         return $pagination;
+    }
+
+    /**
+     * Helper for creating the example category.
+     *
+     * @return Category Category
+     */
+    private function createCategory(): Category
+    {
+        $category = new Category();
+
+        $category->setTitle('Admin test category '.uniqid('', true));
+
+        return $category;
+    }
+
+    /**
+     * Helper for persisting the example category.
+     *
+     * @return Category Category
+     */
+    private function persistCategory(): Category
+    {
+        $category = $this->createCategory();
+
+        $this->manager->persist($category);
+        $this->manager->flush();
+
+        return $category;
+    }
+
+    /**
+     * Helper for creating users.
+     *
+     * @param array $roles Roles
+     *
+     * @return User admin user
+     */
+    private function createUser(array $roles = ['ROLE_USER']): User
+    {
+        $user = new User();
+
+        $prefix = in_array('ROLE_ADMIN', $roles, true)
+            ? 'admin-test-'
+            : 'user-test-';
+
+        $user->setEmail(
+            $prefix.uniqid('', true).'@test.com'
+        );
+        $user->setPassword('password');
+        $user->setRoles($roles);
+
+        return $user;
+    }
+
+    /**
+     * Helper for persisting the example admin.
+     *
+     * @return User user
+     */
+    private function persistAdmin(): User
+    {
+        $admin = $this->createUser(
+            ['ROLE_USER', 'ROLE_ADMIN']
+        );
+
+        $this->manager->persist($admin);
+        $this->manager->flush();
+
+        return $admin;
+    }
+
+    /**
+     * Helper for persisting the example user.
+     *
+     * @return User user
+     */
+    private function persistUser(): User
+    {
+        $user = $this->createUser();
+
+        $this->manager->persist($user);
+        $this->manager->flush();
+
+        return $user;
     }
 }

@@ -6,13 +6,9 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\User;
-use App\Security\CustomAuthenticator;
 use App\Service\RegistrationServiceInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class RegistrationControllerTest.
