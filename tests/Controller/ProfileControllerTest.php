@@ -54,6 +54,60 @@ class ProfileControllerTest extends WebTestCase
     /**
      * Test for changing password.
      */
+    public function testChangePasswordSavesValidPassword(): void
+    {
+        $client = static::createClient();
+        $client->disableReboot();
+
+        $profileService = $this->mockProfileService($client);
+
+        $user = $this->persistUser($client);
+        $client->loginUser($user);
+
+        $password = 'valid-password';
+
+        $profileService
+            ->expects($this->once())
+            ->method('canPasswordBeEmpty')
+            ->with($password)
+            ->willReturn(true);
+
+        $profileService
+            ->expects($this->once())
+            ->method('isPasswordLongEnough')
+            ->with($password)
+            ->willReturn(true);
+
+        $profileService
+            ->expects($this->once())
+            ->method('savePassword')
+            ->with(
+                self::isInstanceOf(User::class),
+                $password
+            );
+
+        $crawler = $client->request(
+            'GET',
+            '/profile/change_password'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="change_password"]')
+            ->form();
+
+        $form['change_password[currentPassword]'] = 'current-password';
+        $form['change_password[newPassword]'] = $password;
+
+        $client->submit($form);
+
+        self::assertResponseRedirects('/profile');
+    }
+
+    /**
+     * Test for changing password.
+     */
     public function testChangePasswordRequiresLogin(): void
     {
         $client = static::createClient();
@@ -79,6 +133,59 @@ class ProfileControllerTest extends WebTestCase
         );
 
         $this->assertResponseRedirects('/login');
+    }
+
+    /**
+     * Test for changing email.
+     */
+    public function testChangeEmailSavesValidEmail(): void
+    {
+        $client = static::createClient();
+        $client->disableReboot();
+
+        $profileService = $this->mockProfileService($client);
+
+        $user = $this->persistUser($client);
+        $client->loginUser($user);
+
+        $email = 'new-email-'.uniqid('', true).'@test.com';
+
+        $profileService
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->with($email)
+            ->willReturn(true);
+
+        $profileService
+            ->expects($this->once())
+            ->method('isEmailUnique')
+            ->with(
+                self::isInstanceOf(User::class),
+                $email
+            )
+            ->willReturn(true);
+
+        $profileService
+            ->expects($this->once())
+            ->method('saveEmail')
+            ->with(
+                self::isInstanceOf(User::class),
+                $email
+            );
+
+        $crawler = $client->request('GET', '/profile/change_email');
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="change_email"]')
+            ->form();
+
+        $form['change_email[email]'] = $email;
+
+        $client->submit($form);
+
+        self::assertResponseRedirects('/profile');
     }
 
     /**
