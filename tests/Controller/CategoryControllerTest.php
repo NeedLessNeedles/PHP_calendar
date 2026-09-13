@@ -10,6 +10,7 @@ use App\Entity\Category;
 use App\Entity\User;
 use App\Service\CategoryServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -56,6 +57,45 @@ class CategoryControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('form');
+    }
+
+    /**
+     * Valid category can be created.
+     */
+    public function testNewSavesValidCategory(): void
+    {
+        $service = $this->mockCategoryService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('save')
+            ->with(self::isInstanceOf(Category::class));
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request('GET', '/category/new');
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="category"]')
+            ->form();
+
+        $form['category[title]'] = 'New category '.uniqid('', true);
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/category');
     }
 
     /**
@@ -140,6 +180,136 @@ class CategoryControllerTest extends WebTestCase
     }
 
     /**
+     * Valid category can be edited.
+     */
+    public function testEditSavesValidCategory(): void
+    {
+        $category = $this->persistCategory();
+        $service = $this->mockCategoryService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('save')
+            ->with(self::isInstanceOf(Category::class));
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/category/'.$category->getId().'/edit'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="category"]')
+            ->form();
+
+        $form['category[title]'] = 'Updated category '.uniqid('', true);
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/category');
+    }
+
+    /**
+     * Empty category title is rejected during edit.
+     */
+    public function testEditRejectsEmptyTitle(): void
+    {
+        $category = $this->persistCategory();
+        $service = $this->mockCategoryService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('isTitleUnique');
+
+        $service
+            ->expects($this->never())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/category/'.$category->getId().'/edit'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="category"]')
+            ->form();
+
+        $form['category[title]'] = '';
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects(
+            '/category/'.$category->getId().'/edit'
+        );
+    }
+
+    /**
+     * Duplicate category title is rejected during edit.
+     */
+    public function testEditRejectsDuplicateTitle(): void
+    {
+        $category = $this->persistCategory();
+        $service = $this->mockCategoryService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/category/'.$category->getId().'/edit'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="category"]')
+            ->form();
+
+        $form['category[title]'] = 'Duplicate category';
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects(
+            '/category/'.$category->getId().'/edit'
+        );
+    }
+
+    /**
      * Delete page can be displayed.
      */
     public function testDeleteGet(): void
@@ -165,6 +335,69 @@ class CategoryControllerTest extends WebTestCase
     }
 
     /**
+     * Category can be deleted.
+     */
+    public function testDelete(): void
+    {
+        $category = $this->persistCategory();
+        $service = $this->mockCategoryService();
+
+        $service
+            ->expects($this->exactly(2))
+            ->method('canBeDeleted')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('delete')
+            ->with(self::isInstanceOf(Category::class));
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/category/'.$category->getId().'/delete'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="category"]')
+            ->form();
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/category');
+    }
+
+    /**
+     * Category containing events cannot be deleted.
+     */
+    public function testDeleteRejectsNotEmptyCategory(): void
+    {
+        $category = $this->persistCategory();
+        $service = $this->mockCategoryService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeDeleted')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('delete');
+
+        $this->loginAdmin();
+
+        $this->client->request(
+            'GET',
+            '/category/'.$category->getId().'/delete'
+        );
+
+        self::assertResponseRedirects('/category');
+    }
+
+    /**
      * Create client and entity manager.
      */
     protected function setUp(): void
@@ -172,6 +405,7 @@ class CategoryControllerTest extends WebTestCase
         parent::setUp();
 
         $this->client = static::createClient();
+        $this->client->disableReboot();
 
         $this->manager = static::getContainer()
             ->get(EntityManagerInterface::class);
@@ -180,7 +414,7 @@ class CategoryControllerTest extends WebTestCase
     /**
      * Get category service mock.
      *
-     * @return CategoryServiceInterface&\PHPUnit\Framework\MockObject\MockObject
+     * @return CategoryServiceInterface&MockObject
      */
     private function mockCategoryService(): CategoryServiceInterface
     {
@@ -192,40 +426,6 @@ class CategoryControllerTest extends WebTestCase
         );
 
         return $service;
-    }
-
-    /**
-     * Get admin user.
-     *
-     * @return User admin user
-     */
-    private function getAdminUser(): User
-    {
-        $users = $this->manager
-            ->getRepository(User::class)
-            ->findAll();
-
-        foreach ($users as $user) {
-            if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-                return $user;
-            }
-        }
-
-        self::fail('ROLE_ADMIN user fixture is required.');
-    }
-
-    /**
-     * Login as administrator.
-     *
-     * @return User admin user
-     */
-    private function loginAdmin(): User
-    {
-        $user = $this->getAdminUser();
-
-        $this->client->loginUser($user);
-
-        return $user;
     }
 
     /**
@@ -261,5 +461,33 @@ class CategoryControllerTest extends WebTestCase
         $this->manager->flush();
 
         return $category;
+    }
+
+    /**
+     * Helper for logging as administrator.
+     */
+    private function loginAdmin(): void
+    {
+        $user = $this->createAdmin();
+
+        $this->manager->persist($user);
+        $this->manager->flush();
+
+        $this->client->loginUser($user);
+    }
+
+    /**
+     * Helper for creating admin user.
+     *
+     * @return User admin user
+     */
+    private function createAdmin(): User
+    {
+        $user = new User();
+        $user->setEmail('category-admin-'.uniqid('', true).'@test.com');
+        $user->setPassword('password');
+        $user->setRoles(['ROLE_ADMIN']);
+
+        return $user;
     }
 }

@@ -77,19 +77,12 @@ class SecurityControllerTest extends WebTestCase
      */
     public function testLogoutThrowsLogicException(): void
     {
-        $service = $this->createMock(
-            SecurityServiceInterface::class
+        $controller = new SecurityController(
+            $this->createStub(SecurityServiceInterface::class)
         );
 
-        $controller = new SecurityController($service);
-
-        $this->expectException(
-            \LogicException::class
-        );
-
-        $this->expectExceptionMessage(
-            'This method can be blank'
-        );
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('This method can be blank');
 
         $controller->logout();
     }

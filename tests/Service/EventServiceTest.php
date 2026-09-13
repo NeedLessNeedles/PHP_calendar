@@ -39,21 +39,10 @@ class EventServiceTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->eventRepository = $this->createStub(
-            EventRepository::class
-        );
-
-        $this->categoryRepository = $this->createStub(
-            CategoryRepository::class
-        );
-
-        $this->tagRepository = $this->createStub(
-            TagRepository::class
-        );
-
-        $this->paginator = $this->createStub(
-            PaginatorInterface::class
-        );
+        $this->eventRepository = $this->createStub(EventRepository::class);
+        $this->categoryRepository = $this->createStub(CategoryRepository::class);
+        $this->tagRepository = $this->createStub(TagRepository::class);
+        $this->paginator = $this->createStub(PaginatorInterface::class);
 
         $this->service = new EventService(
             $this->eventRepository,
@@ -71,13 +60,8 @@ class EventServiceTest extends TestCase
         $queryBuilder = $this->createStub(QueryBuilder::class);
         $pagination = $this->createStub(PaginationInterface::class);
 
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
-
-        $paginator = $this->createMock(
-            PaginatorInterface::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
 
         $eventRepository
             ->expects($this->once())
@@ -132,9 +116,7 @@ class EventServiceTest extends TestCase
             new Category(),
         ];
 
-        $categoryRepository = $this->createMock(
-            CategoryRepository::class
-        );
+        $categoryRepository = $this->createMock(CategoryRepository::class);
 
         $categoryRepository
             ->expects($this->once())
@@ -164,9 +146,7 @@ class EventServiceTest extends TestCase
             new Tag(),
         ];
 
-        $tagRepository = $this->createMock(
-            TagRepository::class
-        );
+        $tagRepository = $this->createMock(TagRepository::class);
 
         $tagRepository
             ->expects($this->once())
@@ -191,9 +171,7 @@ class EventServiceTest extends TestCase
      */
     public function testSaveWithAdminUser(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
 
         $eventRepository
             ->expects($this->once())
@@ -208,14 +186,12 @@ class EventServiceTest extends TestCase
         );
 
         $event = new Event();
-
         $user = new User();
         $user->setRoles(['ROLE_ADMIN']);
 
         $this->service->save($event, $user);
 
         $this->assertSame('approved', $event->getStatus());
-        // $this->assertSame($user, $event->getOwner());
     }
 
     /**
@@ -223,9 +199,7 @@ class EventServiceTest extends TestCase
      */
     public function testSaveWithRegularUser(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
 
         $eventRepository
             ->expects($this->once())
@@ -240,14 +214,12 @@ class EventServiceTest extends TestCase
         );
 
         $event = new Event();
-
         $user = new User();
         $user->setRoles(['ROLE_USER']);
 
         $this->service->save($event, $user);
 
         $this->assertSame('approved', $event->getStatus());
-        // $this->assertSame($user, $event->getOwner());
     }
 
     /**
@@ -255,9 +227,7 @@ class EventServiceTest extends TestCase
      */
     public function testSaveWithoutUser(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
 
         $eventRepository
             ->expects($this->once())
@@ -284,10 +254,7 @@ class EventServiceTest extends TestCase
      */
     public function testDelete(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
-
+        $eventRepository = $this->createMock(EventRepository::class);
         $event = new Event();
 
         $eventRepository
@@ -312,9 +279,7 @@ class EventServiceTest extends TestCase
     {
         $event = new Event();
 
-        $this->assertFalse(
-            $this->service->canBeEmpty($event)
-        );
+        $this->assertFalse($this->service->canBeEmpty($event));
     }
 
     /**
@@ -326,9 +291,7 @@ class EventServiceTest extends TestCase
         $event->setTitle('   ');
         $event->setStartDate(new \DateTime());
 
-        $this->assertFalse(
-            $this->service->canBeEmpty($event)
-        );
+        $this->assertFalse($this->service->canBeEmpty($event));
     }
 
     /**
@@ -339,9 +302,7 @@ class EventServiceTest extends TestCase
         $event = new Event();
         $event->setTitle('Music event');
 
-        $this->assertFalse(
-            $this->service->canBeEmpty($event)
-        );
+        $this->assertFalse($this->service->canBeEmpty($event));
     }
 
     /**
@@ -353,9 +314,7 @@ class EventServiceTest extends TestCase
         $event->setTitle('Music event');
         $event->setStartDate(new \DateTime());
 
-        $this->assertTrue(
-            $this->service->canBeEmpty($event)
-        );
+        $this->assertTrue($this->service->canBeEmpty($event));
     }
 
     /**
@@ -365,9 +324,7 @@ class EventServiceTest extends TestCase
     {
         $event = new Event();
 
-        $this->assertFalse(
-            $this->service->isTitleUnique($event)
-        );
+        $this->assertFalse($this->service->isTitleUnique($event));
     }
 
     /**
@@ -378,9 +335,7 @@ class EventServiceTest extends TestCase
         $event = new Event();
         $event->setTitle('   ');
 
-        $this->assertFalse(
-            $this->service->isTitleUnique($event)
-        );
+        $this->assertFalse($this->service->isTitleUnique($event));
     }
 
     /**
@@ -388,9 +343,7 @@ class EventServiceTest extends TestCase
      */
     public function testIsTitleUniqueReturnsTrueWhenEventDoesNotExist(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
 
         $eventRepository
             ->expects($this->once())
@@ -408,9 +361,7 @@ class EventServiceTest extends TestCase
         $event = new Event();
         $event->setTitle('Music');
 
-        $this->assertTrue(
-            $this->service->isTitleUnique($event)
-        );
+        $this->assertTrue($this->service->isTitleUnique($event));
     }
 
     /**
@@ -418,9 +369,7 @@ class EventServiceTest extends TestCase
      */
     public function testIsTitleUniqueReturnsTrueForSameEvent(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
 
         $event = new Event();
         $event->setTitle('Music');
@@ -442,9 +391,7 @@ class EventServiceTest extends TestCase
             $this->paginator
         );
 
-        $this->assertTrue(
-            $this->service->isTitleUnique($event)
-        );
+        $this->assertTrue($this->service->isTitleUnique($event));
     }
 
     /**
@@ -452,9 +399,7 @@ class EventServiceTest extends TestCase
      */
     public function testIsTitleUniqueReturnsFalseForAnotherEvent(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
 
         $event = new Event();
         $event->setTitle('Music');
@@ -482,9 +427,7 @@ class EventServiceTest extends TestCase
             $this->paginator
         );
 
-        $this->assertFalse(
-            $this->service->isTitleUnique($event)
-        );
+        $this->assertFalse($this->service->isTitleUnique($event));
     }
 
     /**
@@ -492,9 +435,7 @@ class EventServiceTest extends TestCase
      */
     public function testExportToIcsReturnsEmptyCalendar(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
 
         $eventRepository
             ->expects($this->once())
@@ -528,9 +469,7 @@ class EventServiceTest extends TestCase
      */
     public function testExportToIcsIncludesEventData(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
 
         $event = new Event();
         $event->setTitle('Concert; Rock, Roll');
@@ -583,9 +522,7 @@ class EventServiceTest extends TestCase
      */
     public function testExportToIcsHandlesMissingOptionalFields(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
 
         $event = new Event();
         $event->setTitle('Simple event');

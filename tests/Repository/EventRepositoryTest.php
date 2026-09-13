@@ -152,28 +152,27 @@ class EventRepositoryTest extends KernelTestCase
      */
     public function testSave(): void
     {
-        $category = $this->entityManager
-            ->getRepository(Category::class)
-            ->findOneBy([]);
+        $category = new Category();
+        $category->setTitle('Repository test category '.uniqid());
 
-        $this->assertInstanceOf(Category::class, $category);
+        $this->entityManager->persist($category);
+        $this->entityManager->flush();
 
         $event = new Event();
-        $event->setTitle('Repository test event');
+        $event->setTitle('Repository test event '.uniqid());
         $event->setStartDate(new \DateTime('2026-01-01'));
         $event->setCategory($category);
         $event->setStatus('approved');
 
         $this->eventRepository->save($event);
+
         $this->assertNotNull($event->getId());
 
-        $savedEvent = $this->eventRepository->find(
-            $event->getId()
-        );
+        $savedEvent = $this->eventRepository->find($event->getId());
 
         $this->assertInstanceOf(Event::class, $savedEvent);
         $this->assertSame(
-            'Repository test event',
+            $event->getTitle(),
             $savedEvent->getTitle()
         );
     }
@@ -183,14 +182,14 @@ class EventRepositoryTest extends KernelTestCase
      */
     public function testDelete(): void
     {
-        $category = $this->entityManager
-            ->getRepository(Category::class)
-            ->findOneBy([]);
+        $category = new Category();
+        $category->setTitle('Repository delete category '.uniqid());
 
-        $this->assertInstanceOf(Category::class, $category);
+        $this->entityManager->persist($category);
+        $this->entityManager->flush();
 
         $event = new Event();
-        $event->setTitle('Event to delete');
+        $event->setTitle('Event to delete '.uniqid());
         $event->setStartDate(new \DateTime('2026-01-02'));
         $event->setCategory($category);
         $event->setStatus('approved');
@@ -198,9 +197,11 @@ class EventRepositoryTest extends KernelTestCase
         $this->eventRepository->save($event);
 
         $eventId = $event->getId();
+
         $this->assertNotNull($eventId);
         $this->eventRepository->delete($event);
         $deletedEvent = $this->eventRepository->find($eventId);
+
         $this->assertNull($deletedEvent);
     }
 
@@ -209,24 +210,24 @@ class EventRepositoryTest extends KernelTestCase
      */
     public function testCountByCategory(): void
     {
-        $category = $this->entityManager
-            ->getRepository(Category::class)
-            ->findOneBy([]);
+        $category = new Category();
+        $category->setTitle('Count test category '.uniqid());
 
-        $this->assertInstanceOf(Category::class, $category);
+        $this->entityManager->persist($category);
+        $this->entityManager->flush();
 
         $initialCount = $this->eventRepository->countByCategory(
             $category
         );
 
         $event1 = new Event();
-        $event1->setTitle('Count test event 1');
+        $event1->setTitle('Count test event 1 '.uniqid());
         $event1->setStartDate(new \DateTime('2026-02-01'));
         $event1->setCategory($category);
         $event1->setStatus('approved');
 
         $event2 = new Event();
-        $event2->setTitle('Count test event 2');
+        $event2->setTitle('Count test event 2 '.uniqid());
         $event2->setStartDate(new \DateTime('2026-02-02'));
         $event2->setCategory($category);
         $event2->setStatus('approved');
@@ -238,10 +239,7 @@ class EventRepositoryTest extends KernelTestCase
             $category
         );
 
-        $this->assertSame(
-            $initialCount + 2,
-            $count
-        );
+        $this->assertSame($initialCount + 2, $count);
     }
 
     /**
@@ -288,23 +286,49 @@ class EventRepositoryTest extends KernelTestCase
      */
     public function testEventsForIcsExportSortedByStartDate(): void
     {
+        $category = new Category();
+        $category->setTitle('ICS sorting category '.uniqid());
+
+        $this->entityManager->persist($category);
+        $this->entityManager->flush();
+
+        $laterEvent = new Event();
+        $laterEvent->setTitle('ICS later event '.uniqid());
+        $laterEvent->setStartDate(new \DateTime('2026-03-10'));
+        $laterEvent->setCategory($category);
+        $laterEvent->setStatus('approved');
+
+        $earlierEvent = new Event();
+        $earlierEvent->setTitle('ICS earlier event '.uniqid());
+        $earlierEvent->setStartDate(new \DateTime('2026-03-01'));
+        $earlierEvent->setCategory($category);
+        $earlierEvent->setStatus('approved');
+
+        $this->eventRepository->save($laterEvent);
+        $this->eventRepository->save($earlierEvent);
+
         $events = $this->eventRepository->findEventsForIcsExport();
 
-        $previousDate = null;
+        self::assertNotEmpty($events);
 
-        foreach ($events as $event) {
-            $currentDate = $event->getStartDate();
+        $eventIds = array_map(
+            static fn (Event $event): ?int => $event->getId(),
+            $events
+        );
 
-            $this->assertNotNull($currentDate);
+        self::assertContains($laterEvent->getId(), $eventIds);
+        self::assertContains($earlierEvent->getId(), $eventIds);
 
-            if (null !== $previousDate) {
-                $this->assertGreaterThanOrEqual(
-                    $previousDate,
-                    $currentDate
-                );
-            }
+        $dates = array_map(
+            static fn (Event $event): \DateTimeInterface => $event->getStartDate(),
+            $events
+        );
 
-            $previousDate = $currentDate;
+        for ($i = 1, $count = count($dates); $i < $count; ++$i) {
+            self::assertGreaterThanOrEqual(
+                $dates[$i - 1],
+                $dates[$i]
+            );
         }
     }
 

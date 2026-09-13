@@ -6,7 +6,6 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\User;
 use App\Service\RegistrationServiceInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -61,64 +60,39 @@ class RegistrationControllerTest extends WebTestCase
                 'registration_form' => [
                     'email' => 'invalid-email',
                     'plainPassword' => '123',
-                    'agreeTerms' => false,
                 ],
             ]
         );
 
         self::assertResponseStatusCodeSame(422);
-
         self::assertSelectorExists('form');
     }
 
-    //    /**
-    //     * Valid user registration calls registration service.
-    //     */
-    //    public function testRegisterValidUser(): void
-    //    {
-    //        $service = $this->mockRegistrationService();
-    //
-    //        $service
-    //            ->method('canBeEmpty')
-    //            ->willReturn(true);
-    //
-    //        $service
-    //            ->expects($this->once())
-    //            ->method('registerUser')
-    //            ->with(
-    //                $this->callback(
-    //                    static function (User $user): bool {
-    //                        return 'new.user@example.com'
-    //                            === $user->getEmail();
-    //                    }
-    //                ),
-    //                'password123'
-    //            );
-    //
-    //        $crawler = $this->client->request(
-    //            'GET',
-    //            '/register'
-    //        );
-    //
-    //        self::assertResponseIsSuccessful();
-    //
-    //        $form = $crawler
-    //            ->filter('form')
-    //            ->form();
-    //
-    //        $form['registration_form[email]']
-    //            = 'registration-controller-valid-1@example.test';
-    //
-    //        $form['registration_form[plainPassword]']
-    //            = 'password123';
-    //
-    //        $this->client->submit($form);
-    //
-    //        self::assertResponseRedirects();
-    //    }
+    /**
+     * Valid registration is handled successfully.
+     */
+    public function testRegisterValidUser(): void
+    {
+        $email = 'registration-test-'.uniqid('', true).'@example.com';
+
+        $crawler = $this->client->request('GET', '/register');
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="registration_form"]')
+            ->form();
+
+        $form['registration_form[email]'] = $email;
+        $form['registration_form[plainPassword]'] = 'password123';
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/event');
+    }
 
     /**
-     * Registration with empty data is rejected by registration service.
+     * Registration with empty data is rejected.
      */
     public function testRegisterRejectsEmptyData(): void
     {

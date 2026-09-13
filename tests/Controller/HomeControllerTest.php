@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class HomeControllerTest extends WebTestCase
 {
     /**
-     * Anonymous user can view home page.
+     * Tests if nonymous user can view the home page.
      */
     public function testIndexAsAnonymous(): void
     {
@@ -27,35 +27,38 @@ class HomeControllerTest extends WebTestCase
     }
 
     /**
-     * Logged user is redirected.
+     * Tests if logged user is redirected.
      */
     public function testIndexAsLoggedUser(): void
     {
         $client = static::createClient();
-        $user = $this->getUser($client);
+
+        $manager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $user = $this->createUser();
+
+        $manager->persist($user);
+        $manager->flush();
+
         $client->loginUser($user);
+
         $client->request('GET', '/home');
 
-        $this->assertResponseRedirects();
+        self::assertResponseRedirects();
     }
 
     /**
-     * Get user.
+     * Helper for creating regular user.
      *
-     * @param <string> $client Client
-     *
-     * @return User user
+     * @return User admin user
      */
-    private function getUser($client): User
+    private function createUser(): User
     {
-        $user = $client->getContainer()
-            ->get(EntityManagerInterface::class)
-            ->getRepository(User::class)
-            ->findOneBy([
-                'email' => 'user.first@gmail.com',
-            ]);
-
-        $this->assertInstanceOf(User::class, $user);
+        $user = new User();
+        $user->setEmail('home-test-'.uniqid('', true).'@test.com');
+        $user->setPassword('password');
+        $user->setRoles(['ROLE_USER']);
 
         return $user;
     }

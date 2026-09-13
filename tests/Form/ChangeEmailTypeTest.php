@@ -43,6 +43,7 @@ class ChangeEmailTypeTest extends TypeTestCase
     {
         $form = $this->factory->create(ChangeEmailType::class);
         $config = $form->get('email')->getConfig();
+
         $this->assertEquals(EmailType::class, get_class($config->getType()->getInnerType()));
     }
 
@@ -53,6 +54,7 @@ class ChangeEmailTypeTest extends TypeTestCase
     {
         $form = $this->factory->create(ChangeEmailType::class);
         $config = $form->get('email')->getConfig();
+
         $this->assertFalse($config->getOption('mapped'));
     }
 
@@ -62,6 +64,7 @@ class ChangeEmailTypeTest extends TypeTestCase
     public function testFormHasNoDataClass(): void
     {
         $form = $this->factory->create(ChangeEmailType::class);
+
         $this->assertNull($form->getConfig()->getDataClass());
     }
 }

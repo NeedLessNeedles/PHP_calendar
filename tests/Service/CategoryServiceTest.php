@@ -33,17 +33,9 @@ class CategoryServiceTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->categoryRepository = $this->createStub(
-            CategoryRepository::class
-        );
-
-        $this->paginator = $this->createStub(
-            PaginatorInterface::class
-        );
-
-        $this->eventRepository = $this->createStub(
-            EventRepository::class
-        );
+        $this->categoryRepository = $this->createStub(CategoryRepository::class);
+        $this->paginator = $this->createStub(PaginatorInterface::class);
+        $this->eventRepository = $this->createStub(EventRepository::class);
 
         $this->service = new CategoryService(
             $this->categoryRepository,
@@ -60,13 +52,8 @@ class CategoryServiceTest extends TestCase
         $queryBuilder = $this->createStub(QueryBuilder::class);
         $pagination = $this->createStub(PaginationInterface::class);
 
-        $categoryRepository = $this->createMock(
-            CategoryRepository::class
-        );
-
-        $paginator = $this->createMock(
-            PaginatorInterface::class
-        );
+        $categoryRepository = $this->createMock(CategoryRepository::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
 
         $categoryRepository
             ->expects($this->once())
@@ -107,9 +94,7 @@ class CategoryServiceTest extends TestCase
      */
     public function testSave(): void
     {
-        $categoryRepository = $this->createMock(
-            CategoryRepository::class
-        );
+        $categoryRepository = $this->createMock(CategoryRepository::class);
 
         $categoryRepository
             ->expects($this->once())
@@ -123,7 +108,6 @@ class CategoryServiceTest extends TestCase
         );
 
         $category = new Category();
-
         $this->service->save($category);
 
         $this->assertNotNull($category->getCreatedAt());
@@ -135,9 +119,7 @@ class CategoryServiceTest extends TestCase
      */
     public function testSaveExistingCategory(): void
     {
-        $categoryRepository = $this->createMock(
-            CategoryRepository::class
-        );
+        $categoryRepository = $this->createMock(CategoryRepository::class);
 
         $categoryRepository
             ->expects($this->once())
@@ -170,14 +152,8 @@ class CategoryServiceTest extends TestCase
      */
     public function testDeleteSuccess(): void
     {
-        $categoryRepository = $this->createMock(
-            CategoryRepository::class
-        );
-
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
-
+        $categoryRepository = $this->createMock(CategoryRepository::class);
+        $eventRepository = $this->createMock(EventRepository::class);
         $category = new Category();
 
         $eventRepository
@@ -205,14 +181,8 @@ class CategoryServiceTest extends TestCase
      */
     public function testDeleteThrowsWhenUsed(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
-
-        $categoryRepository = $this->createMock(
-            CategoryRepository::class
-        );
-
+        $eventRepository = $this->createMock(EventRepository::class);
+        $categoryRepository = $this->createMock(CategoryRepository::class);
         $category = new Category();
 
         $eventRepository
@@ -246,9 +216,7 @@ class CategoryServiceTest extends TestCase
     {
         $category = new Category();
 
-        $this->assertFalse(
-            $this->service->canBeEmpty($category)
-        );
+        $this->assertFalse($this->service->canBeEmpty($category));
     }
 
     /**
@@ -259,9 +227,7 @@ class CategoryServiceTest extends TestCase
         $category = new Category();
         $category->setTitle('   ');
 
-        $this->assertFalse(
-            $this->service->canBeEmpty($category)
-        );
+        $this->assertFalse($this->service->canBeEmpty($category));
     }
 
     /**
@@ -272,9 +238,7 @@ class CategoryServiceTest extends TestCase
         $category = new Category();
         $category->setTitle('Music');
 
-        $this->assertTrue(
-            $this->service->canBeEmpty($category)
-        );
+        $this->assertTrue($this->service->canBeEmpty($category));
     }
 
     /**
@@ -285,9 +249,7 @@ class CategoryServiceTest extends TestCase
         $category = new Category();
         $category->setTitle('   ');
 
-        $this->assertFalse(
-            $this->service->isTitleUnique($category)
-        );
+        $this->assertFalse($this->service->isTitleUnique($category));
     }
 
     /**
@@ -295,9 +257,7 @@ class CategoryServiceTest extends TestCase
      */
     public function testIsTitleUniqueReturnsTrueWhenCategoryDoesNotExist(): void
     {
-        $categoryRepository = $this->createMock(
-            CategoryRepository::class
-        );
+        $categoryRepository = $this->createMock(CategoryRepository::class);
 
         $categoryRepository
             ->expects($this->once())
@@ -314,9 +274,7 @@ class CategoryServiceTest extends TestCase
         $category = new Category();
         $category->setTitle('Music');
 
-        $this->assertTrue(
-            $this->service->isTitleUnique($category)
-        );
+        $this->assertTrue($this->service->isTitleUnique($category));
     }
 
     /**
@@ -324,9 +282,7 @@ class CategoryServiceTest extends TestCase
      */
     public function testIsTitleUniqueReturnsTrueForSameCategory(): void
     {
-        $categoryRepository = $this->createMock(
-            CategoryRepository::class
-        );
+        $categoryRepository = $this->createMock(CategoryRepository::class);
 
         $category = new Category();
         $category->setTitle('Music');
@@ -347,9 +303,7 @@ class CategoryServiceTest extends TestCase
             $this->eventRepository
         );
 
-        $this->assertTrue(
-            $this->service->isTitleUnique($category)
-        );
+        $this->assertTrue($this->service->isTitleUnique($category));
     }
 
     /**
@@ -357,9 +311,7 @@ class CategoryServiceTest extends TestCase
      */
     public function testIsTitleUniqueReturnsFalseForAnotherCategory(): void
     {
-        $categoryRepository = $this->createMock(
-            CategoryRepository::class
-        );
+        $categoryRepository = $this->createMock(CategoryRepository::class);
 
         $category = new Category();
         $category->setTitle('Music');
@@ -386,9 +338,7 @@ class CategoryServiceTest extends TestCase
             $this->eventRepository
         );
 
-        $this->assertFalse(
-            $this->service->isTitleUnique($category)
-        );
+        $this->assertFalse($this->service->isTitleUnique($category));
     }
 
     /**
@@ -396,10 +346,7 @@ class CategoryServiceTest extends TestCase
      */
     public function testCanBeDeletedReturnsTrueWhenCategoryIsUnused(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
-
+        $eventRepository = $this->createMock(EventRepository::class);
         $category = new Category();
 
         $eventRepository
@@ -414,9 +361,7 @@ class CategoryServiceTest extends TestCase
             $eventRepository
         );
 
-        $this->assertTrue(
-            $this->service->canBeDeleted($category)
-        );
+        $this->assertTrue($this->service->canBeDeleted($category));
     }
 
     /**
@@ -424,10 +369,7 @@ class CategoryServiceTest extends TestCase
      */
     public function testCanBeDeletedReturnsFalseWhenCategoryIsUsed(): void
     {
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
-
+        $eventRepository = $this->createMock(EventRepository::class);
         $category = new Category();
 
         $eventRepository
@@ -442,8 +384,6 @@ class CategoryServiceTest extends TestCase
             $eventRepository
         );
 
-        $this->assertFalse(
-            $this->service->canBeDeleted($category)
-        );
+        $this->assertFalse($this->service->canBeDeleted($category));
     }
 }

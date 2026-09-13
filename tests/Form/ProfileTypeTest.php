@@ -24,6 +24,7 @@ class ProfileTypeTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
+
         $this->formFactory = self::getContainer()->get(FormFactoryInterface::class);
     }
 
@@ -35,6 +36,7 @@ class ProfileTypeTest extends KernelTestCase
         $user = new User();
         $form = $this->formFactory->create(ProfileType::class, $user);
         $form->submit(['email' => 'test@example.com']);
+
         self::assertTrue($form->isSynchronized());
         self::assertSame('test@example.com', $user->getEmail());
     }
@@ -45,6 +47,7 @@ class ProfileTypeTest extends KernelTestCase
     public function testFormHasEmailField(): void
     {
         $form = $this->formFactory->create(ProfileType::class);
+
         self::assertTrue($form->has('email'));
     }
 
@@ -54,6 +57,7 @@ class ProfileTypeTest extends KernelTestCase
     public function testFormDataClassIsUser(): void
     {
         $form = $this->formFactory->create(ProfileType::class);
+
         self::assertSame(User::class, $form->getConfig()->getDataClass());
     }
 }

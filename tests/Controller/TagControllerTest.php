@@ -10,6 +10,7 @@ use App\Entity\Tag;
 use App\Entity\User;
 use App\Service\TagServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -50,7 +51,6 @@ class TagControllerTest extends WebTestCase
     public function testNewGet(): void
     {
         $this->loginAdmin();
-
         $this->client->request('GET', '/tag/new');
 
         self::assertResponseIsSuccessful();
@@ -86,6 +86,83 @@ class TagControllerTest extends WebTestCase
         ]);
 
         self::assertResponseRedirects('/tag/new');
+    }
+
+    /**
+     * Empty tag title is rejected while editing.
+     */
+    public function testEditRejectsEmptyTitle(): void
+    {
+        $tag = $this->persistTag();
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('isTitleUnique');
+
+        $service
+            ->expects($this->never())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $this->client->request(
+            'PUT',
+            '/tag/'.$tag->getId().'/edit',
+            [
+                'tag' => [
+                    'title' => '',
+                ],
+            ]
+        );
+
+        self::assertResponseRedirects(
+            '/tag/'.$tag->getId().'/edit'
+        );
+    }
+
+    /**
+     * Duplicate tag title is rejected while editing.
+     */
+    public function testEditRejectsDuplicateTitle(): void
+    {
+        $tag = $this->persistTag();
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(false);
+
+        $service
+            ->expects($this->never())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $this->client->request(
+            'PUT',
+            '/tag/'.$tag->getId().'/edit',
+            [
+                'tag' => [
+                    'title' => 'Duplicate tag '.uniqid('', true),
+                ],
+            ]
+        );
+
+        self::assertResponseRedirects(
+            '/tag/'.$tag->getId().'/edit'
+        );
     }
 
     /**
@@ -126,7 +203,6 @@ class TagControllerTest extends WebTestCase
     public function testEditGet(): void
     {
         $tag = $this->persistTag();
-
         $this->loginAdmin();
 
         $this->client->request(
@@ -144,7 +220,6 @@ class TagControllerTest extends WebTestCase
     public function testDeleteGet(): void
     {
         $tag = $this->persistTag();
-
         $this->loginAdmin();
 
         $this->client->request(
@@ -157,6 +232,118 @@ class TagControllerTest extends WebTestCase
     }
 
     /**
+     * Valid tag can be created.
+     */
+    public function testNewSavesValidTag(): void
+    {
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('save');
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request('GET', '/tag/new');
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="tag"]')
+            ->form();
+
+        $form['tag[title]'] = 'New tag '.uniqid('', true);
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/tag');
+    }
+
+    /**
+     * Valid tag can be edited.
+     */
+    public function testEditSavesValidTag(): void
+    {
+        $tag = $this->persistTag();
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('canBeEmpty')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('isTitleUnique')
+            ->willReturn(true);
+
+        $service
+            ->expects($this->once())
+            ->method('save')
+            ->with(self::isInstanceOf(Tag::class));
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/tag/'.$tag->getId().'/edit'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="tag"]')
+            ->form();
+
+        $form['tag[title]'] = 'Updated tag '.uniqid('', true);
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/tag');
+    }
+
+    /**
+     * Tag can be deleted.
+     */
+    public function testDelete(): void
+    {
+        $tag = $this->persistTag();
+        $service = $this->mockTagService();
+
+        $service
+            ->expects($this->once())
+            ->method('delete')
+            ->with(self::isInstanceOf(Tag::class));
+
+        $this->loginAdmin();
+
+        $crawler = $this->client->request(
+            'GET',
+            '/tag/'.$tag->getId().'/delete'
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler
+            ->filter('form[name="tag"]')
+            ->form();
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/tag');
+    }
+
+    /**
      * Create client and entity manager.
      */
     protected function setUp(): void
@@ -164,6 +351,7 @@ class TagControllerTest extends WebTestCase
         parent::setUp();
 
         $this->client = static::createClient();
+        $this->client->disableReboot();
 
         $this->manager = static::getContainer()
             ->get(EntityManagerInterface::class);
@@ -172,7 +360,7 @@ class TagControllerTest extends WebTestCase
     /**
      * Get tag service mock.
      *
-     * @return TagServiceInterface&\PHPUnit\Framework\MockObject\MockObject
+     * @return TagServiceInterface&MockObject
      */
     private function mockTagService(): TagServiceInterface
     {
@@ -187,37 +375,31 @@ class TagControllerTest extends WebTestCase
     }
 
     /**
-     * Get admin user.
+     * Helper for creating admin user.
      *
      * @return User admin user
      */
-    private function getAdminUser(): User
+    private function createAdmin(): User
     {
-        $users = $this->manager
-            ->getRepository(User::class)
-            ->findAll();
+        $user = new User();
+        $user->setEmail('tag-admin-'.uniqid('', true).'@test.com');
+        $user->setPassword('password');
+        $user->setRoles(['ROLE_ADMIN']);
 
-        foreach ($users as $user) {
-            if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-                return $user;
-            }
-        }
-
-        self::fail('ROLE_ADMIN user fixture is required.');
+        return $user;
     }
 
     /**
-     * Login as administrator.
-     *
-     * @return User admin user
+     * Helper for logging as administrator.
      */
-    private function loginAdmin(): User
+    private function loginAdmin(): void
     {
-        $user = $this->getAdminUser();
+        $user = $this->createAdmin();
+
+        $this->manager->persist($user);
+        $this->manager->flush();
 
         $this->client->loginUser($user);
-
-        return $user;
     }
 
     /**

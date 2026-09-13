@@ -37,18 +37,10 @@ class AdminServiceTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->userRepository = $this->createStub(
-            UserRepository::class
-        );
-        $this->eventRepository = $this->createStub(
-            EventRepository::class
-        );
-        $this->passwordHasher = $this->createStub(
-            UserPasswordHasherInterface::class
-        );
-        $this->paginator = $this->createStub(
-            PaginatorInterface::class
-        );
+        $this->userRepository = $this->createStub(UserRepository::class);
+        $this->eventRepository = $this->createStub(EventRepository::class);
+        $this->passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
+        $this->paginator = $this->createStub(PaginatorInterface::class);
 
         $this->service = new AdminService(
             $this->passwordHasher,
@@ -65,9 +57,7 @@ class AdminServiceTest extends TestCase
     {
         $user = new User();
 
-        $passwordHasher = $this->createMock(
-            UserPasswordHasherInterface::class
-        );
+        $passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
 
         $passwordHasher
             ->expects($this->once())
@@ -101,9 +91,7 @@ class AdminServiceTest extends TestCase
         $event = new Event();
         $event->setStatus('pending');
 
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
 
         $eventRepository
             ->expects($this->once())
@@ -131,10 +119,7 @@ class AdminServiceTest extends TestCase
     public function testRejectEvent(): void
     {
         $event = new Event();
-
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
 
         $eventRepository
             ->expects($this->once())
@@ -157,12 +142,9 @@ class AdminServiceTest extends TestCase
     public function testToggleBlockThrowsWhenBlockingSelf(): void
     {
         $user = new User();
-
         $this->setUserId($user, 1);
 
-        $this->expectException(
-            \LogicException::class
-        );
+        $this->expectException(\LogicException::class);
 
         $this->expectExceptionMessage(
             'You cannot block yourself.'
@@ -214,9 +196,7 @@ class AdminServiceTest extends TestCase
         $this->setUserId($targetUser, 1);
         $this->setUserId($currentUser, 2);
 
-        $userRepository = $this->createMock(
-            UserRepository::class
-        );
+        $userRepository = $this->createMock(UserRepository::class);
 
         $userRepository
             ->expects($this->once())
@@ -235,9 +215,7 @@ class AdminServiceTest extends TestCase
             $currentUser
         );
 
-        $this->assertTrue(
-            $targetUser->isBlocked()
-        );
+        $this->assertTrue($targetUser->isBlocked());
     }
 
     /**
@@ -253,9 +231,7 @@ class AdminServiceTest extends TestCase
         $this->setUserId($targetUser, 1);
         $this->setUserId($currentUser, 2);
 
-        $userRepository = $this->createMock(
-            UserRepository::class
-        );
+        $userRepository = $this->createMock(UserRepository::class);
 
         $userRepository
             ->expects($this->once())
@@ -274,9 +250,7 @@ class AdminServiceTest extends TestCase
             $currentUser
         );
 
-        $this->assertFalse(
-            $targetUser->isBlocked()
-        );
+        $this->assertFalse($targetUser->isBlocked());
     }
 
     /**
@@ -337,9 +311,7 @@ class AdminServiceTest extends TestCase
         $userTwo = new User();
         $userTwo->setRoles(['ROLE_USER']);
 
-        $userRepository = $this->createMock(
-            UserRepository::class
-        );
+        $userRepository = $this->createMock(UserRepository::class);
 
         $userRepository
             ->expects($this->once())
@@ -370,9 +342,7 @@ class AdminServiceTest extends TestCase
         $user = new User();
         $user->setRoles(['ROLE_USER']);
 
-        $userRepository = $this->createMock(
-            UserRepository::class
-        );
+        $userRepository = $this->createMock(UserRepository::class);
 
         $userRepository
             ->expects($this->once())
@@ -405,9 +375,7 @@ class AdminServiceTest extends TestCase
             'ROLE_ADMIN',
         ]);
 
-        $userRepository = $this->createMock(
-            UserRepository::class
-        );
+        $userRepository = $this->createMock(UserRepository::class);
 
         $userRepository
             ->expects($this->once())
@@ -445,12 +413,8 @@ class AdminServiceTest extends TestCase
     public function testToggleAdminRoleThrowsForLastAdmin(): void
     {
         $user = new User();
-        $user->setRoles([
-            'ROLE_ADMIN',
-        ]);
-        $userRepository = $this->createMock(
-            UserRepository::class
-        );
+        $user->setRoles(['ROLE_ADMIN']);
+        $userRepository = $this->createMock(UserRepository::class);
         $userRepository
             ->expects($this->once())
             ->method('countAdministrators')
@@ -482,9 +446,7 @@ class AdminServiceTest extends TestCase
         $queryBuilder = $this->createStub(QueryBuilder::class);
         $pagination = $this->createStub(PaginationInterface::class);
 
-        $eventRepository = $this->createMock(
-            EventRepository::class
-        );
+        $eventRepository = $this->createMock(EventRepository::class);
 
         $eventRepository
             ->expects($this->once())

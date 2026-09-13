@@ -34,6 +34,7 @@ class ChangePasswordTypeTest extends KernelTestCase
     {
         $form = $this->formFactory->create(ChangePasswordType::class);
         $form->submit(['currentPassword' => 'oldpass123', 'newPassword' => 'newpass123']);
+
         self::assertTrue($form->isSynchronized());
         self::assertSame('oldpass123', $form->get('currentPassword')->getData());
         self::assertSame('newpass123', $form->get('newPassword')->getData());
@@ -45,6 +46,7 @@ class ChangePasswordTypeTest extends KernelTestCase
     public function testFormHasExpectedFields(): void
     {
         $form = $this->formFactory->create(ChangePasswordType::class);
+
         self::assertTrue($form->has('currentPassword'));
         self::assertTrue($form->has('newPassword'));
     }
@@ -56,6 +58,7 @@ class ChangePasswordTypeTest extends KernelTestCase
     {
         $form = $this->formFactory->create(ChangePasswordType::class);
         $config = $form->get('currentPassword')->getConfig();
+
         self::assertSame(PasswordType::class, $config->getType()->getInnerType()::class);
         self::assertFalse($config->getOption('mapped'));
     }
@@ -67,6 +70,7 @@ class ChangePasswordTypeTest extends KernelTestCase
     {
         $form = $this->formFactory->create(ChangePasswordType::class);
         $config = $form->get('newPassword')->getConfig();
+
         self::assertSame(PasswordType::class, $config->getType()->getInnerType()::class);
         self::assertFalse($config->getOption('mapped'));
     }
@@ -77,6 +81,7 @@ class ChangePasswordTypeTest extends KernelTestCase
     public function testFormHasNoDataClass(): void
     {
         $form = $this->formFactory->create(ChangePasswordType::class);
+
         self::assertNull($form->getConfig()->getDataClass());
     }
 }

@@ -112,7 +112,6 @@ class EventTest extends TestCase
     public function testEndDateCanBeNull(): void
     {
         $event = new Event();
-
         $event->setEndDate(null);
 
         $this->assertNull($event->getEndDate());
